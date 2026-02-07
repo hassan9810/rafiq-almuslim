@@ -1,0 +1,500 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Islamic Design System - Rafiq Al-Muslim */
+@import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Noto+Sans+Arabic:wght@400;500;600;700&family=Noto+Sans:wght@400;500;600;700&display=swap');
+
+/* QPC Hafs Uthmani Font for Quran Text */
+@font-face {
+  font-family: 'QPC Hafs';
+  src: url('https://fonts.qurancdn.com/fonts/hafs/UthmanicHafs_v22.woff2') format('woff2'),
+       url('https://cdn.jsdelivr.net/gh/nicekiwi/Quran-Fonts@main/UthmanicHafs.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Surah Header Decorative Font */
+@font-face {
+  font-family: 'Surah Names';
+  src: url('https://fonts.qurancdn.com/fonts/surah_names/surah_names.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@layer base {
+  :root {
+    /* Emerald Green - Primary Islamic Color */
+    --primary: 158 64% 28%;
+    --primary-foreground: 45 100% 96%;
+    
+    /* Gold Accent - Spiritual Warmth */
+    --accent: 43 74% 49%;
+    --accent-foreground: 30 20% 10%;
+    
+    /* Parchment Background */
+    --background: 45 30% 97%;
+    --foreground: 30 20% 15%;
+    
+    /* Cards - Warm Cream */
+    --card: 45 40% 98%;
+    --card-foreground: 30 20% 15%;
+    
+    --popover: 45 40% 98%;
+    --popover-foreground: 30 20% 15%;
+    
+    /* Secondary - Muted Green */
+    --secondary: 158 20% 92%;
+    --secondary-foreground: 158 64% 25%;
+    
+    /* Muted - Subtle Tones */
+    --muted: 45 15% 90%;
+    --muted-foreground: 30 10% 45%;
+    
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    
+    --border: 45 20% 88%;
+    --input: 45 20% 88%;
+    --ring: 158 64% 35%;
+    
+    --radius: 0.75rem;
+    
+    /* Custom Islamic Colors */
+    --emerald-deep: 158 64% 22%;
+    --emerald-light: 158 50% 45%;
+    --gold-bright: 43 90% 55%;
+    --gold-muted: 43 50% 75%;
+    --parchment: 45 45% 95%;
+    --ink: 30 25% 12%;
+    
+    /* Gradients */
+    --gradient-hero: linear-gradient(135deg, hsl(158 64% 28%) 0%, hsl(158 45% 35%) 50%, hsl(43 74% 49%) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(45 40% 99%) 0%, hsl(45 30% 96%) 100%);
+    --gradient-gold: linear-gradient(135deg, hsl(43 74% 49%) 0%, hsl(43 90% 55%) 100%);
+    
+    /* Shadows */
+    --shadow-soft: 0 4px 20px -4px hsl(30 20% 15% / 0.08);
+    --shadow-card: 0 8px 32px -8px hsl(158 64% 28% / 0.12);
+    --shadow-glow: 0 0 40px hsl(43 74% 49% / 0.2);
+    
+    /* Sidebar */
+    --sidebar-background: 158 64% 12%;
+    --sidebar-foreground: 45 30% 95%;
+    --sidebar-primary: 43 74% 49%;
+    --sidebar-primary-foreground: 30 20% 10%;
+    --sidebar-accent: 158 50% 18%;
+    --sidebar-accent-foreground: 45 30% 95%;
+    --sidebar-border: 158 40% 20%;
+    --sidebar-ring: 43 74% 49%;
+  }
+
+  .dark {
+    /* Dark Mode - Rich Night Green */
+    --primary: 158 55% 45%;
+    --primary-foreground: 158 64% 8%;
+    
+    --accent: 43 80% 55%;
+    --accent-foreground: 30 20% 10%;
+    
+    --background: 158 30% 8%;
+    --foreground: 45 20% 92%;
+    
+    --card: 158 25% 12%;
+    --card-foreground: 45 20% 92%;
+    
+    --popover: 158 25% 12%;
+    --popover-foreground: 45 20% 92%;
+    
+    --secondary: 158 25% 18%;
+    --secondary-foreground: 45 20% 90%;
+    
+    --muted: 158 20% 18%;
+    --muted-foreground: 45 15% 60%;
+    
+    --destructive: 0 62% 50%;
+    --destructive-foreground: 0 0% 100%;
+    
+    --border: 158 20% 20%;
+    --input: 158 20% 20%;
+    --ring: 43 80% 55%;
+    
+    --emerald-deep: 158 50% 35%;
+    --emerald-light: 158 45% 55%;
+    --gold-bright: 43 85% 60%;
+    --gold-muted: 43 40% 40%;
+    --parchment: 158 20% 14%;
+    --ink: 45 20% 92%;
+    
+    --gradient-hero: linear-gradient(135deg, hsl(158 30% 10%) 0%, hsl(158 25% 15%) 50%, hsl(158 40% 20%) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(158 25% 13%) 0%, hsl(158 25% 11%) 100%);
+    
+    --shadow-soft: 0 4px 20px -4px hsl(0 0% 0% / 0.3);
+    --shadow-card: 0 8px 32px -8px hsl(0 0% 0% / 0.4);
+    --shadow-glow: 0 0 40px hsl(43 80% 55% / 0.15);
+    
+    --sidebar-background: 158 30% 6%;
+    --sidebar-foreground: 45 20% 92%;
+    --sidebar-primary: 43 80% 55%;
+    --sidebar-primary-foreground: 30 20% 10%;
+    --sidebar-accent: 158 25% 12%;
+    --sidebar-accent-foreground: 45 20% 92%;
+    --sidebar-border: 158 25% 15%;
+    --sidebar-ring: 43 80% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Noto Sans', 'Noto Sans Arabic', sans-serif;
+  }
+  
+  /* Arabic Text Styling */
+  .arabic-text {
+    font-family: 'Amiri', 'Noto Sans Arabic', serif;
+    font-size: 1.75rem;
+    line-height: 2.5;
+    direction: rtl;
+    text-align: right;
+  }
+  
+  .arabic-quran {
+    font-family: 'QPC Hafs', 'Amiri', serif;
+    font-size: 2rem;
+    line-height: 2.8;
+    letter-spacing: 0.02em;
+  }
+  
+  /* Uthmani Quran Text with proper ligatures */
+  .uthmani-text {
+    font-family: 'QPC Hafs', 'Amiri', serif;
+    font-size: 1.75rem;
+    line-height: 2.5;
+    direction: rtl;
+    text-align: right;
+    font-feature-settings: "liga" 1, "calt" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  .surah-header-text {
+    font-family: 'Surah Names', 'Amiri', serif;
+  }
+  
+  /* RTL Support */
+  [dir="rtl"] {
+    font-family: 'Noto Sans Arabic', 'Noto Sans', sans-serif;
+  }
+  
+  /* Scrollbar Styling */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    @apply bg-muted/50;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-primary/30 rounded-full;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-primary/50;
+  }
+}
+
+@layer components {
+  /* Islamic Pattern Background */
+  .islamic-pattern {
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0L60 30L30 60L0 30z' fill='none' stroke='%23ffffff' stroke-opacity='0.05' stroke-width='1'/%3E%3C/svg%3E");
+  }
+  
+  /* Hero Gradient */
+  .hero-gradient {
+    background: var(--gradient-hero);
+  }
+  
+  /* Gold Shimmer Effect */
+  .gold-shimmer {
+    background: linear-gradient(
+      90deg,
+      hsl(var(--accent)) 0%,
+      hsl(43 90% 65%) 50%,
+      hsl(var(--accent)) 100%
+    );
+    background-size: 200% auto;
+    animation: shimmer 3s ease-in-out infinite;
+  }
+  
+  @keyframes shimmer {
+    0%, 100% { background-position: 0% center; }
+    50% { background-position: 200% center; }
+  }
+  
+  /* Floating Animation */
+  .float-animation {
+    animation: float 6s ease-in-out infinite;
+  }
+  
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+  
+  /* Pulse Glow */
+  .pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+  
+  @keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 20px hsl(43 74% 49% / 0.3); }
+    50% { box-shadow: 0 0 40px hsl(43 74% 49% / 0.5); }
+  }
+  
+  /* Surah Card Hover */
+  .surah-card {
+    @apply transition-all duration-300 ease-out;
+  }
+  
+  .surah-card:hover {
+    @apply -translate-y-1;
+    box-shadow: var(--shadow-card);
+  }
+  
+  /* Prayer Time Card */
+  .prayer-card {
+    @apply relative overflow-hidden;
+  }
+  
+  .prayer-card::before {
+    content: '';
+    @apply absolute inset-0 opacity-0 transition-opacity duration-300;
+    background: var(--gradient-gold);
+  }
+  
+  .prayer-card.active::before {
+    @apply opacity-10;
+  }
+  
+  /* Ayah Highlight */
+  .ayah-highlight {
+    @apply relative;
+  }
+  
+  .ayah-highlight::after {
+    content: '';
+    @apply absolute inset-0 rounded-lg opacity-0 transition-opacity duration-300;
+    background: hsl(var(--accent) / 0.1);
+  }
+  
+  .ayah-highlight:hover::after,
+  .ayah-highlight.playing::after {
+    @apply opacity-100;
+  }
+  
+  /* Mushaf Page Styling */
+  .mushaf-page {
+    @apply relative;
+    background: linear-gradient(135deg, 
+      hsl(45 45% 97%) 0%, 
+      hsl(45 40% 95%) 50%, 
+      hsl(45 35% 93%) 100%
+    );
+    box-shadow: 
+      inset 0 0 60px hsl(30 20% 80% / 0.3),
+      0 4px 20px hsl(30 20% 15% / 0.1);
+    color: hsl(30 25% 12%);
+  }
+  
+  .dark .mushaf-page,
+  .dark-mushaf-page {
+    background: linear-gradient(135deg, 
+      hsl(30 15% 12%) 0%, 
+      hsl(30 12% 10%) 50%, 
+      hsl(30 10% 8%) 100%
+    );
+    box-shadow: 
+      inset 0 0 60px hsl(30 20% 5% / 0.5),
+      0 4px 20px hsl(0 0% 0% / 0.3);
+    color: hsl(45 30% 90%) !important;
+  }
+  
+  .dark-mushaf-page .ayah-number {
+    background: linear-gradient(135deg, 
+      hsl(0 40% 45%) 0%, 
+      hsl(0 35% 40%) 100%
+    );
+  }
+  
+  .dark-mushaf-page .text-muted-foreground {
+    color: hsl(45 20% 70%);
+  }
+  
+  .dark-mushaf-page .text-primary {
+    color: hsl(158 55% 50%);
+  }
+  
+  /* Mushaf Paper Texture */
+  .mushaf-texture {
+    background-image: 
+      url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    opacity: 0.03;
+  }
+  
+  /* Page Flip Animation */
+  .page-flip-enter {
+    animation: pageFlipIn 0.5s ease-out forwards;
+  }
+  
+  .page-flip-exit {
+    animation: pageFlipOut 0.5s ease-in forwards;
+  }
+  
+  @keyframes pageFlipIn {
+    0% {
+      transform: rotateY(-90deg);
+      transform-origin: left center;
+      opacity: 0;
+    }
+    100% {
+      transform: rotateY(0);
+      opacity: 1;
+    }
+  }
+  
+  @keyframes pageFlipOut {
+    0% {
+      transform: rotateY(0);
+      opacity: 1;
+    }
+    100% {
+      transform: rotateY(90deg);
+      transform-origin: right center;
+      opacity: 0;
+    }
+  }
+  
+  /* Bismillah Golden Style */
+  .bismillah-golden {
+    background: linear-gradient(135deg, 
+      hsl(43 74% 45%) 0%, 
+      hsl(43 90% 60%) 50%, 
+      hsl(43 74% 45%) 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 2px 4px hsl(43 74% 49% / 0.3));
+  }
+  
+  /* Ayah Number Circle */
+  .ayah-number {
+    @apply inline-flex items-center justify-center;
+    width: 2em;
+    height: 2em;
+    border-radius: 50%;
+    background: linear-gradient(135deg, 
+      hsl(0 50% 35%) 0%, 
+      hsl(0 45% 30%) 100%
+    );
+    color: hsl(45 100% 96%);
+    font-size: 0.6em;
+    font-family: 'Noto Sans Arabic', sans-serif;
+    vertical-align: middle;
+    margin: 0 0.25em;
+  }
+  
+  /* Sajda Marker */
+  .sajda-marker {
+    @apply inline-flex items-center justify-center;
+    color: hsl(0 72% 51%);
+    font-size: 1.2em;
+  }
+  
+  /* Juz/Hizb Marker */
+  .juz-marker {
+    @apply inline-flex items-center justify-center;
+    color: hsl(43 74% 49%);
+    font-size: 1em;
+  }
+}
+
+@layer utilities {
+  /* Text Gradient */
+  .text-gradient-gold {
+    @apply bg-clip-text text-transparent;
+    background-image: var(--gradient-gold);
+  }
+  
+  .text-gradient-emerald {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--emerald-light)) 100%);
+  }
+  
+  /* Glass Effect */
+  .glass {
+    @apply backdrop-blur-md;
+    background: hsl(var(--background) / 0.8);
+  }
+  
+  .glass-dark {
+    @apply backdrop-blur-md;
+    background: hsl(var(--sidebar-background) / 0.9);
+  }
+  
+  /* Mushaf specific utilities */
+  .mushaf-shadow {
+    box-shadow: 
+      0 10px 40px -10px hsl(30 20% 15% / 0.15),
+      0 0 0 1px hsl(30 20% 80% / 0.1);
+  }
+  
+  .dark .mushaf-shadow {
+    box-shadow: 
+      0 10px 40px -10px hsl(0 0% 0% / 0.4),
+      0 0 0 1px hsl(30 20% 20% / 0.2);
+  }
+  
+  /* Night mode filter for images */
+  .night-mode-filter {
+    filter: invert(0.9) hue-rotate(180deg) brightness(0.95);
+  }
+  
+  /* Text Mushaf Night Mode Overrides */
+  .text-mushaf-night-mode {
+    /* Force dark styling for all UI elements within this container */
+  }
+  
+  .text-mushaf-night-mode .night-btn-outline {
+    @apply border-neutral-600 text-neutral-100 bg-neutral-800;
+  }
+  
+  .text-mushaf-night-mode .night-btn-outline:hover {
+    @apply bg-neutral-700;
+  }
+  
+  .text-mushaf-night-mode .night-input {
+    @apply bg-neutral-800 border-neutral-600 text-neutral-100;
+  }
+  
+  .text-mushaf-night-mode .night-select {
+    @apply bg-neutral-800 border-neutral-600 text-neutral-100;
+  }
+  
+  .text-mushaf-night-mode .night-text {
+    @apply text-neutral-100;
+  }
+  
+  .text-mushaf-night-mode .night-text-muted {
+    @apply text-neutral-400;
+  }
+}
