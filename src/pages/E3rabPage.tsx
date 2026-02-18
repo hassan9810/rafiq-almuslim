@@ -57,10 +57,10 @@ export default function E3rabPage() {
   };
 
   return (
-    <div className={`min-h-screen bg-background ${direction === 'rtl' ? 'rtl' : 'ltr'}`} dir={direction}>
+    <div className="min-h-screen bg-background" dir={direction}>
       <Header />
       
-      <main className="pt-20 pb-16">
+      <main className="pt-24 pb-16">
         <div className="container max-w-5xl">
           {/* Page Header */}
           <motion.div
@@ -71,10 +71,10 @@ export default function E3rabPage() {
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-4">
               <BookText className="w-8 h-8 text-primary" />
             </div>
-            <h1 className="text-3xl md:text-4xl font-bold font-arabic mb-2">
+            <h1 className="font-arabic text-3xl md:text-4xl font-bold mb-2">
               إعراب القرآن الكريم
             </h1>
-            <p className="text-muted-foreground max-w-2xl mx-auto font-arabic">
+            <p className="font-arabic text-muted-foreground max-w-2xl mx-auto">
               تعلم إعراب آيات القرآن الكريم مع شرح تفصيلي للقواعد النحوية والصرفية
             </p>
           </motion.div>
@@ -216,7 +216,7 @@ export default function E3rabPage() {
                                 className={`font-arabic text-base leading-loose prose prose-sm max-w-none ${
                                   expandedAyah === item.aya ? '' : 'line-clamp-3'
                                 }`}
-                                dir="rtl"
+                                dir={direction}
                                 dangerouslySetInnerHTML={{ __html: item.text }}
                               />
                               

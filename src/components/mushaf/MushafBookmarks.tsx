@@ -51,7 +51,7 @@ export const MushafBookmarks = memo(function MushafBookmarks({
     <Sheet open={open} onOpenChange={onClose}>
       <SheetContent side={language === 'ar' ? 'right' : 'left'} className="w-80">
         <SheetHeader>
-          <SheetTitle className="flex items-center gap-2">
+          <SheetTitle className="font-arabic flex items-center gap-2">
             <Bookmark className="w-5 h-5" />
             {language === 'ar' ? 'العلامات والسجل' : 'Bookmarks & History'}
           </SheetTitle>
@@ -97,7 +97,7 @@ export const MushafBookmarks = memo(function MushafBookmarks({
 
             <ScrollArea className="h-[50vh]">
               {bookmarks.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
+                <div className="text-center mb-8 text-muted-foreground">
                   <Bookmark className="w-12 h-12 mx-auto mb-2 opacity-30" />
                   <p>{language === 'ar' ? 'لا توجد علامات' : 'No bookmarks yet'}</p>
                 </div>
@@ -151,7 +151,7 @@ export const MushafBookmarks = memo(function MushafBookmarks({
           <TabsContent value="history" className="mt-4">
             <ScrollArea className="h-[50vh]">
               {readingHistory.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
+                <div className="text-center mb-8 text-muted-foreground">
                   <Clock className="w-12 h-12 mx-auto mb-2 opacity-30" />
                   <p>{language === 'ar' ? 'لا يوجد سجل' : 'No history yet'}</p>
                 </div>

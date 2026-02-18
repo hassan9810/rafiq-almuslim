@@ -109,10 +109,10 @@ export default function TranslationsPage() {
   };
 
   return (
-    <div className={`min-h-screen bg-background ${direction === 'rtl' ? 'rtl' : 'ltr'}`} dir={direction}>
+    <div className="min-h-screen bg-background" dir={direction}>
       <Header />
       
-      <main className="pt-20 pb-16">
+      <main className="pt-24 pb-16">
         <div className="container max-w-6xl">
           {/* Page Header */}
           <motion.div
@@ -120,13 +120,13 @@ export default function TranslationsPage() {
             animate={{ opacity: 1, y: 0 }}
             className="text-center mb-8"
           >
-            <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-4">
               <Languages className="w-8 h-8 text-primary" />
             </div>
-            <h1 className="text-3xl md:text-4xl font-bold mb-2">
+            <h1 className="font-arabic text-3xl md:text-4xl font-bold mb-2">
               {isArabic ? 'ترجمات القرآن الكريم' : 'Quran Translations'}
             </h1>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
+            <p className="font-arabic text-muted-foreground max-w-2xl mx-auto">
               {isArabic 
                 ? 'اكتشف أكثر من 90 ترجمة للقرآن الكريم بلغات متعددة من مصادر موثوقة'
                 : 'Discover over 90 Quran translations in multiple languages from trusted sources'

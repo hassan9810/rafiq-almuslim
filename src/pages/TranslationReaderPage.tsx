@@ -112,9 +112,9 @@ export default function TranslationReaderPage() {
 
   if (loading && !ayahs.length) {
     return (
-      <div className={`min-h-screen bg-background ${direction === 'rtl' ? 'rtl' : 'ltr'}`} dir={direction}>
+      <div className="min-h-screen bg-background" dir={direction}>
         <Header />
-        <main className="pt-20 pb-16">
+        <main className="pt-24 pb-16">
           <div className="container max-w-4xl">
             <div className="space-y-4">
               <Skeleton className="h-12 w-full" />
@@ -131,10 +131,10 @@ export default function TranslationReaderPage() {
   }
 
   return (
-    <div className={`min-h-screen bg-background ${direction === 'rtl' ? 'rtl' : 'ltr'}`} dir={direction}>
+    <div className="min-h-screen bg-background" dir={direction}>
       <Header />
       
-      <main className="pt-20 pb-16">
+      <main className="pt-24 pb-16">
         <div className="container max-w-4xl">
           {/* Back Button */}
           <Link to="/translations" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-6">
@@ -254,7 +254,7 @@ export default function TranslationReaderPage() {
                       </div>
 
                       {/* Arabic Text */}
-                      <p className="text-xl md:text-2xl font-arabic leading-loose mb-4 text-foreground" dir="rtl">
+                      <p className="font-arabic text-xl md:text-2xl leading-loose mb-4 text-foreground" dir={direction}>
                         {ayah.arabic_text}
                         <span className="inline-block mx-2 text-primary">
                           ﴿{parseInt(ayah.aya).toLocaleString('ar-EG')}﴾
@@ -264,7 +264,7 @@ export default function TranslationReaderPage() {
                       {/* Translation */}
                       <p 
                         className="text-base leading-relaxed text-muted-foreground"
-                        dir={translation?.direction || 'ltr'}
+                        dir={direction}
                       >
                         {ayah.translation}
                       </p>

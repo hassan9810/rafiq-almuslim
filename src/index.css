@@ -1,11 +1,10 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Islamic Design System - Rafiq Al-Muslim */
 @import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Noto+Sans+Arabic:wght@400;500;600;700&family=Noto+Sans:wght@400;500;600;700&display=swap');
 
-/* QPC Hafs Uthmani Font for Quran Text */
 @font-face {
   font-family: 'QPC Hafs';
   src: url('https://fonts.qurancdn.com/fonts/hafs/UthmanicHafs_v22.woff2') format('woff2'),

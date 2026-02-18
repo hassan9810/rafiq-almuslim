@@ -64,10 +64,10 @@ export default function TafsirPage() {
   }, {} as Record<string, typeof tafsirEditions>);
 
   return (
-    <div className={`min-h-screen bg-background ${direction === 'rtl' ? 'rtl' : 'ltr'}`} dir={direction}>
+    <div className="min-h-screen bg-background" dir={direction}>
       <Header />
       
-      <main className="pt-20 pb-16">
+      <main className="pt-24 pb-16">
         <div className="container">
           {/* Page Header */}
           <motion.div
@@ -78,10 +78,10 @@ export default function TafsirPage() {
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-4">
               <BookMarked className="w-8 h-8 text-primary" />
             </div>
-            <h1 className="text-3xl md:text-4xl font-bold mb-2">
+            <h1 className="font-arabic text-3xl md:text-4xl font-bold mb-2">
               {language === 'ar' ? 'التفسير' : 'Tafsir'}
             </h1>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
+            <p className="font-arabic text-muted-foreground max-w-2xl mx-auto">
               {language === 'ar' 
                 ? 'اقرأ تفسير القرآن الكريم من أشهر المفسرين'
                 : 'Read Quran interpretation from renowned scholars'}
@@ -117,7 +117,7 @@ export default function TafsirPage() {
                     <div className="space-y-4 pr-4">
                       {Object.entries(groupedEditions).map(([lang, editions]) => (
                         <div key={lang}>
-                          <h4 className="text-sm font-semibold text-muted-foreground mb-2 capitalize">
+                          <h4 className="text-sm font-semibold text-muted-foreground mb-2 capitalize text-center">
                             {lang}
                           </h4>
                           <div className="space-y-1">
@@ -125,7 +125,7 @@ export default function TafsirPage() {
                               <button
                                 key={edition.slug}
                                 onClick={() => setSelectedTafsir(edition.slug)}
-                                className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
+                                className={`w-full px-3 py-2 rounded-lg text-sm transition-colors ${
                                   selectedTafsir === edition.slug
                                     ? 'bg-primary text-primary-foreground'
                                     : 'hover:bg-muted'
@@ -225,7 +225,7 @@ export default function TafsirPage() {
                                 <div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold">
                                   {ayah.numberInSurah}
                                 </div>
-                                <p className="font-arabic text-2xl leading-loose text-right flex-1" dir="rtl">
+                                <p className="font-arabic text-2xl leading-loose text-right flex-1" dir={direction}>
                                   {ayah.text}
                                 </p>
                               </div>
@@ -234,7 +234,7 @@ export default function TafsirPage() {
                               {tafsirAyah && (
                                 <div className="bg-muted/50 rounded-lg p-4 ml-14">
                                   <p className={`leading-relaxed ${currentTafsirEdition?.language === 'arabic' ? 'font-arabic text-right text-lg' : ''}`}
-                                     dir={currentTafsirEdition?.language === 'arabic' ? 'rtl' : 'ltr'}>
+                                     dir={direction}>
                                     {tafsirAyah.text}
                                   </p>
                                 </div>

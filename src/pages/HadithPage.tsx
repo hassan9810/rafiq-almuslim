@@ -50,10 +50,10 @@ export default function HadithPage() {
   };
 
   return (
-    <div className={`min-h-screen bg-background ${direction === 'rtl' ? 'rtl' : 'ltr'}`} dir={direction}>
+    <div className="min-h-screen bg-background" dir={direction}>
       <Header />
       
-      <main className="pt-20 pb-16">
+      <main className="pt-24 pb-16">
         <div className="container">
           {/* Page Header */}
           <motion.div
@@ -64,17 +64,17 @@ export default function HadithPage() {
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-4">
               <MessageSquareQuote className="w-8 h-8 text-primary" />
             </div>
-            <h1 className="text-3xl md:text-4xl font-bold mb-2">
+            <h1 className="font-arabic text-3xl md:text-4xl font-bold mb-2">
               {language === 'ar' ? 'الحديث الشريف' : 'Hadith'}
             </h1>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
+            <p className="font-arabic text-muted-foreground max-w-2xl mx-auto">
               {language === 'ar' 
                 ? 'اقرأ أحاديث النبي صلى الله عليه وسلم من الكتب الستة'
                 : 'Read the sayings of Prophet Muhammad ﷺ from the six major collections'}
             </p>
           </motion.div>
 
-          <Tabs defaultValue="browse" className="space-y-6">
+          <Tabs defaultValue="browse" className="space-y-6" dir={direction}>
             <TabsList className="grid w-full max-w-md mx-auto grid-cols-2">
               <TabsTrigger value="browse">
                 {language === 'ar' ? 'تصفح' : 'Browse'}
@@ -103,7 +103,7 @@ export default function HadithPage() {
                       <CardContent className="p-4">
                         <div className="flex items-start justify-between">
                           <div>
-                            <h3 className="font-arabic text-lg font-bold text-right" dir="rtl">
+                            <h3 className="font-arabic text-lg font-bold text-right" dir={direction}>
                               {collection.nameAr}
                             </h3>
                             <p className="text-sm text-muted-foreground">{collection.name}</p>
@@ -184,7 +184,7 @@ export default function HadithPage() {
                             </Button>
                           </div>
                           
-                          <p className={`text-lg leading-relaxed ${language === 'ar' ? 'font-arabic text-right' : ''}`} dir={language === 'ar' ? 'rtl' : 'ltr'}>
+                          <p className={`font-arabic text-lg leading-relaxed ${language === 'ar' ? 'text-right' : ''}`} dir={direction}>
                             {currentHadith.text}
                           </p>
 

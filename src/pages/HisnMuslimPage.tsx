@@ -19,7 +19,8 @@ import {
   UtensilsCrossed,
   Users,
   Compass,
-  Loader2
+  Loader2,
+  Shield
 } from 'lucide-react';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
@@ -208,11 +209,11 @@ export default function HisnMuslimPage() {
   const currentDhikr = selectedChapter?.adhkar[currentDhikrIndex];
 
   return (
-    <div className={`min-h-screen bg-background ${direction === 'rtl' ? 'rtl' : 'ltr'}`} dir={direction}>
+    <div className="min-h-screen bg-background" dir={direction}>
       <Header />
       <audio ref={audioRef} onEnded={() => setIsPlaying(false)} />
       
-      <main className="pt-20 pb-16">
+      <main className="pt-24 pb-16">
         <div className="container max-w-6xl">
           {/* Page Header */}
           <motion.div
@@ -220,10 +221,13 @@ export default function HisnMuslimPage() {
             animate={{ opacity: 1, y: 0 }}
             className="text-center mb-8"
           >
-            <h1 className="text-3xl md:text-4xl font-bold mb-2 font-arabic">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-4">
+              <Shield className="w-8 h-8 text-primary" />
+            </div>
+            <h1 className="font-arabic text-3xl md:text-4xl font-bold mb-2">
               حصن المسلم
             </h1>
-            <p className="text-muted-foreground">
+            <p className="font-arabic text-muted-foreground max-w-2xl mx-auto">
               {isArabic ? 'من أذكار الكتاب والسنة' : 'Fortress of the Muslim - Invocations from the Quran & Sunnah'}
             </p>
           </motion.div>
@@ -236,7 +240,7 @@ export default function HisnMuslimPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pr-10 text-right"
-              dir="rtl"
+              dir={direction}
             />
           </div>
 
@@ -267,7 +271,7 @@ export default function HisnMuslimPage() {
                     >
                       <X className="h-5 w-5" />
                     </Button>
-                    <h2 className="text-lg font-bold font-arabic flex-1 text-center">
+                    <h2 className="font-arabic text-lg font-bold flex-1 text-center">
                       {selectedChapter.title}
                     </h2>
                     <div className="flex gap-2">
@@ -304,13 +308,13 @@ export default function HisnMuslimPage() {
                                 </Badge>
                                 
                                 {/* Arabic Text */}
-                                <p className="text-2xl md:text-3xl font-arabic leading-loose mb-4 text-foreground" dir="rtl">
+                                <p className="font-arabic text-2xl md:text-3xl leading-loose mb-4 text-foreground" dir={direction}>
                                   {currentDhikr?.ARABIC_TEXT}
                                 </p>
                                 
                                 {/* Translation if available */}
                                 {currentDhikr?.TRANSLATED_TEXT && (
-                                  <p className="text-muted-foreground text-sm leading-relaxed mb-4" dir="ltr">
+                                  <p className="text-muted-foreground text-sm leading-relaxed mb-4" dir={direction}>
                                     {currentDhikr.TRANSLATED_TEXT}
                                   </p>
                                 )}
@@ -369,7 +373,7 @@ export default function HisnMuslimPage() {
                                     <Badge variant="outline" className="shrink-0">
                                       {idx + 1}
                                     </Badge>
-                                    <p className="font-arabic text-base leading-relaxed line-clamp-2" dir="rtl">
+                                    <p className="font-arabic text-base leading-relaxed line-clamp-2" dir={direction}>
                                       {dhikr.ARABIC_TEXT}
                                     </p>
                                   </div>
@@ -453,7 +457,7 @@ export default function HisnMuslimPage() {
                       <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
                         <Icon className="h-5 w-5 text-primary" />
                       </div>
-                      <h2 className="text-xl font-bold font-arabic">
+                      <h2 className="font-arabic text-xl font-bold">
                         {isArabic ? label.ar : label.en}
                       </h2>
                       <Badge variant="secondary">{categoryChapters.length}</Badge>

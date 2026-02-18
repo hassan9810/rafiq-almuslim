@@ -1,16 +1,18 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sun, Moon, Bed, Plane, RotateCcw, Check, ChevronLeft, ChevronRight, Vibrate } from 'lucide-react';
+import { Sun, Moon, Bed, Plane, RotateCcw, Check, ChevronLeft, ChevronRight, Vibrate, Mic2 } from 'lucide-react';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAppStore } from '@/store/useAppStore';
+import { useAzkarStore, type AzkarCategory as StoreAzkarCategory } from '@/store/useAzkarStore';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { getAzkarByCategory, Dhikr } from '@/lib/azkarData';
+import { getIslamicDayKey } from '@/lib/islamicDay';
 
 type Category = 'morning' | 'evening' | 'sleep' | 'travel' | 'general';
 
@@ -24,7 +26,12 @@ const categories: { id: Category; icon: any; labelEn: string; labelAr: string }[
 
 export default function AzkarPage() {
   const { t, language } = useTranslation();
-  const { direction } = useAppStore();
+  const { direction, location } = useAppStore();
+  const getDayState = useAzkarStore((s) => s.getDayState);
+  const setDayState = useAzkarStore((s) => s.setDayState);
+
+  const dayKey = getIslamicDayKey(location?.latitude ?? null, location?.longitude ?? null);
+
   const [activeCategory, setActiveCategory] = useState<Category>('morning');
   const [azkar, setAzkar] = useState<Dhikr[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -32,12 +39,18 @@ export default function AzkarPage() {
   const [tasbihCount, setTasbihCount] = useState(0);
   const [vibrationEnabled, setVibrationEnabled] = useState(true);
 
+  // Restore from store when Islamic day or category changes (same day = restore; new day = empty)
   useEffect(() => {
     const categoryAzkar = getAzkarByCategory(activeCategory);
     setAzkar(categoryAzkar);
-    setCurrentIndex(0);
-    setCounts({});
-  }, [activeCategory]);
+    const dayState = getDayState(dayKey);
+    const catState = dayState.byCategory[activeCategory];
+    const countsNum: Record<number, number> = {};
+    for (const [id, c] of Object.entries(catState.counts)) countsNum[Number(id)] = c;
+    setCounts(countsNum);
+    setCurrentIndex(Math.min(catState.currentIndex, Math.max(0, categoryAzkar.length - 1)));
+    setTasbihCount(dayState.tasbihCount);
+  }, [activeCategory, dayKey, getDayState]);
 
   const currentDhikr = azkar[currentIndex];
   const currentCount = counts[currentDhikr?.id] || 0;
@@ -100,6 +113,16 @@ export default function AzkarPage() {
     }
   };
 
+  // Persist to store whenever counts, currentIndex, or tasbihCount change
+  useEffect(() => {
+    const countsStr: Record<string, number> = {};
+    for (const [id, c] of Object.entries(counts)) countsStr[id] = c;
+    const byCategory: Partial<Record<StoreAzkarCategory, { counts: Record<string, number>; currentIndex: number }>> = {
+      [activeCategory]: { counts: countsStr, currentIndex },
+    };
+    setDayState(dayKey, { tasbihCount, byCategory });
+  }, [dayKey, activeCategory, counts, currentIndex, tasbihCount, setDayState]);
+
   const completedCount = Object.entries(counts).filter(
     ([id, count]) => {
       const dhikr = azkar.find(d => d.id === parseInt(id));
@@ -110,10 +133,10 @@ export default function AzkarPage() {
   const totalProgress = azkar.length > 0 ? (completedCount / azkar.length) * 100 : 0;
 
   return (
-    <div className={`min-h-screen bg-background ${direction === 'rtl' ? 'rtl' : 'ltr'}`} dir={direction}>
+    <div className="min-h-screen bg-background" dir={direction}>
       <Header />
       
-      <main className="pt-20 pb-16">
+      <main className="pt-24 pb-16">
         <div className="container max-w-4xl">
           {/* Page Header */}
           <motion.div
@@ -121,10 +144,13 @@ export default function AzkarPage() {
             animate={{ opacity: 1, y: 0 }}
             className="text-center mb-8"
           >
-            <h1 className="text-3xl md:text-4xl font-bold mb-2 font-arabic">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-4">
+              <Mic2 className="w-8 h-8 text-primary" />
+            </div>
+            <h1 className="font-arabic text-3xl md:text-4xl font-bold mb-2">
               {language === 'ar' ? 'الأذكار' : 'Azkar'}
             </h1>
-            <p className="text-muted-foreground">
+            <p className="font-arabic text-muted-foreground max-w-2xl mx-auto">
               {language === 'ar' 
                 ? 'أذكار الصباح والمساء والنوم والسفر'
                 : 'Morning, Evening, Sleep and Travel Remembrances'}
@@ -132,7 +158,7 @@ export default function AzkarPage() {
           </motion.div>
 
           {/* Category Tabs */}
-          <Tabs value={activeCategory} onValueChange={(v) => setActiveCategory(v as Category)} className="space-y-6">
+          <Tabs value={activeCategory} onValueChange={(v) => setActiveCategory(v as Category)} className="space-y-6" dir={direction}>
             <TabsList className="grid grid-cols-5 w-full">
               {categories.map((cat) => (
                 <TabsTrigger key={cat.id} value={cat.id} className="flex flex-col gap-1 py-3">
@@ -238,7 +264,7 @@ export default function AzkarPage() {
                     {/* Current Dhikr Card */}
                     {currentDhikr && (
                       <Card className="overflow-hidden">
-                        <CardHeader className="bg-primary/5 pb-3">
+                        <CardHeader className="bg-primary/5">
                           <div className="flex items-center justify-between">
                             <Badge variant="outline">
                               {currentIndex + 1} / {azkar.length}
@@ -259,7 +285,7 @@ export default function AzkarPage() {
                             disabled={isComplete}
                             className="w-full text-center cursor-pointer disabled:cursor-default"
                           >
-                            <p className="font-arabic text-2xl md:text-3xl leading-loose text-right" dir="rtl">
+                            <p className="font-arabic text-2xl md:text-3xl leading-loose text-right" dir={direction}>
                               {currentDhikr.text}
                             </p>
                           </motion.button>

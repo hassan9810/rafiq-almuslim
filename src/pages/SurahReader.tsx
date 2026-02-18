@@ -49,6 +49,7 @@ export default function SurahReader() {
   const navigate = useNavigate();
   const { t, language } = useTranslation();
   const { 
+    direction,
     favorites, 
     toggleFavorite, 
     addBookmark, 
@@ -152,7 +153,7 @@ export default function SurahReader() {
     return (
       <div className="min-h-screen bg-background">
         <Header />
-        <main className="pt-20 pb-32">
+        <main className="pt-24 pb-32">
           <div className="container max-w-4xl">
             <Skeleton className="h-12 w-48 mb-4" />
             <Skeleton className="h-8 w-32 mb-8" />
@@ -178,16 +179,16 @@ export default function SurahReader() {
   const { arabic, translation } = surahData;
 
   return (
-    <div className="min-h-screen bg-background" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+    <div className="min-h-screen bg-background" dir={direction}>
       <Header />
 
-      <main className="pt-20 pb-40">
+      <main className="pt-24 pb-40">
         <div className="container max-w-4xl">
           {/* Surah Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center py-8 mb-8"
+            className="text-center mb-8"
           >
             <div className="inline-flex items-center gap-2 mb-4">
               <Badge variant="outline" className="text-xs">
@@ -278,7 +279,7 @@ export default function SurahReader() {
                   </div>
 
                   {/* Arabic Text */}
-                  <p className="arabic-quran text-foreground mb-4 leading-loose" dir="rtl">
+                  <p className="arabic-quran text-foreground mb-4 leading-loose" dir={direction}>
                     {ayah.text}
                     <span className="inline-block mx-2 font-arabic text-accent">
                       ﴿{ayah.numberInSurah.toLocaleString('ar-EG')}﴾
@@ -287,7 +288,7 @@ export default function SurahReader() {
 
                   {/* Translation */}
                   {translationAyah && (
-                    <p className="text-muted-foreground text-base leading-relaxed" dir="ltr">
+                    <p className="text-muted-foreground text-base leading-relaxed" dir={direction}>
                       {translationAyah.text}
                     </p>
                   )}

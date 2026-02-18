@@ -18,7 +18,7 @@ export function Footer() {
               </div>
               <span className="text-xl font-bold text-foreground">{t('appName')}</span>
             </div>
-            <p className="text-sm text-muted-foreground">
+            <p className="font-arabic text-sm text-muted-foreground">
               {language === 'ar' 
                 ? 'رفيقك الروحي لتلاوة القرآن والتعلم والصلوات اليومية'
                 : 'Your spiritual companion for Quran recitation, learning, and daily prayers'
@@ -28,7 +28,7 @@ export function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h3 className="font-semibold text-foreground mb-4">
+            <h3 className="font-arabic font-semibold text-foreground mb-4">
               {language === 'ar' ? 'روابط سريعة' : 'Quick Links'}
             </h3>
             <ul className="space-y-2">
@@ -42,7 +42,7 @@ export function Footer() {
 
           {/* Features */}
           <div>
-            <h3 className="font-semibold text-foreground mb-4">
+            <h3 className="font-arabic font-semibold text-foreground mb-4">
               {language === 'ar' ? 'الميزات' : 'Features'}
             </h3>
             <ul className="space-y-2">

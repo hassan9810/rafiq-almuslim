@@ -21,9 +21,10 @@ interface SurahCardProps {
 
 function SurahCard({ surah, index, isFavorite, onToggleFavorite, onClick, animateDelay = 0 }: SurahCardProps) {
   const { t, language } = useTranslation();
-  
+  const { direction } = useAppStore();
   return (
     <motion.div
+      dir={direction}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2, delay: animateDelay }}
@@ -43,21 +44,28 @@ function SurahCard({ surah, index, isFavorite, onToggleFavorite, onClick, animat
         }}
         className="absolute top-3 right-3 p-1.5 rounded-full hover:bg-accent/10 transition-colors"
       >
-        <Star 
-          className={`w-4 h-4 transition-colors ${
-            isFavorite ? 'fill-accent text-accent' : 'text-muted-foreground'
-          }`} 
+        <Star
+          className={`w-4 h-4 transition-colors ${isFavorite ? 'fill-accent text-accent' : 'text-muted-foreground'
+            }`}
         />
       </button>
 
       <div className="pt-4">
-        {/* Arabic Name */}
-        <h3 className="font-arabic text-2xl text-foreground mb-1 text-right">
-          {surah.name}
-        </h3>
-        
-        {/* English Name (Transliteration only) */}
-        <p className="text-sm font-medium text-foreground">{surah.englishName}</p>
+        {language === 'ar' ? (
+          <>
+            <h3 className="font-arabic text-2xl text-foreground mb-1 text-right">
+              {surah.name}
+            </h3>
+            <p className="text-sm font-medium text-muted-foreground">{surah.englishName}</p>
+          </>
+        ) : (
+          <>
+            <h3 className="text-2xl font-semibold text-foreground mb-1">
+              {surah.englishName}
+            </h3>
+            <p className="font-arabic text-sm text-muted-foreground text-right">{surah.name}</p>
+          </>
+        )}
 
         {/* Meta Info */}
         <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border/50">
@@ -87,7 +95,7 @@ function SurahCard({ surah, index, isFavorite, onToggleFavorite, onClick, animat
 export function SurahList() {
   const { t, language } = useTranslation();
   const navigate = useNavigate();
-  const { surahs, setSurahs, favorites, toggleFavorite, bookmarks, recentReads } = useAppStore();
+  const { surahs, setSurahs, favorites, toggleFavorite, bookmarks, recentReads, direction } = useAppStore();
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('all');
 
@@ -105,36 +113,21 @@ export function SurahList() {
   const bookmarkedSurahNumbers = [...new Set(bookmarks.map(b => b.surah))];
   const recentSurahNumbers = [...new Map(recentReads.map(r => [r.surah, r.timestamp])).keys()];
 
-  const displayedSurahs = activeTab === 'favorites' 
+  const displayedSurahs = activeTab === 'favorites'
     ? surahs.filter(s => favorites.includes(s.number))
     : activeTab === 'bookmarks'
       ? surahs.filter(s => bookmarkedSurahNumbers.includes(s.number))
       : activeTab === 'recent'
         ? surahs
-            .filter(s => recentSurahNumbers.includes(s.number))
-            .sort((a, b) => recentSurahNumbers.indexOf(a.number) - recentSurahNumbers.indexOf(b.number))
+          .filter(s => recentSurahNumbers.includes(s.number))
+          .sort((a, b) => recentSurahNumbers.indexOf(a.number) - recentSurahNumbers.indexOf(b.number))
         : surahs;
 
   return (
-    <section className="py-12 md:py-20 bg-background">
+    <section className="py-6 bg-background">
       <div className="container">
-        {/* Section Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-10"
-        >
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-3">{t('quran')}</h2>
-          <p className="text-muted-foreground max-w-xl mx-auto">
-            {language === 'ar' 
-              ? 'تصفح جميع سور القرآن الكريم مع التلاوة والترجمة'
-              : 'Explore all 114 surahs of the Holy Quran with recitation and translation'}
-          </p>
-        </motion.div>
-
         {/* Tabs */}
-        <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="mb-8">
+        <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="mb-8" dir={direction}>
           <TabsList className="grid w-full max-w-2xl mx-auto grid-cols-4">
             <TabsTrigger value="all">{t('allSurahs')}</TabsTrigger>
             <TabsTrigger value="favorites">{t('favorites')}</TabsTrigger>

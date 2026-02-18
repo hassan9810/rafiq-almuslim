@@ -6,6 +6,7 @@ import {
   ZoomIn, 
   ZoomOut,
   BookOpen,
+  BookImage,
   Loader2,
   Home,
   Maximize,
@@ -24,6 +25,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useTranslation } from '@/hooks/useTranslation';
+import { useAppStore } from '@/store/useAppStore';
 import { Link } from 'react-router-dom';
 
 interface MushafEdition {
@@ -182,6 +184,7 @@ const mushafEditions: MushafEdition[] = [
 
 export default function MushafPage() {
   const { t, language } = useTranslation();
+  const { direction } = useAppStore();
   const [selectedEdition, setSelectedEdition] = useState<MushafEdition>(mushafEditions[0]);
   const [currentPage, setCurrentPage] = useState(1);
   const [zoom, setZoom] = useState(100);
@@ -277,34 +280,27 @@ export default function MushafPage() {
   }, [language, handleNextPage, handlePrevPage]);
 
   return (
-    <div className="min-h-screen bg-background" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+    <div className="min-h-screen bg-background" dir={direction}>
       <Header />
       
-      <main className="pt-20 pb-8">
+      <main className="pt-24 pb-16">
         <div className="container max-w-6xl">
-          {/* Header */}
+          {/* Page Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center py-8"
+            className="text-center mb-8"
           >
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <Link to="/">
-                <Button variant="ghost" size="icon">
-                  <Home className="w-5 h-5" />
-                </Button>
-              </Link>
-              <BookOpen className="w-8 h-8 text-primary" />
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-4">
+              <BookImage className="w-8 h-8 text-primary" />
             </div>
             <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
               {language === 'ar' ? 'المصحف الشريف' : 'Holy Quran Mushaf'}
             </h1>
-            <p className="text-muted-foreground">
+            <p className="text-muted-foreground max-w-2xl mx-auto">
               {language === 'ar' ? 'تصفح صفحات المصحف الشريف' : 'Browse the pages of the Holy Quran'}
             </p>
-            
-            {/* Link to Text Mushaf */}
-            <div className="mt-4">
+            <div className="flex flex-wrap items-center justify-center gap-3 mt-4">
               <Link to="/mushaf-text">
                 <Button variant="outline" className="gap-2">
                   <BookOpen className="w-4 h-4" />

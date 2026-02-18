@@ -8,7 +8,7 @@ import { Footer } from '@/components/Footer';
 import { PrayerTimesWidget } from '@/components/PrayerTimesWidget';
 
 const Index = () => {
-  const { theme } = useAppStore();
+  const { theme, direction } = useAppStore();
   const { language } = useTranslation();
 
   useEffect(() => {
@@ -17,7 +17,7 @@ const Index = () => {
   }, [theme]);
 
   return (
-    <div className="min-h-screen bg-background" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+    <div className="min-h-screen bg-background" dir={direction}>
       <Header />
       <main>
         <HeroSection />

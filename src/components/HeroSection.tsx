@@ -67,7 +67,7 @@ export function HeroSection() {
       </svg>
 
       {/* Date Bar - Right below header */}
-      <div className="relative z-10 pt-16 md:pt-20">
+      <div className="relative z-10 pt-16 md:pt-24">
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -78,7 +78,7 @@ export function HeroSection() {
             <Calendar className="w-4 h-4" />
             <span className="font-arabic text-sm md:text-base">{hijriDate}</span>
             <span className="text-primary-foreground/50 dark:text-foreground/50">|</span>
-            <span className="text-smz-10 md:text-base">{gregorianDate}</span>
+            <span className="text-sm md:text-base">{gregorianDate}</span>
           </div>
         </motion.div>
       </div>
@@ -108,7 +108,7 @@ export function HeroSection() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
-                className="text-4xl md:text-5xl lg:text-6xl font-bold text-primary-foreground leading-tight"
+                className="font-arabic text-4xl md:text-5xl lg:text-6xl font-bold text-primary-foreground leading-tight"
               >
                 {t('welcome')}
               </motion.h1>
@@ -116,7 +116,7 @@ export function HeroSection() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
-                className="text-lg md:text-xl text-primary-foreground/80 max-w-xl"
+                className="font-arabic text-lg md:text-xl text-primary-foreground/80 max-w-xl"
               >
                 {t('heroSubtitle')}
               </motion.p>

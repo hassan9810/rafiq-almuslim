@@ -6,6 +6,7 @@ import { Footer } from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { useTranslation } from '@/hooks/useTranslation';
+import { useAppStore } from '@/store/useAppStore';
 
 interface RadioStation {
   id: number;
@@ -54,6 +55,7 @@ const radioStations: RadioStation[] = [
 
 export default function RadioPage() {
   const { t, language } = useTranslation();
+  const { direction } = useAppStore();
   const [currentStation, setCurrentStation] = useState<RadioStation | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(0.8);
@@ -100,24 +102,24 @@ export default function RadioPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+    <div className="min-h-screen bg-background" dir={direction}>
       <Header />
       
-      <main className="pt-20 pb-32">
+      <main className="pt-24 pb-16">
         <div className="container max-w-2xl">
-          {/* Header */}
+          {/* Page Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center py-8"
+            className="text-center mb-8"
           >
-            <div className="w-16 h-16 mx-auto mb-4 bg-primary/10 rounded-2xl flex items-center justify-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-4">
               <Radio className="w-8 h-8 text-primary" />
             </div>
             <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
               {t('radio')}
             </h1>
-            <p className="text-muted-foreground">
+            <p className="text-muted-foreground max-w-2xl mx-auto">
               {language === 'ar' ? 'استمع إلى إذاعات القرآن الكريم' : 'Listen to Quran Radio Stations'}
             </p>
           </motion.div>

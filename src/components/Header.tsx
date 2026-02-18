@@ -90,7 +90,7 @@ export function Header() {
               <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
                 <span className="font-arabic text-lg text-primary-foreground font-bold">ق</span>
               </div>
-              <span className={`text-xl font-bold ${useLightText ? 'text-primary-foreground' : 'text-foreground'}`}>
+              <span className={`font-arabic text-xl font-bold ${useLightText ? 'text-primary-foreground' : 'text-foreground'}`}>
                 {t('appName')}
               </span>
             </Link>

@@ -11,7 +11,7 @@ import { fetchSurahs, type Surah } from '@/lib/quranApi';
 
 export default function BookmarksPage() {
   const { t, language } = useTranslation();
-  const { bookmarks, removeBookmark, favorites, toggleFavorite } = useAppStore();
+  const { direction, bookmarks, removeBookmark, favorites, toggleFavorite } = useAppStore();
   const [surahs, setSurahs] = useState<Surah[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -32,9 +32,9 @@ export default function BookmarksPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background" dir={direction}>
         <Header />
-        <main className="pt-20 pb-32">
+        <main className="pt-24 pb-16">
           <div className="container max-w-3xl py-12">
             <div className="animate-pulse space-y-4">
               {[1, 2, 3, 4, 5].map((i) => (
@@ -48,23 +48,28 @@ export default function BookmarksPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+    <div className="min-h-screen bg-background" dir={direction}>
       <Header />
-      <main className="pt-20 pb-32">
-        <div className="container max-w-3xl py-12">
+      <main className="pt-24 pb-16">
+        <div className="container">
+          {/* Page Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-10"
+            className="text-center mb-8"
           >
-            <h1 className="text-3xl font-bold text-foreground mb-2">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-4">
+              <Bookmark className="w-8 h-8 text-primary" />
+            </div>
+            <h1 className="font-arabic text-3xl md:text-4xl font-bold mb-2">
               {t('bookmarks')}
             </h1>
-            <p className="text-muted-foreground">
+            <p className="font-arabic text-muted-foreground max-w-2xl mx-auto">
               {favorites.length} {favorites.length === 1 ? t('favorite') : t('favorites')} · {bookmarks.length} {bookmarks.length === 1 ? t('bookmark') : t('bookmarks')}
             </p>
           </motion.div>
 
+          <div className="max-w-3xl mx-auto">
           {/* Favorites Section */}
           <motion.section
             initial={{ opacity: 0, y: 20 }}
@@ -100,7 +105,7 @@ export default function BookmarksPage() {
                           <Star className="w-6 h-6 text-accent fill-accent" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="font-arabic font-semibold text-foreground truncate">
+                          <p className="  font-semibold text-foreground truncate">
                             {getSurahName(surahNum)}
                           </p>
                           <p className="text-sm text-muted-foreground">
@@ -177,7 +182,7 @@ export default function BookmarksPage() {
                       <Bookmark className="w-6 h-6 text-primary fill-primary" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-arabic font-semibold text-foreground truncate">
+                      <p className="  font-semibold text-foreground truncate">
                         {getSurahName(bookmark.surah)}
                       </p>
                       <p className="text-sm text-muted-foreground">
@@ -204,6 +209,7 @@ export default function BookmarksPage() {
             </div>
           )}
           </motion.section>
+          </div>
         </div>
       </main>
       <Footer />

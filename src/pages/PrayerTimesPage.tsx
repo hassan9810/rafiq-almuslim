@@ -31,7 +31,7 @@ const prayerIcons = {
 
 export default function PrayerTimesPage() {
   const { t, language } = useTranslation();
-  const { location, setLocation } = useAppStore();
+  const { direction, location, setLocation } = useAppStore();
   const [prayerTimes, setPrayerTimes] = useState<PrayerTime[]>([]);
   const [loading, setLoading] = useState(false);
   const [timeUntilNext, setTimeUntilNext] = useState('');
@@ -93,17 +93,20 @@ export default function PrayerTimesPage() {
   const nextPrayer = prayerTimes.find(p => p.isNext);
 
   return (
-    <div className="min-h-screen bg-background" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+    <div className="min-h-screen bg-background" dir={direction}>
       <Header />
       
-      <main className="pt-20 pb-12">
+      <main className="pt-24 pb-16">
         <div className="container max-w-2xl">
-          {/* Header */}
+          {/* Page Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center py-8"
+            className="text-center mb-8"
           >
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-4">
+              <Clock className="w-8 h-8 text-primary" />
+            </div>
             <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
               {t('prayerTimes')}
             </h1>

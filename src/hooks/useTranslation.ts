@@ -106,7 +106,7 @@ const translations: Record<'en' | 'ar', Record<TranslationKey, string>> = {
     heroSubtitle: 'Your spiritual companion for Quran recitation, learning, and daily prayers',
     startReading: 'Start Reading',
     listenNow: 'Listen Now',
-    bismillah: 'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ',
+    bismillah: 'In the name of Allah, the Most Gracious, the Most Merciful',
     surahNumber: 'Surah',
     juz: 'Juz',
     hizb: 'Hizb',
