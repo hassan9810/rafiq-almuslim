@@ -16,16 +16,17 @@ interface SurahCardProps {
   isFavorite: boolean;
   onToggleFavorite: () => void;
   onClick: () => void;
+  animateDelay?: number;
 }
 
-function SurahCard({ surah, index, isFavorite, onToggleFavorite, onClick }: SurahCardProps) {
+function SurahCard({ surah, index, isFavorite, onToggleFavorite, onClick, animateDelay = 0 }: SurahCardProps) {
   const { t, language } = useTranslation();
   
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, delay: index * 0.02 }}
+      transition={{ duration: 0.2, delay: animateDelay }}
       className="surah-card group relative bg-card rounded-xl p-4 border border-border/50 cursor-pointer"
       onClick={onClick}
     >
@@ -86,7 +87,7 @@ function SurahCard({ surah, index, isFavorite, onToggleFavorite, onClick }: Sura
 export function SurahList() {
   const { t, language } = useTranslation();
   const navigate = useNavigate();
-  const { surahs, setSurahs, favorites, toggleFavorite } = useAppStore();
+  const { surahs, setSurahs, favorites, toggleFavorite, bookmarks, recentReads } = useAppStore();
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('all');
 
@@ -101,9 +102,18 @@ export function SurahList() {
     loadSurahs();
   }, [surahs.length, setSurahs]);
 
+  const bookmarkedSurahNumbers = [...new Set(bookmarks.map(b => b.surah))];
+  const recentSurahNumbers = [...new Map(recentReads.map(r => [r.surah, r.timestamp])).keys()];
+
   const displayedSurahs = activeTab === 'favorites' 
     ? surahs.filter(s => favorites.includes(s.number))
-    : surahs;
+    : activeTab === 'bookmarks'
+      ? surahs.filter(s => bookmarkedSurahNumbers.includes(s.number))
+      : activeTab === 'recent'
+        ? surahs
+            .filter(s => recentSurahNumbers.includes(s.number))
+            .sort((a, b) => recentSurahNumbers.indexOf(a.number) - recentSurahNumbers.indexOf(b.number))
+        : surahs;
 
   return (
     <section className="py-12 md:py-20 bg-background">
@@ -125,9 +135,10 @@ export function SurahList() {
 
         {/* Tabs */}
         <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="mb-8">
-          <TabsList className="grid w-full max-w-md mx-auto grid-cols-3">
+          <TabsList className="grid w-full max-w-2xl mx-auto grid-cols-4">
             <TabsTrigger value="all">{t('allSurahs')}</TabsTrigger>
             <TabsTrigger value="favorites">{t('favorites')}</TabsTrigger>
+            <TabsTrigger value="bookmarks">{t('bookmarks')}</TabsTrigger>
             <TabsTrigger value="recent">{t('recentReads')}</TabsTrigger>
           </TabsList>
         </Tabs>
@@ -149,6 +160,7 @@ export function SurahList() {
                 isFavorite={favorites.includes(surah.number)}
                 onToggleFavorite={() => toggleFavorite(surah.number)}
                 onClick={() => navigate(`/quran/${surah.number}`)}
+                animateDelay={['favorites', 'bookmarks', 'recent'].includes(activeTab) ? 0 : index * 0.015}
               />
             ))}
           </div>
@@ -158,6 +170,18 @@ export function SurahList() {
           <div className="text-center py-12 text-muted-foreground">
             <Star className="w-12 h-12 mx-auto mb-4 opacity-50" />
             <p>No favorite surahs yet. Click the star icon on any surah to add it to favorites.</p>
+          </div>
+        )}
+
+        {activeTab === 'bookmarks' && bookmarks.length === 0 && (
+          <div className="text-center py-12 text-muted-foreground">
+            <p>{t('noBookmarks')}</p>
+          </div>
+        )}
+
+        {activeTab === 'recent' && recentReads.length === 0 && (
+          <div className="text-center py-12 text-muted-foreground">
+            <p>{t('noRecentReads')}</p>
           </div>
         )}
       </div>

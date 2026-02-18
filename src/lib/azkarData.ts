@@ -74,6 +74,78 @@ export const morningAzkar: Dhikr[] = [
     count: 1,
     category: 'morning'
   },
+  {
+    id: 9,
+    text: 'اللَّهُمَّ اسْتُرْ عَوْرَاتِي، وَآمِنْ رَوْعَاتِي، وَاحْفَظْنِي مِنْ بَيْنِ يَدَيَّ، وَمِنْ خَلْفِي، وَعَنْ يَمِينِي، وَعَنْ شِمَالِي، وَمِنْ فَوْقِي، وَأَعُوذُ بِعَظَمَتِكَ أَنْ أُغْتَالَ مِنْ تَحْتِي',
+    translation: 'O Allah, conceal my faults, calm my fears, guard me from before me and behind me, from my right and from my left, and from above me. I seek refuge in Your greatness from being taken unaware from beneath me.',
+    reference: 'Abu Dawud 5074, Ibn Majah 3871',
+    count: 1,
+    category: 'morning'
+  },
+  {
+    id: 10,
+    text: 'اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْهَمِّ وَالْحَزَنِ، وَالْعَجْزِ وَالْكَسَلِ، وَالْبُخْلِ وَالْجُبْنِ، وَضَلَعِ الدَّيْنِ، وَغَلَبَةِ الرِّجَالِ',
+    translation: 'O Allah, I seek refuge in You from anxiety and sorrow, from weakness and laziness, from miserliness and cowardice, from being overcome by debt and overpowered by men.',
+    reference: 'Al-Bukhari 2893',
+    count: 1,
+    category: 'morning'
+  },
+  {
+    id: 11,
+    text: 'يَا حَيُّ يَا قَيُّومُ، بِرَحْمَتِكَ أَسْتَغِيثُ، أَصْلِحْ لِي شَأْنِي كُلَّهُ، وَلَا تَكِلْنِي إِلَى نَفْسِي طَرْفَةَ عَيْنٍ',
+    translation: 'O Ever-Living, O Sustainer, by Your mercy I seek help. Rectify for me all of my affairs and do not leave me to myself even for the blink of an eye.',
+    reference: 'An-Nasa’i, Al-Hakim',
+    count: 1,
+    category: 'morning'
+  },
+  {
+    id: 12,
+    text: 'اللَّهُمَّ مَا أَصْبَحَ بِي مِنْ نِعْمَةٍ أَوْ بِأَحَدٍ مِنْ خَلْقِكَ فَمِنْكَ وَحْدَكَ لَا شَرِيكَ لَكَ، فَلَكَ الْحَمْدُ وَلَكَ الشُّكْرُ',
+    translation: 'O Allah, whatever blessing I or any of Your creation have received this morning is from You alone, without partner, so for You is all praise and all thanks.',
+    reference: 'Abu Dawud 5073',
+    count: 1,
+    category: 'morning'
+  },
+  {
+    id: 13,
+    text: 'رَضِيتُ بِاللَّهِ رَبًّا، وَبِالْإِسْلَامِ دِينًا، وَبِمُحَمَّدٍ صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ رَسُولًا',
+    translation: 'I am pleased with Allah as my Lord, with Islam as my religion, and with Muhammad ﷺ as my Messenger.',
+    reference: 'Abu Dawud 5072, At-Tirmidhi',
+    count: 3,
+    category: 'morning'
+  },
+  {
+    id: 14,
+    text: 'اللَّهُمَّ صَلِّ وَسَلِّمْ وَبَارِكْ عَلَى نَبِيِّنَا مُحَمَّدٍ',
+    translation: 'O Allah, send prayers, peace, and blessings upon our Prophet Muhammad.',
+    reference: 'At-Tabarani, Hasan',
+    count: 10,
+    category: 'morning'
+  },
+  {
+    id: 15,
+    text: 'سُبْحَانَ اللَّهِ وَبِحَمْدِهِ، عَدَدَ خَلْقِهِ، وَرِضَا نَفْسِهِ، وَزِنَةَ عَرْشِهِ، وَمِدَادَ كَلِمَاتِهِ',
+    translation: 'Glory and praise be to Allah as many times as the number of His creation, as pleases Him, equal to the weight of His Throne, and equal to the ink of His words.',
+    reference: 'Muslim 2726',
+    count: 3,
+    category: 'morning'
+  },
+  {
+    id: 16,
+    text: 'حَسْبِيَ اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ، عَلَيْهِ تَوَكَّلْتُ، وَهُوَ رَبُّ الْعَرْشِ الْعَظِيمِ',
+    translation: 'Allah is sufficient for me. None has the right to be worshipped except Him. Upon Him I rely, and He is the Lord of the Mighty Throne.',
+    reference: 'Abu Dawud 5081',
+    count: 7,
+    category: 'morning'
+  },
+  {
+    id: 17,
+    text: 'أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ',
+    translation: 'I seek refuge in the perfect words of Allah from the evil of what He has created.',
+    reference: 'Muslim 2708',
+    count: 3,
+    category: 'morning'
+  }
 ];
 
 export const eveningAzkar: Dhikr[] = [

@@ -24,7 +24,10 @@ const prayerIcons = {
   Asr: '🌤️',
   Maghrib: '🌇',
   Isha: '🌃',
+  Midnight: '🌌',
+  LastThird: '✨',
 };
+
 
 export default function PrayerTimesPage() {
   const { t, language } = useTranslation();

@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  ChevronLeft, 
-  ChevronRight, 
-  Play, 
-  Pause, 
-  SkipBack, 
+import {
+  ChevronLeft,
+  ChevronRight,
+  Play,
+  Pause,
+  SkipBack,
   SkipForward,
   Volume2,
   VolumeX,
@@ -25,7 +25,7 @@ import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { 
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -34,8 +34,8 @@ import {
 } from '@/components/ui/select';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAppStore } from '@/store/useAppStore';
-import { 
-  fetchSurahWithTranslation, 
+import {
+  fetchSurahWithTranslation,
   fetchReciters,
   getRecitersFromData,
   getAudioUrl,
@@ -52,6 +52,7 @@ export default function SurahReader() {
     favorites, 
     toggleFavorite, 
     addBookmark, 
+    removeBookmark, 
     bookmarks, 
     addRecentRead,
     player,
@@ -66,7 +67,7 @@ export default function SurahReader() {
   const [currentAyah, setCurrentAyah] = useState<number>(1);
   const [volume, setVolume] = useState(1);
   const [isMuted, setIsMuted] = useState(false);
-  
+
   const audioRef = useRef<HTMLAudioElement>(null);
   const surahNum = parseInt(surahNumber || '1');
   const isFavorite = favorites.includes(surahNum);
@@ -74,7 +75,7 @@ export default function SurahReader() {
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-      
+
       // Load reciters based on language
       const recitersData = await fetchReciters(language);
       if (recitersData.length > 0) {
@@ -95,14 +96,14 @@ export default function SurahReader() {
           setSelectedReciter(maher || recitersData[0]);
         }
       }
-      
+
       // Load surah data
       const surah = await fetchSurahWithTranslation(surahNum, selectedTranslation);
       if (surah) {
         setSurahData(surah);
         addRecentRead(surahNum, 1);
       }
-      
+
       setLoading(false);
     };
     loadData();
@@ -116,12 +117,12 @@ export default function SurahReader() {
 
   const handlePlay = () => {
     if (!selectedReciter || !audioRef.current) return;
-    
+
     const audioUrl = getAudioUrl(selectedReciter, surahNum);
     if (audioRef.current.src !== audioUrl) {
       audioRef.current.src = audioUrl;
     }
-    
+
     if (player.isPlaying) {
       audioRef.current.pause();
       setPlayer({ isPlaying: false });
@@ -179,7 +180,7 @@ export default function SurahReader() {
   return (
     <div className="min-h-screen bg-background" dir={language === 'ar' ? 'rtl' : 'ltr'}>
       <Header />
-      
+
       <main className="pt-20 pb-40">
         <div className="container max-w-4xl">
           {/* Surah Header */}
@@ -196,7 +197,7 @@ export default function SurahReader() {
                 {arabic.numberOfAyahs} {t('verses')}
               </Badge>
             </div>
-            
+
             <h1 className="font-arabic text-4xl md:text-5xl text-foreground mb-2">
               {arabic.name}
             </h1>
@@ -241,18 +242,17 @@ export default function SurahReader() {
             {arabic.ayahs.map((ayah, index) => {
               const translationAyah = translation.ayahs[index];
               const isActive = currentAyah === ayah.numberInSurah;
-              
+
               return (
                 <motion.div
                   key={ayah.number}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.02 }}
-                  className={`ayah-highlight p-6 rounded-2xl border transition-all ${
-                    isActive 
-                      ? 'border-accent bg-accent/5 playing' 
+                  className={`ayah-highlight p-6 rounded-2xl border transition-all ${isActive
+                      ? 'border-accent bg-accent/5 playing'
                       : 'border-border/50 bg-card hover:border-primary/30'
-                  }`}
+                    }`}
                 >
                   {/* Ayah Number */}
                   <div className="flex items-start justify-between mb-4">
@@ -269,7 +269,9 @@ export default function SurahReader() {
                     <Button
                       variant="ghost"
                       size="icon-sm"
-                      onClick={() => addBookmark(surahNum, ayah.numberInSurah)}
+                      onClick={() => isBookmarked(ayah.numberInSurah) 
+                        ? removeBookmark(surahNum, ayah.numberInSurah) 
+                        : addBookmark(surahNum, ayah.numberInSurah)}
                     >
                       <Bookmark className={`w-4 h-4 ${isBookmarked(ayah.numberInSurah) ? 'fill-accent text-accent' : ''}`} />
                     </Button>
@@ -355,9 +357,9 @@ export default function SurahReader() {
 
             {/* Volume */}
             <div className="flex items-center gap-2 w-32">
-              <Button 
-                variant="ghost" 
-                size="icon-sm" 
+              <Button
+                variant="ghost"
+                size="icon-sm"
                 onClick={() => setIsMuted(!isMuted)}
               >
                 {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}

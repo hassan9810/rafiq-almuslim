@@ -44,7 +44,7 @@ export function HeroSection() {
   };
 
   return (
-    <section className="relative min-h-[90vh] flex flex-col overflow-hidden">
+    <section className="relative min-h-[75vh] flex flex-col overflow-hidden">
       {/* Background */}
       <div className="absolute inset-0 hero-gradient islamic-pattern" />
       
@@ -78,12 +78,12 @@ export function HeroSection() {
             <Calendar className="w-4 h-4" />
             <span className="font-arabic text-sm md:text-base">{hijriDate}</span>
             <span className="text-primary-foreground/50 dark:text-foreground/50">|</span>
-            <span className="text-sm md:text-base">{gregorianDate}</span>
+            <span className="text-smz-10 md:text-base">{gregorianDate}</span>
           </div>
         </motion.div>
       </div>
 
-      <div className="container relative z-10 flex-1 flex items-center py-8 md:py-12">
+      <div className="container relative z-10 items-center py-8 md:py-12">
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
           {/* Left Content */}
           <motion.div

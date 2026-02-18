@@ -13,6 +13,7 @@ import {
   Menu, 
   X,
   BookMarked,
+  Bookmark,
   MessageSquareQuote,
   Shield,
   Languages,
@@ -25,6 +26,7 @@ import { Button } from '@/components/ui/button';
 const navItems = [
   { path: '/quran', icon: BookOpen, labelKey: 'quran' as const },
   { path: '/mushaf', icon: BookImage, labelKey: 'mushaf' as const },
+  { path: '/bookmarks', icon: Bookmark, labelKey: 'bookmarks' as const },
   { path: '/tafsir', icon: BookMarked, labelKey: 'tafsir' as const },
   { path: '/hadith', icon: MessageSquareQuote, labelKey: 'hadith' as const },
   { path: '/translations', icon: Languages, labelKey: 'translations' as const },
@@ -81,8 +83,8 @@ export function Header() {
       <header 
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${headerBg}`}
       >
-        <div className="container">
-          <div className="flex items-center justify-between h-16 md:h-20">
+        <div className="container max-w-[1600px]">
+          <div className="flex items-center justify-between h-16 md:h-20 gap-4">
             {/* Logo */}
             <Link to="/" className="flex items-center gap-2">
               <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
@@ -94,7 +96,7 @@ export function Header() {
             </Link>
 
             {/* Desktop Navigation */}
-            <nav className="hidden lg:flex items-center gap-1">
+            <nav className="hidden lg:flex items-center gap-1 flex-nowrap flex-shrink-0 min-w-0">
               {navItems.map((item) => {
                 const isActive = location.pathname.startsWith(item.path);
                 const Icon = item.icon;
@@ -102,7 +104,7 @@ export function Header() {
                   <Link
                     key={item.path}
                     to={item.path}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
                       isActive 
                         ? 'bg-primary text-primary-foreground' 
                         : useLightText

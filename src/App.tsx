@@ -18,6 +18,7 @@ import HisnMuslimPage from "./pages/HisnMuslimPage";
 import TranslationsPage from "./pages/TranslationsPage";
 import TranslationReaderPage from "./pages/TranslationReaderPage";
 import E3rabPage from "./pages/E3rabPage";
+import BookmarksPage from "./pages/BookmarksPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -44,6 +45,7 @@ const App = () => (
           <Route path="/prayer-times" element={<PrayerTimesPage />} />
           <Route path="/qibla" element={<QiblaPage />} />
           <Route path="/radio" element={<RadioPage />} />
+          <Route path="/bookmarks" element={<BookmarksPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

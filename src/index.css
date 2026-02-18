@@ -292,7 +292,7 @@
   
   .ayah-highlight::after {
     content: '';
-    @apply absolute inset-0 rounded-lg opacity-0 transition-opacity duration-300;
+    @apply absolute inset-0 rounded-lg opacity-0 transition-opacity duration-300 pointer-events-none;
     background: hsl(var(--accent) / 0.1);
   }
   

@@ -49,7 +49,16 @@ type TranslationKey =
   | 'surahNumber'
   | 'juz'
   | 'hizb'
-  | 'page';
+  | 'page'
+  | 'ayah'
+  | 'bookmark'
+  | 'noBookmarks'
+  | 'noBookmarksHint'
+  | 'removeBookmark'
+  | 'favorite'
+  | 'noFavorites'
+  | 'removeFavorite'
+  | 'noRecentReads';
 
 const translations: Record<'en' | 'ar', Record<TranslationKey, string>> = {
   en: {
@@ -102,6 +111,15 @@ const translations: Record<'en' | 'ar', Record<TranslationKey, string>> = {
     juz: 'Juz',
     hizb: 'Hizb',
     page: 'Page',
+    ayah: 'Ayah',
+    bookmark: 'bookmark',
+    noBookmarks: 'No bookmarks yet',
+    noBookmarksHint: 'Bookmark verses while reading to find them here quickly',
+    removeBookmark: 'Remove bookmark',
+    favorite: 'favorite',
+    noFavorites: 'No favorite surahs yet',
+    removeFavorite: 'Remove from favorites',
+    noRecentReads: 'No recent reads. Start reading a surah to see it here.',
   },
   ar: {
     appName: 'رفيق المسلم',
@@ -153,6 +171,15 @@ const translations: Record<'en' | 'ar', Record<TranslationKey, string>> = {
     juz: 'جزء',
     hizb: 'حزب',
     page: 'صفحة',
+    ayah: 'آية',
+    bookmark: 'علامة مرجعية',
+    noBookmarks: 'لا توجد علامات مرجعية بعد',
+    noBookmarksHint: 'علّم الآيات أثناء القراءة لتجدها هنا بسرعة',
+    removeBookmark: 'إزالة العلامة المرجعية',
+    favorite: 'مفضلة',
+    noFavorites: 'لا توجد سور مفضلة بعد',
+    removeFavorite: 'إزالة من المفضلة',
+    noRecentReads: 'لا توجد قراءات حديثة. ابدأ بقراءة سورة لتراها هنا.',
   },
 };
 
