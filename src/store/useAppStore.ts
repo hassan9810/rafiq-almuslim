@@ -51,6 +51,9 @@ interface AppState {
   
   // Location
   location: { latitude: number; longitude: number; city: string } | null;
+
+  // Layout (e.g. hide header in fullscreen mushaf)
+  hideAppHeader: boolean;
   
   // Actions
   setLanguage: (lang: 'ar' | 'en') => void;
@@ -63,6 +66,7 @@ interface AppState {
   addRecentRead: (surah: number, ayah: number) => void;
   setPlayer: (player: Partial<PlayerState>) => void;
   setLocation: (location: { latitude: number; longitude: number; city: string }) => void;
+  setHideAppHeader: (hide: boolean) => void;
 }
 
 export const useAppStore = create<AppState>()(
@@ -88,7 +92,8 @@ export const useAppStore = create<AppState>()(
         repeatMode: 'none',
       },
       location: null,
-      
+      hideAppHeader: false,
+
       // Actions
       setLanguage: (lang) => set({ 
         language: lang, 
@@ -136,6 +141,7 @@ export const useAppStore = create<AppState>()(
       }),
       
       setLocation: (location) => set({ location }),
+      setHideAppHeader: (hide) => set({ hideAppHeader: hide }),
     }),
     {
       name: 'rafiq-muslim-storage',

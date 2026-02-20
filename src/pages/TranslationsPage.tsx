@@ -12,8 +12,6 @@ import {
   Languages,
   BookOpen
 } from 'lucide-react';
-import { Header } from '@/components/Header';
-import { Footer } from '@/components/Footer';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAppStore } from '@/store/useAppStore';
 import { Button } from '@/components/ui/button';
@@ -37,7 +35,7 @@ import {
 
 export default function TranslationsPage() {
   const navigate = useNavigate();
-  const { language } = useTranslation();
+  const { t, language } = useTranslation();
   const { direction } = useAppStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [translations, setTranslations] = useState<TranslationEdition[]>([]);
@@ -109,10 +107,8 @@ export default function TranslationsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background" dir={direction}>
-      <Header />
-      
-      <main className="pt-24 pb-16">
+    <div>
+      <main>
         <div className="container max-w-6xl">
           {/* Page Header */}
           <motion.div
@@ -124,13 +120,10 @@ export default function TranslationsPage() {
               <Languages className="w-8 h-8 text-primary" />
             </div>
             <h1 className="font-arabic text-3xl md:text-4xl font-bold mb-2">
-              {isArabic ? 'ترجمات القرآن الكريم' : 'Quran Translations'}
+              {t('quranTranslations')}
             </h1>
             <p className="font-arabic text-muted-foreground max-w-2xl mx-auto">
-              {isArabic 
-                ? 'اكتشف أكثر من 90 ترجمة للقرآن الكريم بلغات متعددة من مصادر موثوقة'
-                : 'Discover over 90 Quran translations in multiple languages from trusted sources'
-              }
+              {t('quranTranslationsSubtitle')}
             </p>
           </motion.div>
 
@@ -140,7 +133,7 @@ export default function TranslationsPage() {
             <div className="relative flex-1">
               <Search className={`absolute ${isArabic ? 'right-3' : 'left-3'} top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground`} />
               <Input
-                placeholder={isArabic ? 'ابحث في الترجمات...' : 'Search translations...'}
+                placeholder={t('searchTranslationsPlaceholder')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className={isArabic ? 'pr-10' : 'pl-10'}
@@ -151,11 +144,11 @@ export default function TranslationsPage() {
             <Select value={selectedLanguage} onValueChange={setSelectedLanguage}>
               <SelectTrigger className="w-full md:w-[200px]">
                 <Globe className="w-4 h-4 mr-2" />
-                <SelectValue placeholder={isArabic ? 'اختر اللغة' : 'Select Language'} />
+                <SelectValue placeholder={t('selectLanguage')} />
               </SelectTrigger>
               <SelectContent className="bg-background border shadow-lg z-50">
                 <SelectItem value="all">
-                  {isArabic ? 'جميع اللغات' : 'All Languages'}
+                  {t('allLanguages')}
                 </SelectItem>
                 {availableLanguages.map((lang) => (
                   <SelectItem key={lang} value={lang}>
@@ -172,7 +165,7 @@ export default function TranslationsPage() {
               <CardContent className="p-4 text-center">
                 <p className="text-3xl font-bold text-primary">{translations.length}</p>
                 <p className="text-sm text-muted-foreground">
-                  {isArabic ? 'ترجمة متاحة' : 'Translations'}
+                  {t('translationsAvailable')}
                 </p>
               </CardContent>
             </Card>
@@ -180,7 +173,7 @@ export default function TranslationsPage() {
               <CardContent className="p-4 text-center">
                 <p className="text-3xl font-bold text-primary">{availableLanguages.length}</p>
                 <p className="text-sm text-muted-foreground">
-                  {isArabic ? 'لغة' : 'Languages'}
+                  {t('languages')}
                 </p>
               </CardContent>
             </Card>
@@ -190,7 +183,7 @@ export default function TranslationsPage() {
                   {translations.filter(t => t.pdf_url).length}
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  {isArabic ? 'ملف PDF' : 'PDF Files'}
+                  {t('pdfFiles')}
                 </p>
               </CardContent>
             </Card>
@@ -200,7 +193,7 @@ export default function TranslationsPage() {
                   {translations.filter(t => t.epub_url).length}
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  {isArabic ? 'ملف EPUB' : 'EPUB Files'}
+                  {t('epubFiles')}
                 </p>
               </CardContent>
             </Card>
@@ -269,14 +262,12 @@ export default function TranslationsPage() {
             <div className="text-center py-12">
               <Globe className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
               <p className="text-muted-foreground">
-                {isArabic ? 'لا توجد ترجمات مطابقة للبحث' : 'No translations found matching your search'}
+                {t('noTranslationsFound')}
               </p>
             </div>
           )}
         </div>
       </main>
-
-      <Footer />
     </div>
   );
 }
@@ -295,6 +286,7 @@ function TranslationCard({
   getLanguageName: (code: string) => string;
   onRead: (key: string) => void;
 }) {
+  const { t } = useTranslation();
   return (
     <Card className="hover:shadow-lg transition-all hover:border-primary/50">
       <CardHeader className="pb-2">
@@ -313,7 +305,7 @@ function TranslationCard({
         )}
         
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <span>{isArabic ? 'الإصدار:' : 'Version:'} {translation.version}</span>
+          <span>{t('version')} {translation.version}</span>
           {translation.last_update && (
             <>
               <span>•</span>
@@ -331,7 +323,7 @@ function TranslationCard({
             onClick={() => onRead(translation.key)}
           >
             <BookOpen className="w-3 h-3" />
-            {isArabic ? 'قراءة' : 'Read'}
+            {t('read')}
           </Button>
 
           {/* Download links */}

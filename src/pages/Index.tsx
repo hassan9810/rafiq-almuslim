@@ -1,10 +1,8 @@
 import { useEffect } from 'react';
 import { useAppStore } from '@/store/useAppStore';
 import { useTranslation } from '@/hooks/useTranslation';
-import { Header } from '@/components/Header';
 import { HeroSection } from '@/components/HeroSection';
 import { SurahList } from '@/components/SurahList';
-import { Footer } from '@/components/Footer';
 import { PrayerTimesWidget } from '@/components/PrayerTimesWidget';
 
 const Index = () => {
@@ -17,8 +15,7 @@ const Index = () => {
   }, [theme]);
 
   return (
-    <div className="min-h-screen bg-background" dir={direction}>
-      <Header />
+    <div>
       <main>
         <HeroSection />
         
@@ -29,7 +26,6 @@ const Index = () => {
         
         <SurahList />
       </main>
-      <Footer />
     </div>
   );
 };

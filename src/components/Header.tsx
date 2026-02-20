@@ -88,9 +88,9 @@ export function Header() {
             {/* Logo */}
             <Link to="/" className="flex items-center gap-2">
               <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
-                <span className="font-arabic text-lg text-primary-foreground font-bold">ق</span>
+                <span className="text-lg text-primary-foreground font-bold">ق</span>
               </div>
-              <span className={`font-arabic text-xl font-bold ${useLightText ? 'text-primary-foreground' : 'text-foreground'}`}>
+              <span className={`text-xl font-bold ${useLightText ? 'text-primary-foreground' : 'text-foreground'}`}>
                 {t('appName')}
               </span>
             </Link>

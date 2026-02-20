@@ -1,9 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Noto+Sans+Arabic:wght@400;500;600;700&family=Noto+Sans:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Noto+Sans+Arabic:wght@400;500;600;700&family=Noto+Sans:wght@400;500;600;700&display=swap');
 
 @font-face {
   font-family: 'QPC Hafs';
@@ -187,10 +187,7 @@
     font-family: 'Surah Names', 'Amiri', serif;
   }
   
-  /* RTL Support */
-  [dir="rtl"] {
-    font-family: 'Noto Sans Arabic', 'Noto Sans', sans-serif;
-  }
+
   
   /* Scrollbar Styling */
   ::-webkit-scrollbar {

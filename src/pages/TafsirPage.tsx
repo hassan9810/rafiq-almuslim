@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { BookMarked, Search, ChevronDown, Book, Languages, Loader2 } from 'lucide-react';
-import { Header } from '@/components/Header';
-import { Footer } from '@/components/Footer';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAppStore } from '@/store/useAppStore';
 import { Button } from '@/components/ui/button';
@@ -64,10 +62,8 @@ export default function TafsirPage() {
   }, {} as Record<string, typeof tafsirEditions>);
 
   return (
-    <div className="min-h-screen bg-background" dir={direction}>
-      <Header />
-      
-      <main className="pt-24 pb-16">
+    <div>
+      <main>
         <div className="container">
           {/* Page Header */}
           <motion.div
@@ -79,12 +75,10 @@ export default function TafsirPage() {
               <BookMarked className="w-8 h-8 text-primary" />
             </div>
             <h1 className="font-arabic text-3xl md:text-4xl font-bold mb-2">
-              {language === 'ar' ? 'التفسير' : 'Tafsir'}
+              {t('tafsir')}
             </h1>
             <p className="font-arabic text-muted-foreground max-w-2xl mx-auto">
-              {language === 'ar' 
-                ? 'اقرأ تفسير القرآن الكريم من أشهر المفسرين'
-                : 'Read Quran interpretation from renowned scholars'}
+              {t('tafsirSubtitle')}
             </p>
           </motion.div>
 
@@ -99,14 +93,14 @@ export default function TafsirPage() {
                 <CardHeader className="pb-3">
                   <CardTitle className="text-lg flex items-center gap-2">
                     <Languages className="w-5 h-5" />
-                    {language === 'ar' ? 'اختر التفسير' : 'Select Tafsir'}
+                    {t('selectTafsir')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                     <Input
-                      placeholder={language === 'ar' ? 'ابحث...' : 'Search...'}
+                      placeholder={t('searchShort')}
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       className="pl-9"
@@ -162,7 +156,7 @@ export default function TafsirPage() {
                     <div className="flex items-center gap-2">
                       <Book className="w-5 h-5 text-primary" />
                       <span className="font-medium">
-                        {language === 'ar' ? 'السورة:' : 'Surah:'}
+                        {t('surahLabel')}
                       </span>
                     </div>
                     <Select
@@ -251,8 +245,6 @@ export default function TafsirPage() {
           </div>
         </div>
       </main>
-
-      <Footer />
     </div>
   );
 }

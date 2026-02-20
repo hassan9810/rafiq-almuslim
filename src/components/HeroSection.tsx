@@ -178,10 +178,10 @@ export function HeroSection() {
               className="flex flex-wrap gap-8 pt-4"
             >
               {[
-                { value: language === 'ar' ? 'القرآن' : 'Quran', label: language === 'ar' ? 'الكريم' : 'Kareem' },
-                { value: '+50', label: language === 'ar' ? 'قارئ' : 'Reciters' },
-                { value: language === 'ar' ? 'الحديث' : 'Hadith', label: language === 'ar' ? 'الشريف' : 'Sharif' },
-                { value: language === 'ar' ? 'حصن' : 'Hisn', label: language === 'ar' ? 'المسلم' : 'Muslim' },
+                { value: t('quran'), label: t('kareem') },
+                { value: '+50', label: t('reciters') },
+                { value: t('hadith'), label: t('sharif') },
+                { value: t('hisn'), label: t('muslim') },
               ].map((stat, index) => (
                 <div key={index} className="text-center">
                   <p className="text-2xl md:text-3xl font-bold text-primary-foreground">{stat.value}</p>

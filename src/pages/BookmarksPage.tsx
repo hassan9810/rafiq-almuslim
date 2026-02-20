@@ -2,8 +2,6 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Bookmark, BookmarkMinus, ChevronRight, BookOpen, Star } from 'lucide-react';
-import { Header } from '@/components/Header';
-import { Footer } from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAppStore } from '@/store/useAppStore';
@@ -32,9 +30,8 @@ export default function BookmarksPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background" dir={direction}>
-        <Header />
-        <main className="pt-24 pb-16">
+      <div>
+        <main>
           <div className="container max-w-3xl py-12">
             <div className="animate-pulse space-y-4">
               {[1, 2, 3, 4, 5].map((i) => (
@@ -48,9 +45,8 @@ export default function BookmarksPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background" dir={direction}>
-      <Header />
-      <main className="pt-24 pb-16">
+    <div>
+      <main>
         <div className="container">
           {/* Page Header */}
           <motion.div
@@ -212,7 +208,6 @@ export default function BookmarksPage() {
           </div>
         </div>
       </main>
-      <Footer />
     </div>
   );
 }

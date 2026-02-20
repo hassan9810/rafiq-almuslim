@@ -1,8 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Radio, Play, Pause, Volume2, VolumeX, Heart, Loader2 } from 'lucide-react';
-import { Header } from '@/components/Header';
-import { Footer } from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -102,10 +100,8 @@ export default function RadioPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background" dir={direction}>
-      <Header />
-      
-      <main className="pt-24 pb-16">
+    <div>
+      <main>
         <div className="container max-w-2xl">
           {/* Page Header */}
           <motion.div
@@ -116,11 +112,11 @@ export default function RadioPage() {
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-4">
               <Radio className="w-8 h-8 text-primary" />
             </div>
-            <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
+            <h1 className="font-arabic text-3xl md:text-4xl font-bold text-foreground mb-2">
               {t('radio')}
             </h1>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              {language === 'ar' ? 'استمع إلى إذاعات القرآن الكريم' : 'Listen to Quran Radio Stations'}
+            <p className="font-arabic text-muted-foreground max-w-2xl mx-auto">
+              {t('radioSubtitle')}
             </p>
           </motion.div>
 
@@ -183,7 +179,7 @@ export default function RadioPage() {
                       <div className="flex items-center gap-1 mt-1">
                         <span className="w-2 h-2 bg-accent rounded-full animate-pulse" />
                         <span className="text-xs text-accent">
-                          {language === 'ar' ? 'يعمل الآن' : 'Now Playing'}
+                          {t('nowPlaying')}
                         </span>
                       </div>
                     )}
@@ -261,7 +257,6 @@ export default function RadioPage() {
       )}
 
       <audio ref={audioRef} />
-      <Footer />
     </div>
   );
 }

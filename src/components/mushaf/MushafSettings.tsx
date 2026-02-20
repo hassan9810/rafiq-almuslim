@@ -31,7 +31,7 @@ export const MushafSettings = memo(function MushafSettings({
   open,
   onClose
 }: MushafSettingsProps) {
-  const { language } = useTranslation();
+  const { t, language } = useTranslation();
   const { settings, updateSettings } = useMushafStore();
 
   return (
@@ -39,7 +39,7 @@ export const MushafSettings = memo(function MushafSettings({
       <SheetContent side={language === 'ar' ? 'right' : 'left'} className="w-80">
         <SheetHeader>
           <SheetTitle className="flex items-center gap-2">
-            {language === 'ar' ? 'إعدادات المصحف' : 'Mushaf Settings'}
+            {t('mushafSettings')}
           </SheetTitle>
         </SheetHeader>
 
@@ -55,7 +55,7 @@ export const MushafSettings = memo(function MushafSettings({
             <div className="flex items-center justify-between">
               <Label htmlFor="night-mode" className="flex items-center gap-2">
                 {settings.nightMode ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
-                {language === 'ar' ? 'الوضع الليلي' : 'Night Mode'}
+                {t('nightMode')}
               </Label>
               <Switch
                 id="night-mode"
@@ -88,7 +88,7 @@ export const MushafSettings = memo(function MushafSettings({
             {/* Show Tashkeel */}
             <div className="flex items-center justify-between">
               <Label htmlFor="tashkeel">
-                {language === 'ar' ? 'إظهار التشكيل' : 'Show Tashkeel'}
+                {t('showTashkeel')}
               </Label>
               <Switch
                 id="tashkeel"
@@ -102,7 +102,7 @@ export const MushafSettings = memo(function MushafSettings({
           <div className="space-y-4">
             <h3 className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
               <Languages className="w-4 h-4" />
-              {language === 'ar' ? 'الترجمة' : 'Translation'}
+              {t('translation')}
             </h3>
 
             {/* Show Translation */}
@@ -120,7 +120,7 @@ export const MushafSettings = memo(function MushafSettings({
             {/* Translation Edition */}
             {settings.showTranslation && (
               <div className="space-y-2">
-                <Label>{language === 'ar' ? 'نسخة الترجمة' : 'Translation Edition'}</Label>
+                <Label>{t('translationEdition')}</Label>
                 <Select
                   value={settings.translationEdition}
                   onValueChange={(val) => updateSettings({ translationEdition: val })}

@@ -43,7 +43,7 @@ export const MushafToolbar = memo(function MushafToolbar({
   onSearchClick,
   onSettingsClick
 }: MushafToolbarProps) {
-  const { language } = useTranslation();
+  const { t, language } = useTranslation();
   const {
     currentPage,
     zoom,
@@ -106,7 +106,7 @@ export const MushafToolbar = memo(function MushafToolbar({
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                {language === 'ar' ? 'صفحة واحدة' : 'Single Page'}
+                {t('singlePageTooltip')}
               </TooltipContent>
             </Tooltip>
             
@@ -122,7 +122,7 @@ export const MushafToolbar = memo(function MushafToolbar({
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                {language === 'ar' ? 'صفحتين' : 'Double Page'}
+                {t('doublePageTooltip')}
               </TooltipContent>
             </Tooltip>
           </div>
@@ -192,7 +192,7 @@ export const MushafToolbar = memo(function MushafToolbar({
               </Button>
             </TooltipTrigger>
             <TooltipContent>
-              {language === 'ar' ? 'البحث' : 'Search'}
+              {t('search')}
             </TooltipContent>
           </Tooltip>
 
@@ -228,7 +228,7 @@ export const MushafToolbar = memo(function MushafToolbar({
               </Button>
             </TooltipTrigger>
             <TooltipContent>
-              {language === 'ar' ? 'الوضع الليلي' : 'Night Mode'}
+              {t('nightMode')}
             </TooltipContent>
           </Tooltip>
         </div>
@@ -259,7 +259,7 @@ export const MushafToolbar = memo(function MushafToolbar({
               </Button>
             </TooltipTrigger>
             <TooltipContent>
-              {language === 'ar' ? (isFullscreen ? 'إلغاء ملء الشاشة' : 'ملء الشاشة') : (isFullscreen ? 'Exit Fullscreen' : 'Fullscreen')}
+              {isFullscreen ? t('exitFullscreen') : t('fullscreen')}
             </TooltipContent>
           </Tooltip>
         </div>

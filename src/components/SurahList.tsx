@@ -36,20 +36,6 @@ function SurahCard({ surah, index, isFavorite, onToggleFavorite, onClick, animat
         <span className="text-sm font-bold text-primary-foreground">{surah.number}</span>
       </div>
 
-      {/* Favorite Button */}
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          onToggleFavorite();
-        }}
-        className="absolute top-3 right-3 p-1.5 rounded-full hover:bg-accent/10 transition-colors"
-      >
-        <Star
-          className={`w-4 h-4 transition-colors ${isFavorite ? 'fill-accent text-accent' : 'text-muted-foreground'
-            }`}
-        />
-      </button>
-
       <div className="pt-4">
         {language === 'ar' ? (
           <>
@@ -68,13 +54,30 @@ function SurahCard({ surah, index, isFavorite, onToggleFavorite, onClick, animat
         )}
 
         {/* Meta Info */}
-        <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border/50">
-          <Badge variant={surah.revelationType === 'Meccan' ? 'default' : 'secondary'} className="text-xs">
-            {surah.revelationType === 'Meccan' ? t('makki') : t('madani')}
-          </Badge>
-          <span className="text-xs text-muted-foreground">
-            {surah.numberOfAyahs} {t('verses')}
+        <div className="flex items-center justify-between gap-2 mt-3 pt-3 border-t border-border/50">
+          <span className="flex items-center gap-2">
+            <Badge variant={surah.revelationType === 'Meccan' ? 'default' : 'secondary'} className="text-xs">
+              {surah.revelationType === 'Meccan' ? t('makki') : t('madani')}
+            </Badge>
+            <span className="text-xs text-muted-foreground">
+              {surah.numberOfAyahs} {t('verses')}
+            </span>
           </span>
+
+          {/* Favorite Button */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleFavorite();
+            }}
+            className="p-1.5 rounded-full hover:bg-accent/10 transition-colors"
+          >
+            <Star
+              className={`w-4 h-4 transition-colors ${isFavorite ? 'fill-accent text-accent' : 'text-muted-foreground'
+                }`}
+            />
+          </button>
+
         </div>
       </div>
 
@@ -124,7 +127,7 @@ export function SurahList() {
         : surahs;
 
   return (
-    <section className="py-6 bg-background">
+    <section className="pt-6 bg-background">
       <div className="container">
         {/* Tabs */}
         <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="mb-8" dir={direction}>

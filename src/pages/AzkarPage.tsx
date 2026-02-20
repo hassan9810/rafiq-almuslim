@@ -1,8 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sun, Moon, Bed, Plane, RotateCcw, Check, ChevronLeft, ChevronRight, Vibrate, Mic2 } from 'lucide-react';
-import { Header } from '@/components/Header';
-import { Footer } from '@/components/Footer';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAppStore } from '@/store/useAppStore';
 import { useAzkarStore, type AzkarCategory as StoreAzkarCategory } from '@/store/useAzkarStore';
@@ -133,10 +131,8 @@ export default function AzkarPage() {
   const totalProgress = azkar.length > 0 ? (completedCount / azkar.length) * 100 : 0;
 
   return (
-    <div className="min-h-screen bg-background" dir={direction}>
-      <Header />
-      
-      <main className="pt-24 pb-16">
+    <div>
+      <main>
         <div className="container max-w-4xl">
           {/* Page Header */}
           <motion.div
@@ -148,7 +144,7 @@ export default function AzkarPage() {
               <Mic2 className="w-8 h-8 text-primary" />
             </div>
             <h1 className="font-arabic text-3xl md:text-4xl font-bold mb-2">
-              {language === 'ar' ? 'الأذكار' : 'Azkar'}
+              {t('azkar')}
             </h1>
             <p className="font-arabic text-muted-foreground max-w-2xl mx-auto">
               {language === 'ar' 
@@ -182,12 +178,10 @@ export default function AzkarPage() {
                     <Card className="text-center">
                       <CardHeader>
                         <CardTitle className="font-arabic text-2xl">
-                          {language === 'ar' ? 'المسبحة الإلكترونية' : 'Digital Tasbih'}
+                          {t('digitalTasbih')}
                         </CardTitle>
                         <CardDescription>
-                          {language === 'ar' 
-                            ? 'اضغط للتسبيح - يهتز عند ٣٣ و ٩٩'
-                            : 'Tap to count - vibrates at 33 and 99'}
+                          {t('digitalTasbihDescription')}
                         </CardDescription>
                       </CardHeader>
                       <CardContent className="space-y-6">
@@ -214,14 +208,14 @@ export default function AzkarPage() {
                         <div className="flex justify-center gap-4">
                           <Button variant="outline" onClick={resetTasbih}>
                             <RotateCcw className="w-4 h-4 mr-2" />
-                            {language === 'ar' ? 'إعادة' : 'Reset'}
+                            {t('reset')}
                           </Button>
                           <Button
                             variant={vibrationEnabled ? 'default' : 'outline'}
                             onClick={() => setVibrationEnabled(!vibrationEnabled)}
                           >
                             <Vibrate className="w-4 h-4 mr-2" />
-                            {language === 'ar' ? 'اهتزاز' : 'Vibrate'}
+                            {t('vibrate')}
                           </Button>
                         </div>
 
@@ -251,7 +245,7 @@ export default function AzkarPage() {
                       <CardContent className="py-3">
                         <div className="flex items-center justify-between mb-2">
                           <span className="text-sm text-muted-foreground">
-                            {language === 'ar' ? 'التقدم' : 'Progress'}
+                            {t('progress')}
                           </span>
                           <span className="text-sm font-medium">
                             {completedCount}/{azkar.length}
@@ -272,7 +266,7 @@ export default function AzkarPage() {
                             {isComplete && (
                               <Badge className="bg-green-500">
                                 <Check className="w-3 h-3 mr-1" />
-                                {language === 'ar' ? 'مكتمل' : 'Complete'}
+                                {t('complete')}
                               </Badge>
                             )}
                           </div>
@@ -332,7 +326,7 @@ export default function AzkarPage() {
                               disabled={currentIndex === 0}
                             >
                               <ChevronLeft className="w-4 h-4 mr-1" />
-                              {language === 'ar' ? 'السابق' : 'Previous'}
+                              {t('previous')}
                             </Button>
                             
                             <Button
@@ -341,7 +335,7 @@ export default function AzkarPage() {
                               size="lg"
                               className="px-8"
                             >
-                              {language === 'ar' ? 'تسبيح' : 'Count'}
+                              {t('count')}
                             </Button>
 
                             <Button
@@ -349,7 +343,7 @@ export default function AzkarPage() {
                               onClick={goNext}
                               disabled={currentIndex === azkar.length - 1}
                             >
-                              {language === 'ar' ? 'التالي' : 'Next'}
+                              {t('next')}
                               <ChevronRight className="w-4 h-4 ml-1" />
                             </Button>
                           </div>
@@ -364,7 +358,6 @@ export default function AzkarPage() {
         </div>
       </main>
 
-      <Footer />
     </div>
   );
 }

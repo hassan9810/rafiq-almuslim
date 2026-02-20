@@ -22,8 +22,6 @@ import {
   FileText,
   List
 } from 'lucide-react';
-import { Header } from '@/components/Header';
-import { Footer } from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
@@ -89,7 +87,7 @@ interface TextMushafSettings {
 export default function TextMushafPage() {
   const { language } = useTranslation();
   const containerRef = useRef<HTMLDivElement>(null);
-  const { direction, bookmarks, addBookmark, removeBookmark } = useAppStore();
+  const { direction, bookmarks, addBookmark, removeBookmark, setHideAppHeader } = useAppStore();
   
   // Page state
   const [currentPage, setCurrentPage] = useState(1);
@@ -229,11 +227,16 @@ export default function TextMushafPage() {
 
   useEffect(() => {
     const handleFullscreenChange = () => {
-      setIsFullscreen(!!document.fullscreenElement);
+      const fullscreen = !!document.fullscreenElement;
+      setIsFullscreen(fullscreen);
+      setHideAppHeader(fullscreen);
     };
     document.addEventListener('fullscreenchange', handleFullscreenChange);
-    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
-  }, []);
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      setHideAppHeader(false);
+    };
+  }, [setHideAppHeader]);
 
   // Keyboard navigation
   useEffect(() => {
@@ -436,15 +439,11 @@ export default function TextMushafPage() {
   return (
     <div 
       ref={containerRef}
-      className="min-h-screen flex flex-col bg-background"
-      dir={direction}
+      className="flex flex-col min-h-full"
     >
-      {/* Header - Always uses global theme, not affected by Text Mushaf night mode */}
-      {!isFullscreen && <Header />}
-      
       {/* Main content wrapper - Night mode applies only here */}
       <div className={`flex-1 flex flex-col ${settings.nightMode ? 'bg-neutral-950 text-neutral-100' : ''}`}>
-        <main className={`flex-1 flex flex-col ${isFullscreen ? '' : 'pt-24 pb-24'}`}>
+        <main className={`flex-1 flex flex-col ${isFullscreen ? '' : 'pb-24'}`}>
         {/* Page Header */}
         {!isFullscreen && (
           <motion.div
@@ -456,7 +455,7 @@ export default function TextMushafPage() {
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-2">
                   <BookOpen className={`w-6 h-6 ${settings.nightMode ? 'text-emerald-400' : 'text-primary'}`} />
-                  <h1 className={`text-xl md:text-2xl font-bold ${settings.nightMode ? 'text-neutral-100' : 'text-foreground'}`}>
+                  <h1 className={`font-arabic text-xl md:text-2xl font-bold ${settings.nightMode ? 'text-neutral-100' : 'text-foreground'}`}>
                     {language === 'ar' ? 'المصحف النصي' : 'Text Mushaf'}
                   </h1>
                 </div>
@@ -970,8 +969,6 @@ export default function TextMushafPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Footer */}
-      {!isFullscreen && <Footer />}
     </div>
   );
 }

@@ -22,8 +22,6 @@ import {
   Loader2,
   Shield
 } from 'lucide-react';
-import { Header } from '@/components/Header';
-import { Footer } from '@/components/Footer';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAppStore } from '@/store/useAppStore';
 import { Button } from '@/components/ui/button';
@@ -66,7 +64,7 @@ const categoryIcons: Record<string, any> = {
 };
 
 export default function HisnMuslimPage() {
-  const { language } = useTranslation();
+  const { t, language } = useTranslation();
   const { direction } = useAppStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [chapters, setChapters] = useState<HisnChapter[]>([]);
@@ -209,11 +207,9 @@ export default function HisnMuslimPage() {
   const currentDhikr = selectedChapter?.adhkar[currentDhikrIndex];
 
   return (
-    <div className="min-h-screen bg-background" dir={direction}>
-      <Header />
+    <div>
       <audio ref={audioRef} onEnded={() => setIsPlaying(false)} />
-      
-      <main className="pt-24 pb-16">
+      <main>
         <div className="container max-w-6xl">
           {/* Page Header */}
           <motion.div
@@ -225,10 +221,10 @@ export default function HisnMuslimPage() {
               <Shield className="w-8 h-8 text-primary" />
             </div>
             <h1 className="font-arabic text-3xl md:text-4xl font-bold mb-2">
-              حصن المسلم
+              {t('hisnMuslim')}
             </h1>
             <p className="font-arabic text-muted-foreground max-w-2xl mx-auto">
-              {isArabic ? 'من أذكار الكتاب والسنة' : 'Fortress of the Muslim - Invocations from the Quran & Sunnah'}
+              {t('hisnSubtitle')}
             </p>
           </motion.div>
 
@@ -236,7 +232,7 @@ export default function HisnMuslimPage() {
           <div className="relative max-w-md mx-auto mb-8">
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder={isArabic ? 'ابحث في الأذكار...' : 'Search adhkar...'}
+              placeholder={t('searchAdhkarPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pr-10 text-right"
@@ -322,7 +318,7 @@ export default function HisnMuslimPage() {
                                 {/* Repeat count */}
                                 {currentDhikr?.REPEAT && (
                                   <Badge variant="secondary" className="mt-2">
-                                    {isArabic ? 'التكرار:' : 'Repeat:'} {currentDhikr.REPEAT}
+                                    {t('repeat')} {currentDhikr.REPEAT}
                                   </Badge>
                                 )}
                               </div>
@@ -337,14 +333,14 @@ export default function HisnMuslimPage() {
                               disabled={currentDhikrIndex === 0}
                             >
                               <ChevronRight className="h-4 w-4 ml-2" />
-                              {isArabic ? 'السابق' : 'Previous'}
+                              {t('previous')}
                             </Button>
                             <Button
                               variant="outline"
                               onClick={nextDhikr}
                               disabled={currentDhikrIndex === selectedChapter.adhkar.length - 1}
                             >
-                              {isArabic ? 'التالي' : 'Next'}
+                              {t('next')}
                               <ChevronLeft className="h-4 w-4 mr-2" />
                             </Button>
                           </div>
@@ -379,7 +375,7 @@ export default function HisnMuslimPage() {
                                   </div>
                                   {dhikr.REPEAT && (
                                     <Badge variant="secondary" className="mt-2 text-xs">
-                                      {dhikr.REPEAT} {isArabic ? 'مرة' : 'times'}
+                                      {dhikr.REPEAT} {t('times')}
                                     </Badge>
                                   )}
                                 </CardContent>
@@ -391,14 +387,14 @@ export default function HisnMuslimPage() {
                         <div className="text-center py-12">
                           <Loader2 className="h-12 w-12 text-primary mx-auto mb-4 animate-spin" />
                           <p className="text-muted-foreground">
-                            {isArabic ? 'جاري تحميل الأذكار...' : 'Loading adhkar...'}
+                            {t('loadingAdhkar')}
                           </p>
                         </div>
                       ) : (
                         <div className="text-center py-12">
                           <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                           <p className="text-muted-foreground">
-                            {isArabic ? 'لا يوجد محتوى متاح حالياً' : 'No content available'}
+                            {t('noContentAvailable')}
                           </p>
                         </div>
                       )}
@@ -494,7 +490,6 @@ export default function HisnMuslimPage() {
         </div>
       </main>
       
-      <Footer />
     </div>
   );
 }

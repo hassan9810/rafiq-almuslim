@@ -10,8 +10,6 @@ import {
   Languages,
   Info
 } from 'lucide-react';
-import { Header } from '@/components/Header';
-import { Footer } from '@/components/Footer';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAppStore } from '@/store/useAppStore';
 import { Button } from '@/components/ui/button';
@@ -43,7 +41,7 @@ import { fetchSurahs, Surah } from '@/lib/quranApi';
 export default function TranslationReaderPage() {
   const { translationKey, surahNumber } = useParams();
   const navigate = useNavigate();
-  const { language } = useTranslation();
+  const { t, language } = useTranslation();
   const { direction } = useAppStore();
   
   const [translation, setTranslation] = useState<TranslationEdition | null>(null);
@@ -112,9 +110,8 @@ export default function TranslationReaderPage() {
 
   if (loading && !ayahs.length) {
     return (
-      <div className="min-h-screen bg-background" dir={direction}>
-        <Header />
-        <main className="pt-24 pb-16">
+      <div>
+        <main>
           <div className="container max-w-4xl">
             <div className="space-y-4">
               <Skeleton className="h-12 w-full" />
@@ -125,21 +122,18 @@ export default function TranslationReaderPage() {
             </div>
           </div>
         </main>
-        <Footer />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background" dir={direction}>
-      <Header />
-      
-      <main className="pt-24 pb-16">
+    <div>
+      <main>
         <div className="container max-w-4xl">
           {/* Back Button */}
           <Link to="/translations" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-6">
             <ArrowLeft className="w-4 h-4" />
-            {isArabic ? 'العودة للترجمات' : 'Back to Translations'}
+            {t('backToTranslations')}
           </Link>
 
           {/* Header */}
@@ -153,7 +147,7 @@ export default function TranslationReaderPage() {
                 <Languages className="w-6 h-6 text-primary" />
               </div>
               <div>
-                <h1 className="text-xl md:text-2xl font-bold line-clamp-1">
+                <h1 className="font-arabic text-xl md:text-2xl font-bold line-clamp-1">
                   {translation?.title || translationKey}
                 </h1>
                 {translation?.description && (
@@ -186,7 +180,7 @@ export default function TranslationReaderPage() {
             <Select value={translationKey} onValueChange={changeTranslation}>
               <SelectTrigger className="flex-1">
                 <Languages className="w-4 h-4 mr-2" />
-                <SelectValue placeholder={isArabic ? 'اختر الترجمة' : 'Select Translation'} />
+                <SelectValue placeholder={t('selectTranslation')} />
               </SelectTrigger>
               <SelectContent className="bg-background border shadow-lg z-50 max-h-[300px]">
                 {translations.map((t) => (
@@ -211,12 +205,12 @@ export default function TranslationReaderPage() {
                   </div>
                   <div className="flex items-center gap-2">
                     <Badge variant="secondary">
-                      {currentSurah.numberOfAyahs} {isArabic ? 'آية' : 'verses'}
+                      {currentSurah.numberOfAyahs} {t('verses')}
                     </Badge>
                     <Badge variant="outline">
                       {currentSurah.revelationType === 'Meccan' 
-                        ? (isArabic ? 'مكية' : 'Meccan')
-                        : (isArabic ? 'مدنية' : 'Medinan')
+                        ? t('makki')
+                        : t('madani')
                       }
                     </Badge>
                   </div>
@@ -276,7 +270,7 @@ export default function TranslationReaderPage() {
                             <AccordionTrigger className="py-2 text-sm text-primary hover:no-underline">
                               <div className="flex items-center gap-2">
                                 <Info className="w-4 h-4" />
-                                {isArabic ? 'الحواشي' : 'Footnotes'}
+                                {t('footnotes')}
                               </div>
                             </AccordionTrigger>
                             <AccordionContent>
@@ -303,7 +297,7 @@ export default function TranslationReaderPage() {
               className="flex-1"
             >
               <ChevronRight className="w-4 h-4 ml-2" />
-              {isArabic ? 'السورة السابقة' : 'Previous Surah'}
+              {t('previousSurah')}
             </Button>
             <Button
               variant="outline"
@@ -311,14 +305,12 @@ export default function TranslationReaderPage() {
               disabled={surahNum >= 114}
               className="flex-1"
             >
-              {isArabic ? 'السورة التالية' : 'Next Surah'}
+              {t('nextSurah')}
               <ChevronLeft className="w-4 h-4 mr-2" />
             </Button>
           </div>
         </div>
       </main>
-
-      <Footer />
     </div>
   );
 }

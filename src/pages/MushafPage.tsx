@@ -12,8 +12,6 @@ import {
   Maximize,
   Minimize
 } from 'lucide-react';
-import { Header } from '@/components/Header';
-import { Footer } from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
@@ -280,10 +278,8 @@ export default function MushafPage() {
   }, [language, handleNextPage, handlePrevPage]);
 
   return (
-    <div className="min-h-screen bg-background" dir={direction}>
-      <Header />
-      
-      <main className="pt-24 pb-16">
+    <div>
+      <main>
         <div className="container max-w-6xl">
           {/* Page Header */}
           <motion.div
@@ -294,17 +290,17 @@ export default function MushafPage() {
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-4">
               <BookImage className="w-8 h-8 text-primary" />
             </div>
-            <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
-              {language === 'ar' ? 'المصحف الشريف' : 'Holy Quran Mushaf'}
+            <h1 className="font-arabic text-3xl md:text-4xl font-bold text-foreground mb-2">
+              {t('holyQuranMushaf')}
             </h1>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              {language === 'ar' ? 'تصفح صفحات المصحف الشريف' : 'Browse the pages of the Holy Quran'}
+            <p className="font-arabic text-muted-foreground max-w-2xl mx-auto">
+              {t('browseMushafPages')}
             </p>
             <div className="flex flex-wrap items-center justify-center gap-3 mt-4">
               <Link to="/mushaf-text">
                 <Button variant="outline" className="gap-2">
                   <BookOpen className="w-4 h-4" />
-                  {language === 'ar' ? 'المصحف النصي' : 'Text Mushaf'}
+                  {t('textMushaf')}
                 </Button>
               </Link>
             </div>
@@ -316,7 +312,7 @@ export default function MushafPage() {
               {/* Edition Select */}
               <div className="flex items-center gap-2">
                 <span className="text-sm text-muted-foreground">
-                  {language === 'ar' ? 'المصحف:' : 'Edition:'}
+                  {t('edition')}
                 </span>
                 <Select value={selectedEdition.id} onValueChange={handleEditionChange}>
                   <SelectTrigger className="w-48">
@@ -335,7 +331,7 @@ export default function MushafPage() {
               {/* Page Navigation */}
               <form onSubmit={handlePageSubmit} className="flex items-center gap-2">
                 <span className="text-sm text-muted-foreground">
-                  {language === 'ar' ? 'صفحة:' : 'Page:'}
+                  {t('pageLabel')}
                 </span>
                 <Input
                   type="number"
@@ -382,7 +378,7 @@ export default function MushafPage() {
                 variant="outline"
                 size="icon"
                 onClick={toggleFullscreen}
-                title={language === 'ar' ? (isFullscreen ? 'إلغاء ملء الشاشة' : 'ملء الشاشة') : (isFullscreen ? 'Exit Fullscreen' : 'Fullscreen')}
+                title={isFullscreen ? t('exitFullscreen') : t('fullscreen')}
               >
                 {isFullscreen ? <Minimize className="w-4 h-4" /> : <Maximize className="w-4 h-4" />}
               </Button>
@@ -401,7 +397,7 @@ export default function MushafPage() {
                   size="sm"
                   onClick={() => setViewMode('double')}
                 >
-                  {language === 'ar' ? 'صفحتين' : 'Double'}
+                  {t('doublePage')}
                 </Button>
               </div>
             </div>
@@ -449,7 +445,7 @@ export default function MushafPage() {
                   }}
                 >
                   <Minimize className="w-4 h-4" />
-                  {language === 'ar' ? 'إغلاق' : 'Exit'}
+                  {t('close')}
                 </Button>
               </div>
             )}
@@ -528,15 +524,13 @@ export default function MushafPage() {
 
           {/* Page Info */}
           <div className="text-center mt-4 text-muted-foreground">
-            {language === 'ar' ? `صفحة ${currentPage}` : `Page ${currentPage}`}
+            {`${t('page')} ${currentPage}`}
             {viewMode === 'double' && currentPage + 1 <= selectedEdition.endPage && (
               <span> - {currentPage + 1}</span>
             )}
           </div>
         </div>
       </main>
-      
-      <Footer />
     </div>
   );
 }
