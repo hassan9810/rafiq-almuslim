@@ -177,8 +177,8 @@ export default function RadioPage() {
                     </h3>
                     {isActive && isPlaying && (
                       <div className="flex items-center gap-1 mt-1">
-                        <span className="w-2 h-2 bg-accent rounded-full animate-pulse" />
-                        <span className="text-xs text-accent">
+                        <span className="w-2 h-2 bg-primary rounded-full animate-pulse" />
+                        <span className="text-xs text-primary">
                           {t('nowPlaying')}
                         </span>
                       </div>
@@ -219,8 +219,8 @@ export default function RadioPage() {
                 </p>
                 {isPlaying && (
                   <div className="flex items-center gap-1">
-                    <span className="w-2 h-2 bg-accent rounded-full animate-pulse" />
-                    <span className="text-xs text-accent">Live</span>
+                    <span className="w-2 h-2 bg-primary rounded-full animate-pulse" />
+                    <span className="text-xs text-primary">Live</span>
                   </div>
                 )}
               </div>

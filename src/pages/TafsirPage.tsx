@@ -160,6 +160,7 @@ export default function TafsirPage() {
                       </span>
                     </div>
                     <Select
+                      dir={direction}
                       value={selectedSurah.toString()}
                       onValueChange={(v) => setSelectedSurah(parseInt(v))}
                     >

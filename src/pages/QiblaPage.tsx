@@ -176,7 +176,7 @@ export default function QiblaPage() {
 
                 {/* Center Point */}
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-4 h-4 rounded-full bg-accent shadow-glow" />
+                  <div className="w-4 h-4 rounded-full bg-primary shadow-glow" />
                 </div>
               </div>
 

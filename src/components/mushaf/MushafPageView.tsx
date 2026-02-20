@@ -160,7 +160,7 @@ export const MushafPageView = memo(function MushafPageView({
 
           {/* Juz Marker */}
           {juzPageMap[pageJuz] === page && (
-            <div className="bg-accent/90 text-accent-foreground rounded-full px-3 py-1 text-xs font-medium shadow-sm">
+            <div className="bg-primary/90 text-primary-foreground rounded-full px-3 py-1 text-xs font-medium shadow-sm">
               {language === 'ar' ? `الجزء ${pageJuz}` : `Juz ${pageJuz}`}
             </div>
           )}

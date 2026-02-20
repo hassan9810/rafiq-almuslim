@@ -314,7 +314,7 @@ export default function MushafPage() {
                 <span className="text-sm text-muted-foreground">
                   {t('edition')}
                 </span>
-                <Select value={selectedEdition.id} onValueChange={handleEditionChange}>
+                <Select dir={direction} value={selectedEdition.id} onValueChange={handleEditionChange}>
                   <SelectTrigger className="w-48">
                     <SelectValue />
                   </SelectTrigger>

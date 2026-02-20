@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Noto+Sans+Arabic:wght@400;500;600;700&family=Noto+Sans:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Noto+Sans+Arabic:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Scheherazade+New:wght@400;700&family=Noto+Sans:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -142,6 +142,173 @@
     --sidebar-accent-foreground: 45 20% 92%;
     --sidebar-border: 158 25% 15%;
     --sidebar-ring: 43 80% 55%;
+  }
+
+  /* Theme color presets (unified primary + accent) */
+  [data-theme-color="gold"] {
+    --primary: 43 74% 42%;
+    --primary-foreground: 30 20% 10%;
+    --accent: 43 74% 49%;
+    --accent-foreground: 30 20% 10%;
+    --ring: 43 74% 45%;
+    --shadow-card: 0 8px 32px -8px hsl(43 74% 28% / 0.15);
+  }
+  .dark[data-theme-color="gold"] {
+    --primary: 43 75% 50%;
+    --primary-foreground: 30 20% 10%;
+    --accent: 43 80% 55%;
+    --accent-foreground: 30 20% 10%;
+    --ring: 43 80% 55%;
+  }
+
+  [data-theme-color="teal"] {
+    --primary: 170 55% 32%;
+    --primary-foreground: 0 0% 98%;
+    --accent: 170 55% 38%;
+    --accent-foreground: 0 0% 98%;
+    --ring: 170 55% 35%;
+    --shadow-card: 0 8px 32px -8px hsl(170 55% 20% / 0.12);
+  }
+  .dark[data-theme-color="teal"] {
+    --primary: 170 50% 48%;
+    --primary-foreground: 170 30% 8%;
+    --accent: 170 55% 52%;
+    --accent-foreground: 170 30% 8%;
+    --ring: 170 55% 52%;
+  }
+
+  [data-theme-color="blue"] {
+    --primary: 217 70% 42%;
+    --primary-foreground: 0 0% 98%;
+    --accent: 217 70% 48%;
+    --accent-foreground: 0 0% 98%;
+    --ring: 217 70% 45%;
+    --shadow-card: 0 8px 32px -8px hsl(217 70% 25% / 0.12);
+  }
+  .dark[data-theme-color="blue"] {
+    --primary: 217 65% 55%;
+    --primary-foreground: 0 0% 98%;
+    --accent: 217 70% 60%;
+    --accent-foreground: 217 30% 8%;
+    --ring: 217 70% 60%;
+  }
+
+  [data-theme-color="violet"] {
+    --primary: 263 70% 42%;
+    --primary-foreground: 0 0% 98%;
+    --accent: 263 70% 50%;
+    --accent-foreground: 0 0% 98%;
+    --ring: 263 70% 45%;
+    --shadow-card: 0 8px 32px -8px hsl(263 70% 25% / 0.12);
+  }
+  .dark[data-theme-color="violet"] {
+    --primary: 263 65% 55%;
+    --primary-foreground: 0 0% 98%;
+    --accent: 263 70% 60%;
+    --accent-foreground: 263 20% 8%;
+    --ring: 263 70% 60%;
+  }
+
+  [data-theme-color="rose"] {
+    --primary: 350 65% 45%;
+    --primary-foreground: 0 0% 98%;
+    --accent: 350 65% 52%;
+    --accent-foreground: 0 0% 98%;
+    --ring: 350 65% 48%;
+    --shadow-card: 0 8px 32px -8px hsl(350 65% 28% / 0.12);
+  }
+  .dark[data-theme-color="rose"] {
+    --primary: 350 60% 55%;
+    --primary-foreground: 0 0% 98%;
+    --accent: 350 65% 60%;
+    --accent-foreground: 350 25% 8%;
+    --ring: 350 65% 60%;
+  }
+
+  [data-theme-color="orange"] {
+    --primary: 25 85% 45%;
+    --primary-foreground: 0 0% 98%;
+    --accent: 25 85% 52%;
+    --accent-foreground: 25 20% 8%;
+    --ring: 25 85% 48%;
+    --shadow-card: 0 8px 32px -8px hsl(25 85% 28% / 0.12);
+  }
+  .dark[data-theme-color="orange"] {
+    --primary: 25 80% 55%;
+    --primary-foreground: 25 30% 8%;
+    --accent: 25 85% 60%;
+    --accent-foreground: 25 25% 8%;
+    --ring: 25 85% 60%;
+  }
+
+  [data-theme-color="sky"] {
+    --primary: 199 89% 42%;
+    --primary-foreground: 0 0% 98%;
+    --accent: 199 89% 48%;
+    --accent-foreground: 0 0% 98%;
+    --ring: 199 89% 45%;
+    --shadow-card: 0 8px 32px -8px hsl(199 89% 25% / 0.12);
+  }
+  .dark[data-theme-color="sky"] {
+    --primary: 199 85% 55%;
+    --primary-foreground: 199 30% 8%;
+    --accent: 199 89% 60%;
+    --accent-foreground: 199 25% 8%;
+    --ring: 199 89% 60%;
+  }
+
+  [data-theme-color="cyan"] {
+    --primary: 187 75% 38%;
+    --primary-foreground: 0 0% 98%;
+    --accent: 187 75% 44%;
+    --accent-foreground: 0 0% 98%;
+    --ring: 187 75% 42%;
+    --shadow-card: 0 8px 32px -8px hsl(187 75% 22% / 0.12);
+  }
+  .dark[data-theme-color="cyan"] {
+    --primary: 187 70% 50%;
+    --primary-foreground: 187 30% 8%;
+    --accent: 187 75% 55%;
+    --accent-foreground: 187 25% 8%;
+    --ring: 187 75% 55%;
+  }
+
+  [data-theme-color="lime"] {
+    --primary: 84 65% 35%;
+    --primary-foreground: 0 0% 98%;
+    --accent: 84 65% 42%;
+    --accent-foreground: 84 20% 8%;
+    --ring: 84 65% 40%;
+    --shadow-card: 0 8px 32px -8px hsl(84 65% 20% / 0.12);
+  }
+  .dark[data-theme-color="lime"] {
+    --primary: 84 60% 48%;
+    --primary-foreground: 84 30% 8%;
+    --accent: 84 65% 52%;
+    --accent-foreground: 84 25% 8%;
+    --ring: 84 65% 52%;
+  }
+
+  /* Quran font options – each distinct (Uthmanic = Hafs only, no Amiri fallback here) */
+  [data-quran-font="uthmanic"] .arabic-quran,
+  [data-quran-font="uthmanic"] .uthmani-text {
+    font-family: 'QPC Hafs', serif;
+  }
+  [data-quran-font="amiri"] .arabic-quran,
+  [data-quran-font="amiri"] .uthmani-text {
+    font-family: 'Amiri', serif;
+  }
+  [data-quran-font="noto"] .arabic-quran,
+  [data-quran-font="noto"] .uthmani-text {
+    font-family: 'Noto Sans Arabic', sans-serif;
+  }
+  [data-quran-font="noto-naskh"] .arabic-quran,
+  [data-quran-font="noto-naskh"] .uthmani-text {
+    font-family: 'Noto Naskh Arabic', serif;
+  }
+  [data-quran-font="scheherazade"] .arabic-quran,
+  [data-quran-font="scheherazade"] .uthmani-text {
+    font-family: 'Scheherazade New', serif;
   }
 }
 
@@ -289,11 +456,10 @@
   .ayah-highlight::after {
     content: '';
     @apply absolute inset-0 rounded-lg opacity-0 transition-opacity duration-300 pointer-events-none;
-    background: hsl(var(--accent) / 0.1);
+    background: hsl(var(--primary) / 0.08);
   }
   
-  .ayah-highlight:hover::after,
-  .ayah-highlight.playing::after {
+  .ayah-highlight:hover::after {
     @apply opacity-100;
   }
   

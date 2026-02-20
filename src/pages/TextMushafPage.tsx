@@ -320,7 +320,7 @@ export default function TextMushafPage() {
               {language === 'ar' ? toArabicNumerals(pageNum) : pageNum}
             </span>
             {isJuzStart && (
-              <span className="bg-accent/20 text-accent-foreground rounded-full px-2 py-0.5 text-xs juz-marker">
+              <span className="bg-primary/20 text-primary-foreground rounded-full px-2 py-0.5 text-xs juz-marker">
                 ۞ {language === 'ar' ? `الجزء ${toArabicNumerals(pageJuz)}` : `Juz ${pageJuz}`}
               </span>
             )}
@@ -404,7 +404,7 @@ export default function TextMushafPage() {
                 >
                   {ayahs.map((ayah, idx) => (
                     <span key={`${ayah.surah}-${ayah.ayah}`} className="inline">
-                      <span className="hover:bg-accent/10 rounded transition-colors">
+                      <span className="hover:bg-primary/10 rounded transition-colors">
                         {ayah.text}
                       </span>
                       <span className="ayah-number mx-1">
@@ -551,7 +551,7 @@ export default function TextMushafPage() {
                           variant={isPageBookmarked ? 'default' : 'outline'}
                           size="icon"
                           onClick={toggleBookmark}
-                          className={`${isPageBookmarked ? 'bg-accent text-accent-foreground' : ''} ${settings.nightMode && !isPageBookmarked ? '!border-neutral-600 !text-neutral-100 !bg-neutral-800 hover:!bg-neutral-700' : ''}`}
+                          className={`${isPageBookmarked ? 'bg-primary text-primary-foreground' : ''} ${settings.nightMode && !isPageBookmarked ? '!border-neutral-600 !text-neutral-100 !bg-neutral-800 hover:!bg-neutral-700' : ''}`}
                         >
                           {isPageBookmarked ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
                         </Button>
@@ -683,7 +683,7 @@ export default function TextMushafPage() {
                 </div>
 
                 {/* Surah Select */}
-                <Select onValueChange={goToSurah} value={currentSurah?.number.toString()}>
+                <Select dir={direction} onValueChange={goToSurah} value={currentSurah?.number.toString()}>
                   <SelectTrigger className={`w-40 ${settings.nightMode ? '!bg-neutral-800 !border-neutral-600 !text-neutral-100' : ''}`}>
                     <SelectValue placeholder={language === 'ar' ? 'السورة' : 'Surah'} />
                   </SelectTrigger>
@@ -701,7 +701,7 @@ export default function TextMushafPage() {
                 </Select>
 
                 {/* Juz Select */}
-                <Select onValueChange={goToJuz} value={currentJuz.toString()}>
+                <Select dir={direction} onValueChange={goToJuz} value={currentJuz.toString()}>
                   <SelectTrigger className={`w-28 ${settings.nightMode ? '!bg-neutral-800 !border-neutral-600 !text-neutral-100' : ''}`}>
                     <SelectValue placeholder={language === 'ar' ? 'الجزء' : 'Juz'} />
                   </SelectTrigger>
@@ -895,6 +895,7 @@ export default function TextMushafPage() {
               <div className="space-y-2">
                 <Label>{language === 'ar' ? 'نسخة الترجمة' : 'Translation'}</Label>
                 <Select
+                  dir={direction}
                   value={settings.translationEdition}
                   onValueChange={(val) => setSettings(s => ({ ...s, translationEdition: val }))}
                 >

@@ -28,11 +28,11 @@ function SurahCard({ surah, index, isFavorite, onToggleFavorite, onClick, animat
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2, delay: animateDelay }}
-      className="surah-card group relative bg-card rounded-xl p-4 border border-border/50 cursor-pointer"
+      className="surah-card group relative bg-card hover:bg-primary/5 rounded-xl p-4 border border-border/50 cursor-pointer"
       onClick={onClick}
     >
       {/* Surah Number */}
-      <div className="absolute -top-3 -left-3 w-10 h-10 bg-primary rounded-lg flex items-center justify-center shadow-md">
+      <div className="group-hover:opacity-100 transition-opacity absolute -top-3 -left-3 w-10 h-10 bg-primary rounded-lg flex items-center justify-center shadow-md">
         <span className="text-sm font-bold text-primary-foreground">{surah.number}</span>
       </div>
 
@@ -70,10 +70,10 @@ function SurahCard({ surah, index, isFavorite, onToggleFavorite, onClick, animat
               e.stopPropagation();
               onToggleFavorite();
             }}
-            className="p-1.5 rounded-full hover:bg-accent/10 transition-colors"
+            className="p-1.5 rounded-full hover:bg-primary/10 transition-colors"
           >
             <Star
-              className={`w-4 h-4 transition-colors ${isFavorite ? 'fill-accent text-accent' : 'text-muted-foreground'
+              className={`w-4 h-4 transition-colors ${isFavorite ? 'fill-primary text-primary' : 'text-muted-foreground'
                 }`}
             />
           </button>
@@ -81,16 +81,6 @@ function SurahCard({ surah, index, isFavorite, onToggleFavorite, onClick, animat
         </div>
       </div>
 
-      {/* Hover Actions */}
-      <div className="absolute inset-0 bg-primary/5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-        <Button variant="emerald" size="sm" className="opacity-0 group-hover:opacity-100 transition-opacity">
-          <BookOpen className="w-4 h-4" />
-          {t('quran')}
-        </Button>
-        <Button variant="gold" size="sm" className="opacity-0 group-hover:opacity-100 transition-opacity">
-          <Play className="w-4 h-4" />
-        </Button>
-      </div>
     </motion.div>
   );
 }

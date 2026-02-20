@@ -1,17 +1,18 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  BookOpen, 
-  Mic2, 
-  Radio, 
-  Compass, 
-  Clock, 
-  Moon, 
-  Sun, 
-  Globe, 
-  Menu, 
+import {
+  BookOpen,
+  Mic2,
+  Radio,
+  Compass,
+  Clock,
+  Moon,
+  Sun,
+  Globe,
+  Menu,
   X,
+  Settings,
   BookMarked,
   Bookmark,
   MessageSquareQuote,
@@ -20,8 +21,16 @@ import {
   BookImage
 } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
-import { useAppStore } from '@/store/useAppStore';
+import { useAppStore, type ThemeColorId } from '@/store/useAppStore';
 import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 const navItems = [
   { path: '/quran', icon: BookOpen, labelKey: 'quran' as const },
@@ -37,9 +46,32 @@ const navItems = [
   { path: '/radio', icon: Radio, labelKey: 'radio' as const },
 ];
 
+type QuranFontId = 'uthmanic' | 'amiri' | 'noto' | 'noto-naskh' | 'scheherazade';
+
+const THEME_COLOR_SWATCHES: { id: ThemeColorId; swatch: string }[] = [
+  { id: 'emerald', swatch: 'hsl(158, 64%, 28%)' },
+  { id: 'gold', swatch: 'hsl(43, 74%, 42%)' },
+  { id: 'teal', swatch: 'hsl(170, 55%, 32%)' },
+  { id: 'blue', swatch: 'hsl(217, 70%, 42%)' },
+  { id: 'violet', swatch: 'hsl(263, 70%, 42%)' },
+  { id: 'rose', swatch: 'hsl(350, 65%, 45%)' },
+  { id: 'orange', swatch: 'hsl(25, 85%, 45%)' },
+  { id: 'sky', swatch: 'hsl(199, 89%, 42%)' },
+  { id: 'cyan', swatch: 'hsl(187, 75%, 38%)' },
+  { id: 'lime', swatch: 'hsl(84, 65%, 35%)' },
+];
+
+const QURAN_FONT_OPTIONS: { id: QuranFontId; labelKey: 'quranFontUthmanic' | 'quranFontAmiri' | 'quranFontNoto' | 'quranFontNotoNaskh' | 'quranFontScheherazade' }[] = [
+  { id: 'uthmanic', labelKey: 'quranFontUthmanic' },
+  { id: 'amiri', labelKey: 'quranFontAmiri' },
+  { id: 'noto', labelKey: 'quranFontNoto' },
+  { id: 'noto-naskh', labelKey: 'quranFontNotoNaskh' },
+  { id: 'scheherazade', labelKey: 'quranFontScheherazade' },
+];
+
 export function Header() {
   const { t, language } = useTranslation();
-  const { theme, toggleTheme, setLanguage } = useAppStore();
+  const { theme, toggleTheme, setLanguage, themeColor, setThemeColor, quranFont, setQuranFont, direction } = useAppStore();
   const location = useLocation();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -56,31 +88,13 @@ export function Header() {
     setMobileMenuOpen(false);
   }, [location.pathname]);
 
-  const isHomePage = location.pathname === '/';
-  const isDarkMode = theme === 'dark';
-  
-  // Header background logic
-  const getHeaderBg = () => {
-    if (isScrolled) {
-      return 'bg-background/95 backdrop-blur-md border-b border-border/50';
-    }
-    if (isHomePage) {
-      // Dark mode: same as scrolled state, Light mode: transparent
-      return isDarkMode 
-        ? 'bg-background/95 backdrop-blur-md border-b border-border/50' 
-        : 'bg-transparent';
-    }
-    return 'bg-background/95 backdrop-blur-md border-b border-border/50';
-  };
-  
-  const headerBg = getHeaderBg();
-  
-  // Use light text only on homepage in light mode (transparent bg)
-  const useLightText = isHomePage && !isScrolled && !isDarkMode;
+  // Solid header so nav and buttons are always visible (no transparent/light-text on homepage)
+  const headerBg = 'bg-background/95 backdrop-blur-md border-b border-border/50';
+  const useLightText = false;
 
   return (
     <>
-      <header 
+      <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${headerBg}`}
       >
         <div className="container max-w-[1600px]">
@@ -104,13 +118,12 @@ export function Header() {
                   <Link
                     key={item.path}
                     to={item.path}
-                    className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
-                      isActive 
-                        ? 'bg-primary text-primary-foreground' 
-                        : useLightText
-                          ? 'text-primary-foreground/80 hover:text-primary-foreground hover:bg-primary-foreground/10'
-                          : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-                    }`}
+                    className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${isActive
+                      ? 'bg-primary text-primary-foreground'
+                      : useLightText
+                        ? 'text-primary-foreground/80 hover:text-primary-foreground hover:bg-primary-foreground/10'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                      }`}
                   >
                     <Icon className="w-4 h-4" />
                     {t(item.labelKey)}
@@ -140,6 +153,47 @@ export function Header() {
               >
                 {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
               </Button>
+
+              {/* Settings: App Color + Quran Font */}
+              <DropdownMenu dir={direction}>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon-sm"
+                    className={useLightText ? 'text-primary-foreground hover:bg-primary-foreground/10' : ''}
+                    aria-label={t('settings')}
+                  >
+                    <Settings className="w-4 h-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuLabel>{t('appColor')}</DropdownMenuLabel>
+                  <div className="grid grid-cols-5 gap-1 py-1.5">
+                    {THEME_COLOR_SWATCHES.map(({ id, swatch }) => (
+                      <button
+                        key={id}
+                        type="button"
+                        onClick={() => setThemeColor(id)}
+                        className={`h-5 w-5 rounded border shadow-sm transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1 ${themeColor === id ? 'border-foreground ring-2 ring-primary ring-offset-1' : 'border-transparent'}`}
+                        style={{ backgroundColor: swatch }}
+                        aria-label={id}
+                        aria-pressed={themeColor === id}
+                      />
+                    ))}
+                  </div>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuLabel>{t('quranFont')}</DropdownMenuLabel>
+                  {QURAN_FONT_OPTIONS.map(({ id, labelKey }) => (
+                    <DropdownMenuItem
+                      key={id}
+                      onClick={() => setQuranFont(id)}
+                      className={quranFont === id ? 'bg-primary/15 text-primary font-medium' : ''}
+                    >
+                      {t(labelKey)}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
 
               {/* Mobile Menu Toggle */}
               <Button
@@ -172,11 +226,10 @@ export function Header() {
                   <Link
                     key={item.path}
                     to={item.path}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
-                      isActive 
-                        ? 'bg-primary text-primary-foreground' 
-                        : 'text-foreground hover:bg-muted'
-                    }`}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive
+                      ? 'bg-primary text-primary-foreground'
+                      : 'text-foreground hover:bg-muted'
+                      }`}
                   >
                     <Icon className="w-5 h-5" />
                     {t(item.labelKey)}

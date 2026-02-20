@@ -18,6 +18,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
+import { useAppStore } from '@/store/useAppStore';
 import { useMushafStore } from '@/hooks/useMushafStore';
 import { useTranslation } from '@/hooks/useTranslation';
 import { translations } from '@/lib/quranApi';
@@ -32,6 +33,7 @@ export const MushafSettings = memo(function MushafSettings({
   onClose
 }: MushafSettingsProps) {
   const { t, language } = useTranslation();
+  const { direction } = useAppStore();
   const { settings, updateSettings } = useMushafStore();
 
   return (
@@ -122,6 +124,7 @@ export const MushafSettings = memo(function MushafSettings({
               <div className="space-y-2">
                 <Label>{t('translationEdition')}</Label>
                 <Select
+                  dir={direction}
                   value={settings.translationEdition}
                   onValueChange={(val) => updateSettings({ translationEdition: val })}
                 >

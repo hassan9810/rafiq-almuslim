@@ -74,7 +74,7 @@ export default function BookmarksPage() {
             className="mb-12"
           >
             <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-              <Star className="w-5 h-5 text-accent fill-accent" />
+              <Star className="w-5 h-5 text-primary fill-primary" />
               {t('favorites')}
             </h2>
             {favorites.length === 0 ? (
@@ -97,8 +97,8 @@ export default function BookmarksPage() {
                         to={`/quran/${surahNum}`}
                         className="group flex items-center gap-4 p-4 rounded-2xl border border-border/50 bg-card hover:border-primary/30 hover:bg-card/80 transition-all block"
                       >
-                        <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center flex-shrink-0">
-                          <Star className="w-6 h-6 text-accent fill-accent" />
+                        <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                          <Star className="w-6 h-6 text-primary fill-primary" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="  font-semibold text-foreground truncate">

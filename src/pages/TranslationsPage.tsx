@@ -141,7 +141,7 @@ export default function TranslationsPage() {
             </div>
 
             {/* Language Filter */}
-            <Select value={selectedLanguage} onValueChange={setSelectedLanguage}>
+            <Select dir={direction} value={selectedLanguage} onValueChange={setSelectedLanguage}>
               <SelectTrigger className="w-full md:w-[200px]">
                 <Globe className="w-4 h-4 mr-2" />
                 <SelectValue placeholder={t('selectLanguage')} />

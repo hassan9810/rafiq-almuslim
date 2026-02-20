@@ -1,11 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  BookOpen, 
-  Search, 
-  Play, 
-  Pause, 
-  Volume2, 
+import {
+  BookOpen,
+  Search,
+  Play,
+  Pause,
+  Volume2,
   VolumeX,
   ChevronLeft,
   ChevronRight,
@@ -30,7 +30,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
-import { 
+import {
   HisnChapter,
   HisnDhikr,
   initHisnMuslim,
@@ -73,10 +73,22 @@ export default function HisnMuslimPage() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [currentDhikrIndex, setCurrentDhikrIndex] = useState(0);
+  const [repeatCount, setRepeatCount] = useState(0);
   const [loadingChapter, setLoadingChapter] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
 
   const isArabic = language === 'ar';
+  const hasMultipleAdhkar = (selectedChapter?.adhkar.length ?? 0) > 1;
+
+  // Reset repeat count when changing dhikr
+  useEffect(() => {
+    setRepeatCount(0);
+  }, [currentDhikrIndex]);
+
+  // Reset repeat count when popup closed or switching to another category
+  useEffect(() => {
+    if (!selectedChapter) setRepeatCount(0);
+  }, [selectedChapter]);
 
   // Load chapters on mount
   useEffect(() => {
@@ -113,11 +125,12 @@ export default function HisnMuslimPage() {
   const openChapter = async (chapter: HisnChapter) => {
     setSelectedChapter(chapter);
     setCurrentDhikrIndex(0);
+    setRepeatCount(0);
     setIsPlaying(false);
     if (audioRef.current) {
       audioRef.current.pause();
     }
-    
+
     // Fetch adhkar from API if not cached
     if (chapter.adhkar.length === 0) {
       setLoadingChapter(true);
@@ -126,7 +139,7 @@ export default function HisnMuslimPage() {
         if (updatedChapter) {
           setSelectedChapter(updatedChapter);
           // Update the chapter in the chapters list too
-          setChapters(prev => prev.map(ch => 
+          setChapters(prev => prev.map(ch =>
             ch.id === updatedChapter.id ? updatedChapter : ch
           ));
         }
@@ -141,7 +154,7 @@ export default function HisnMuslimPage() {
   // Play audio for current dhikr
   const playCurrentDhikrAudio = () => {
     if (!selectedChapter || !audioRef.current) return;
-    
+
     const currentDhikr = selectedChapter.adhkar[currentDhikrIndex];
     if (currentDhikr?.AUDIO) {
       if (isPlaying) {
@@ -205,6 +218,7 @@ export default function HisnMuslimPage() {
   };
 
   const currentDhikr = selectedChapter?.adhkar[currentDhikrIndex];
+  const targetRepeat = Number(currentDhikr?.REPEAT ?? 0);
 
   return (
     <div>
@@ -254,7 +268,7 @@ export default function HisnMuslimPage() {
                   initial={{ scale: 0.9, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   exit={{ scale: 0.9, opacity: 0 }}
-                  className="bg-background rounded-2xl w-full max-w-2xl max-h-[85vh] overflow-hidden"
+                  className="bg-background rounded-2xl w-full max-w-4xl max-h-[85vh] overflow-hidden"
                   onClick={(e) => e.stopPropagation()}
                 >
                   {/* Header */}
@@ -290,116 +304,160 @@ export default function HisnMuslimPage() {
                     </div>
                   </div>
 
-                  {/* Content */}
-                  <ScrollArea className="h-[calc(85vh-140px)]">
-                    <div className="p-6">
-                      {selectedChapter.adhkar.length > 0 ? (
-                        <div className="space-y-6">
-                          {/* Current Dhikr Card */}
-                          <Card className="border-2 border-primary/20 bg-primary/5">
-                            <CardContent className="p-6">
-                              <div className="text-center">
-                                <Badge className="mb-4">
-                                  {currentDhikrIndex + 1} / {selectedChapter.adhkar.length}
-                                </Badge>
-                                
-                                {/* Arabic Text */}
-                                <p className="font-arabic text-2xl md:text-3xl leading-loose mb-4 text-foreground" dir={direction}>
-                                  {currentDhikr?.ARABIC_TEXT}
-                                </p>
-                                
-                                {/* Translation if available */}
-                                {currentDhikr?.TRANSLATED_TEXT && (
-                                  <p className="text-muted-foreground text-sm leading-relaxed mb-4" dir={direction}>
-                                    {currentDhikr.TRANSLATED_TEXT}
-                                  </p>
-                                )}
-                                
-                                {/* Repeat count */}
-                                {currentDhikr?.REPEAT && (
-                                  <Badge variant="secondary" className="mt-2">
-                                    {t('repeat')} {currentDhikr.REPEAT}
-                                  </Badge>
-                                )}
+                  {/* Content: list scrolls; main azkar fixed; center when single azkar */}
+                  <div className={`h-[calc(85vh-140px)] p-6 flex flex-row gap-6 overflow-hidden ${!hasMultipleAdhkar ? 'justify-center' : ''}`} dir={direction}>
+                    {selectedChapter.adhkar.length > 0 ? (
+                      <>
+                        {/* Adhkar list — only when more than one azkar */}
+                        {hasMultipleAdhkar && (
+                          <aside className="w-72 shrink-0" dir={direction}>
+                            <Card className="h-full flex flex-col overflow-hidden border border-border">
+                              <div className="px-4 py-3 border-b border-border bg-muted/30 shrink-0">
+                                <h3 className="font-semibold text-muted-foreground">
+                                  {t('allAdhkar')}
+                                </h3>
+                              </div>
+                              <ScrollArea className="flex-1 min-h-0">
+                                <div className="p-3 space-y-2">
+                                  {selectedChapter.adhkar.map((dhikr, idx) => (
+                                    <Card
+                                      key={dhikr.ID || idx}
+                                      className={`cursor-pointer transition-all ${idx === currentDhikrIndex
+                                        ? 'ring-2 ring-primary'
+                                        : 'hover:bg-muted/50'
+                                        }`}
+                                      onClick={() => {
+                                        setCurrentDhikrIndex(idx);
+                                        setIsPlaying(false);
+                                        if (audioRef.current) audioRef.current.pause();
+                                      }}
+                                    >
+                                      <CardContent className="p-3">
+                                        <div className="flex items-start gap-2">
+                                          <Badge variant="outline" className="shrink-0 text-xs">
+                                            {idx + 1}
+                                          </Badge>
+                                          <p className="font-arabic text-sm leading-relaxed line-clamp-2" dir="rtl">
+                                            {dhikr.ARABIC_TEXT}
+                                          </p>
+                                        </div>
+                                        {dhikr.REPEAT && (
+                                          <Badge variant="secondary" className="mt-1.5 text-xs">
+                                            {dhikr.REPEAT} {t('times')}
+                                          </Badge>
+                                        )}
+                                      </CardContent>
+                                    </Card>
+                                  ))}
+                                </div>
+                              </ScrollArea>
+                            </Card>
+                          </aside>
+                        )}
+
+                        {/* Main azkar content — centered when single azkar */}
+                        <div className={`flex flex-col min-h-0 ${hasMultipleAdhkar ? 'flex-1 min-w-0' : 'max-w-2xl w-full mx-auto'}`}>
+                          <Card className="border-2 border-primary/20 bg-primary/5 flex-1 flex flex-col min-h-0 overflow-hidden">
+                            <CardContent className="p-6 flex flex-col flex-1 min-h-0 text-center">
+                              {/* الذكر، التكرار وعددها من القائمة — وسطنهم رأسياً */}
+                              <div className="flex-1 flex flex-col justify-center min-h-0 gap-4">
+                                {/* Badges row: current/total (start) and repeat (end) */}
+                                <div className="flex justify-between items-center w-full shrink-0" dir={direction}>
+                                  <div>
+                                    {hasMultipleAdhkar && (
+                                      <Badge variant="default" className="text-sm px-3 py-1">
+                                        {currentDhikrIndex + 1} / {selectedChapter.adhkar.length}
+                                      </Badge>
+                                    )}
+                                  </div>
+                                  <div>
+                                    {currentDhikr?.REPEAT != null && Number(currentDhikr.REPEAT) > 0 && (
+                                      <Badge variant="secondary" className="text-sm px-3 py-1">
+                                        {t('repeat')} {currentDhikr.REPEAT}
+                                      </Badge>
+                                    )}
+                                  </div>
+                                </div>
+
+                                {/* Scrollable text — wrap + scroll when long; centered */}
+                                <ScrollArea className="min-h-0 max-h-[min(40vh,320px)] -mx-1 px-1 shrink-0">
+                                  <div className="space-y-4 pr-2 flex flex-col items-center text-center max-w-full">
+                                    <p
+                                      className={`font-arabic text-foreground w-full ${(currentDhikr?.ARABIC_TEXT?.length ?? 0) > 400 ? 'text-lg md:text-xl' : (currentDhikr?.ARABIC_TEXT?.length ?? 0) > 200 ? 'text-xl md:text-2xl' : 'text-2xl md:text-3xl'}`}
+                                      dir={direction}
+                                      style={{ lineHeight: '2.2' }}
+                                    >
+                                      {currentDhikr?.ARABIC_TEXT}
+                                    </p>
+
+                                    {currentDhikr?.TRANSLATED_TEXT && (
+                                      <p
+                                        className={`text-muted-foreground leading-relaxed w-full ${(currentDhikr?.TRANSLATED_TEXT?.length ?? 0) > 300 ? 'text-xs' : 'text-sm'}`}
+                                        dir={direction}
+                                        style={{ lineHeight: '1.9' }}
+                                      >
+                                        {currentDhikr.TRANSLATED_TEXT}
+                                      </p>
+                                    )}
+                                  </div>
+                                </ScrollArea>
+
+                                {/* Repeat counter button (تسبيح) */}
+                                <div className="flex flex-col items-center justify-center gap-2 shrink-0 pt-4 border-t border-border text-center">
+                                <span className="text-sm text-muted-foreground">{t('count')}</span>
+                                <Button
+                                  variant={repeatCount >= targetRepeat && targetRepeat > 0 ? 'default' : 'outline'}
+                                  size="lg"
+                                  className="min-w-[120px] text-lg font-semibold"
+                                  onClick={() => {
+                                    setRepeatCount(prev => (targetRepeat > 0 ? Math.min(prev + 1, targetRepeat) : prev + 1));
+                                  }}
+                                >
+                                  {targetRepeat > 0 ? `${repeatCount} / ${targetRepeat}` : repeatCount}
+                                </Button>
+                                </div>
                               </div>
                             </CardContent>
                           </Card>
 
-                          {/* Navigation */}
-                          <div className="flex justify-center gap-4">
-                            <Button
-                              variant="outline"
-                              onClick={prevDhikr}
-                              disabled={currentDhikrIndex === 0}
-                            >
-                              <ChevronRight className="h-4 w-4 ml-2" />
-                              {t('previous')}
-                            </Button>
-                            <Button
-                              variant="outline"
-                              onClick={nextDhikr}
-                              disabled={currentDhikrIndex === selectedChapter.adhkar.length - 1}
-                            >
-                              {t('next')}
-                              <ChevronLeft className="h-4 w-4 mr-2" />
-                            </Button>
-                          </div>
-
-                          {/* All Adhkar List */}
-                          <div className="space-y-3 mt-8">
-                            <h3 className="font-semibold text-muted-foreground">
-                              {isArabic ? 'جميع الأذكار' : 'All Adhkar'}
-                            </h3>
-                            {selectedChapter.adhkar.map((dhikr, idx) => (
-                              <Card 
-                                key={dhikr.ID || idx}
-                                className={`cursor-pointer transition-all ${
-                                  idx === currentDhikrIndex 
-                                    ? 'ring-2 ring-primary' 
-                                    : 'hover:bg-muted/50'
-                                }`}
-                                onClick={() => {
-                                  setCurrentDhikrIndex(idx);
-                                  setIsPlaying(false);
-                                  if (audioRef.current) audioRef.current.pause();
-                                }}
+                          {hasMultipleAdhkar && (
+                            <div className="flex justify-center gap-4 mt-6 shrink-0">
+                              <Button
+                                variant="outline"
+                                onClick={prevDhikr}
+                                disabled={currentDhikrIndex === 0}
                               >
-                                <CardContent className="p-4">
-                                  <div className="flex items-start gap-3">
-                                    <Badge variant="outline" className="shrink-0">
-                                      {idx + 1}
-                                    </Badge>
-                                    <p className="font-arabic text-base leading-relaxed line-clamp-2" dir={direction}>
-                                      {dhikr.ARABIC_TEXT}
-                                    </p>
-                                  </div>
-                                  {dhikr.REPEAT && (
-                                    <Badge variant="secondary" className="mt-2 text-xs">
-                                      {dhikr.REPEAT} {t('times')}
-                                    </Badge>
-                                  )}
-                                </CardContent>
-                              </Card>
-                            ))}
-                          </div>
+                                <ChevronRight className="h-4 w-4 ml-2" />
+                                {t('previous')}
+                              </Button>
+                              <Button
+                                variant="outline"
+                                onClick={nextDhikr}
+                                disabled={currentDhikrIndex === selectedChapter.adhkar.length - 1}
+                              >
+                                {t('next')}
+                                <ChevronLeft className="h-4 w-4 mr-2" />
+                              </Button>
+                            </div>
+                          )}
                         </div>
-                      ) : loadingChapter ? (
-                        <div className="text-center py-12">
-                          <Loader2 className="h-12 w-12 text-primary mx-auto mb-4 animate-spin" />
-                          <p className="text-muted-foreground">
-                            {t('loadingAdhkar')}
-                          </p>
-                        </div>
-                      ) : (
-                        <div className="text-center py-12">
-                          <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                          <p className="text-muted-foreground">
-                            {t('noContentAvailable')}
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  </ScrollArea>
+                      </>
+                    ) : loadingChapter ? (
+                      <div className="text-center py-12">
+                        <Loader2 className="h-12 w-12 text-primary mx-auto mb-4 animate-spin" />
+                        <p className="text-muted-foreground">
+                          {t('loadingAdhkar')}
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="text-center py-12">
+                        <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                        <p className="text-muted-foreground">
+                          {t('noContentAvailable')}
+                        </p>
+                      </div>
+                    )}
+                  </div>
                 </motion.div>
               </motion.div>
             )}
@@ -441,7 +499,7 @@ export default function HisnMuslimPage() {
               {Object.entries(groupedChapters).map(([category, categoryChapters]) => {
                 const Icon = categoryIcons[category] || BookOpen;
                 const label = categoryLabels[category] || { ar: category, en: category };
-                
+
                 return (
                   <motion.div
                     key={category}
@@ -458,7 +516,7 @@ export default function HisnMuslimPage() {
                       </h2>
                       <Badge variant="secondary">{categoryChapters.length}</Badge>
                     </div>
-                    
+
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                       {categoryChapters.map((chapter) => (
                         <Card
@@ -489,7 +547,7 @@ export default function HisnMuslimPage() {
           )}
         </div>
       </main>
-      
+
     </div>
   );
 }

@@ -22,6 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { useAppStore } from '@/store/useAppStore';
 import { useMushafStore } from '@/hooks/useMushafStore';
 import { useTranslation } from '@/hooks/useTranslation';
 import { fetchReciters, getAudioUrl, Reciter } from '@/lib/quranApi';
@@ -37,6 +38,7 @@ export const MushafAudioPlayer = memo(function MushafAudioPlayer({
   onToggleExpand
 }: MushafAudioPlayerProps) {
   const { language } = useTranslation();
+  const { direction } = useAppStore();
   const audioRef = useRef<HTMLAudioElement>(null);
   const [reciters, setReciters] = useState<Reciter[]>([]);
   const [selectedReciter, setSelectedReciter] = useState<Reciter | null>(null);
@@ -298,6 +300,7 @@ export const MushafAudioPlayer = memo(function MushafAudioPlayer({
 
           {/* Reciter Select */}
           <Select
+            dir={direction}
             value={selectedReciter?.id.toString() || ''}
             onValueChange={handleReciterChange}
           >
@@ -391,6 +394,7 @@ export const MushafAudioPlayer = memo(function MushafAudioPlayer({
                 {/* Mobile Reciter Select */}
                 <div className="md:hidden flex-1">
                   <Select
+                    dir={direction}
                     value={selectedReciter?.id.toString() || ''}
                     onValueChange={handleReciterChange}
                   >

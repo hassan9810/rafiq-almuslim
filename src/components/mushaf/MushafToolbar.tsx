@@ -170,7 +170,7 @@ export const MushafToolbar = memo(function MushafToolbar({
                 variant={isPageBookmarked ? 'default' : 'outline'}
                 size="icon"
                 onClick={toggleBookmark}
-                className={isPageBookmarked ? 'bg-accent text-accent-foreground' : ''}
+                className={isPageBookmarked ? 'bg-primary text-primary-foreground' : ''}
               >
                 {isPageBookmarked ? (
                   <BookmarkCheck className="w-4 h-4" />

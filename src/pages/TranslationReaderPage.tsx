@@ -162,7 +162,7 @@ export default function TranslationReaderPage() {
           {/* Controls */}
           <div className="flex flex-col md:flex-row gap-4 mb-6">
             {/* Surah Selector */}
-            <Select value={surahNum.toString()} onValueChange={(v) => goToSurah(parseInt(v))}>
+            <Select dir={direction} value={surahNum.toString()} onValueChange={(v) => goToSurah(parseInt(v))}>
               <SelectTrigger className="flex-1">
                 <BookOpen className="w-4 h-4 mr-2" />
                 <SelectValue placeholder={isArabic ? 'اختر السورة' : 'Select Surah'} />
@@ -177,7 +177,7 @@ export default function TranslationReaderPage() {
             </Select>
 
             {/* Translation Selector */}
-            <Select value={translationKey} onValueChange={changeTranslation}>
+            <Select dir={direction} value={translationKey} onValueChange={changeTranslation}>
               <SelectTrigger className="flex-1">
                 <Languages className="w-4 h-4 mr-2" />
                 <SelectValue placeholder={t('selectTranslation')} />

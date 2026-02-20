@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 
 export function PrayerTimesWidget() {
   const { t, language } = useTranslation();
-  const { location, setLocation } = useAppStore();
+  const { location, setLocation, direction } = useAppStore();
   const [prayerTimes, setPrayerTimes] = useState<PrayerTime[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -62,7 +62,7 @@ export function PrayerTimesWidget() {
           <h3 className="font-semibold text-foreground">{t('prayerTimes')}</h3>
         </div>
         {location && (
-          <div className="flex items-center gap-1 text-sm text-muted-foreground">
+          <div className="px-3 flex items-center gap-1 text-sm text-muted-foreground" dir='ltr'>
             <MapPin className="w-3 h-3" />
             <span>{location.city}</span>
           </div>
@@ -103,7 +103,7 @@ export function PrayerTimesWidget() {
                 </div>
                 <div className="text-right">
                   <p className="text-2xl font-bold text-foreground">{formatTime(nextPrayer.time)}</p>
-                  <p className="text-xs text-accent font-medium">{timeUntilNext}</p>
+                  <p className="text-xs text-primary font-medium">{timeUntilNext}</p>
                 </div>
               </div>
             </div>
@@ -115,7 +115,7 @@ export function PrayerTimesWidget() {
               <motion.div
                 key={prayer.name}
                 className={`flex items-center justify-between py-2 px-3 rounded-lg transition-colors ${
-                  prayer.isNext ? 'bg-accent/10' : 'hover:bg-muted/50'
+                  prayer.isNext ? 'bg-primary/10' : 'hover:bg-muted/50'
                 }`}
                 whileHover={{ x: 4 }}
               >
