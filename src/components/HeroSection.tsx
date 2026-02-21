@@ -44,7 +44,7 @@ export function HeroSection() {
   };
 
   return (
-    <section className="relative min-h-[90vh] flex flex-col overflow-hidden">
+    <section className="relative min-h-[75vh] flex flex-col overflow-hidden">
       {/* Background */}
       <div className="absolute inset-0 hero-gradient islamic-pattern" />
       
@@ -67,7 +67,7 @@ export function HeroSection() {
       </svg>
 
       {/* Date Bar - Right below header */}
-      <div className="relative z-10 pt-16 md:pt-20">
+      <div className="relative z-10 pt-16 md:pt-24">
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -83,7 +83,7 @@ export function HeroSection() {
         </motion.div>
       </div>
 
-      <div className="container relative z-10 flex-1 flex items-center py-8 md:py-12">
+      <div className="container relative z-10 items-center py-8 md:py-12">
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
           {/* Left Content */}
           <motion.div
@@ -108,7 +108,7 @@ export function HeroSection() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
-                className="text-4xl md:text-5xl lg:text-6xl font-bold text-primary-foreground leading-tight"
+                className="font-arabic text-4xl md:text-5xl lg:text-6xl font-bold text-primary-foreground leading-tight"
               >
                 {t('welcome')}
               </motion.h1>
@@ -116,7 +116,7 @@ export function HeroSection() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
-                className="text-lg md:text-xl text-primary-foreground/80 max-w-xl"
+                className="font-arabic text-lg md:text-xl text-primary-foreground/80 max-w-xl"
               >
                 {t('heroSubtitle')}
               </motion.p>
@@ -178,10 +178,10 @@ export function HeroSection() {
               className="flex flex-wrap gap-8 pt-4"
             >
               {[
-                { value: language === 'ar' ? 'القرآن' : 'Quran', label: language === 'ar' ? 'الكريم' : 'Kareem' },
-                { value: '+50', label: language === 'ar' ? 'قارئ' : 'Reciters' },
-                { value: language === 'ar' ? 'الحديث' : 'Hadith', label: language === 'ar' ? 'الشريف' : 'Sharif' },
-                { value: language === 'ar' ? 'حصن' : 'Hisn', label: language === 'ar' ? 'المسلم' : 'Muslim' },
+                { value: t('quran'), label: t('kareem') },
+                { value: '+50', label: t('reciters') },
+                { value: t('hadith'), label: t('sharif') },
+                { value: t('hisn'), label: t('muslim') },
               ].map((stat, index) => (
                 <div key={index} className="text-center">
                   <p className="text-2xl md:text-3xl font-bold text-primary-foreground">{stat.value}</p>

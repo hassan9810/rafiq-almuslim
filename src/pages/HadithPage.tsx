@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { MessageSquareQuote, Search, Book, Heart, Loader2, ChevronRight, Star } from 'lucide-react';
-import { Header } from '@/components/Header';
-import { Footer } from '@/components/Footer';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAppStore } from '@/store/useAppStore';
 import { Button } from '@/components/ui/button';
@@ -50,10 +48,8 @@ export default function HadithPage() {
   };
 
   return (
-    <div className={`min-h-screen bg-background ${direction === 'rtl' ? 'rtl' : 'ltr'}`} dir={direction}>
-      <Header />
-      
-      <main className="pt-20 pb-16">
+    <div>
+      <main>
         <div className="container">
           {/* Page Header */}
           <motion.div
@@ -64,20 +60,18 @@ export default function HadithPage() {
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-4">
               <MessageSquareQuote className="w-8 h-8 text-primary" />
             </div>
-            <h1 className="text-3xl md:text-4xl font-bold mb-2">
-              {language === 'ar' ? 'الحديث الشريف' : 'Hadith'}
+            <h1 className="font-arabic text-3xl md:text-4xl font-bold mb-2">
+              {t('hadith')}
             </h1>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              {language === 'ar' 
-                ? 'اقرأ أحاديث النبي صلى الله عليه وسلم من الكتب الستة'
-                : 'Read the sayings of Prophet Muhammad ﷺ from the six major collections'}
+            <p className="font-arabic text-muted-foreground max-w-2xl mx-auto">
+              {t('hadithSubtitle')}
             </p>
           </motion.div>
 
-          <Tabs defaultValue="browse" className="space-y-6">
+          <Tabs defaultValue="browse" className="space-y-6" dir={direction}>
             <TabsList className="grid w-full max-w-md mx-auto grid-cols-2">
               <TabsTrigger value="browse">
-                {language === 'ar' ? 'تصفح' : 'Browse'}
+                {t('browse')}
               </TabsTrigger>
               <TabsTrigger value="search">
                 {language === 'ar' ? 'بحث' : 'Search'}
@@ -103,7 +97,7 @@ export default function HadithPage() {
                       <CardContent className="p-4">
                         <div className="flex items-start justify-between">
                           <div>
-                            <h3 className="font-arabic text-lg font-bold text-right" dir="rtl">
+                            <h3 className="font-arabic text-lg font-bold text-right" dir={direction}>
                               {collection.nameAr}
                             </h3>
                             <p className="text-sm text-muted-foreground">{collection.name}</p>
@@ -113,7 +107,7 @@ export default function HadithPage() {
                         </div>
                         <div className="mt-3 flex items-center justify-between">
                           <Badge variant="secondary">
-                            {collection.hadiths.toLocaleString()} {language === 'ar' ? 'حديث' : 'hadiths'}
+                            {collection.hadiths.toLocaleString()} {t('hadithsCount')}
                           </Badge>
                           {selectedCollection.id === collection.id && (
                             <ChevronRight className="w-4 h-4 text-primary" />
@@ -142,7 +136,7 @@ export default function HadithPage() {
                   <div className="flex gap-2">
                     <Input
                       type="number"
-                      placeholder={language === 'ar' ? 'رقم الحديث...' : 'Hadith number...'}
+                      placeholder={t('hadithNumberPlaceholder')}
                       value={hadithNumber}
                       onChange={(e) => setHadithNumber(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && loadHadith()}
@@ -153,7 +147,7 @@ export default function HadithPage() {
                       {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : (language === 'ar' ? 'اقرأ' : 'Read')}
                     </Button>
                     <Button variant="outline" onClick={loadRandomHadith} disabled={loading}>
-                      {language === 'ar' ? 'عشوائي' : 'Random'}
+                      {t('random')}
                     </Button>
                   </div>
 
@@ -184,14 +178,14 @@ export default function HadithPage() {
                             </Button>
                           </div>
                           
-                          <p className={`text-lg leading-relaxed ${language === 'ar' ? 'font-arabic text-right' : ''}`} dir={language === 'ar' ? 'rtl' : 'ltr'}>
+                          <p className={`font-arabic text-lg leading-relaxed ${language === 'ar' ? 'text-right' : ''}`} dir={direction}>
                             {currentHadith.text}
                           </p>
 
                           {currentHadith.grades && currentHadith.grades.length > 0 && (
                             <div className="mt-4 pt-4 border-t border-border">
                               <p className="text-sm text-muted-foreground mb-2">
-                                {language === 'ar' ? 'التصنيف:' : 'Grades:'}
+                                {t('grades')}
                               </p>
                               <div className="flex flex-wrap gap-2">
                                 {currentHadith.grades.map((grade, idx) => (
@@ -225,9 +219,7 @@ export default function HadithPage() {
                   <div className="text-center py-12 text-muted-foreground">
                     <MessageSquareQuote className="w-12 h-12 mx-auto mb-4 opacity-50" />
                     <p className="mb-4">
-                      {language === 'ar' 
-                        ? 'للبحث، يرجى استخدام رقم الحديث في تبويب "تصفح"' 
-                        : 'To search, please use the hadith number in the "Browse" tab'}
+                      {t('searchHadithHint')}
                     </p>
                     <p className="text-sm">
                       {language === 'ar' 
@@ -242,7 +234,6 @@ export default function HadithPage() {
         </div>
       </main>
 
-      <Footer />
     </div>
   );
 }

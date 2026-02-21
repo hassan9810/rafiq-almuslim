@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { MapPin, Loader2, Navigation } from 'lucide-react';
-import { Header } from '@/components/Header';
-import { Footer } from '@/components/Footer';
+import { MapPin, Loader2, Navigation, Compass } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAppStore } from '@/store/useAppStore';
@@ -10,7 +8,7 @@ import { getCurrentLocation, getQiblaDirection } from '@/lib/prayerTimes';
 
 export default function QiblaPage() {
   const { t, language } = useTranslation();
-  const { location, setLocation } = useAppStore();
+  const { direction, location, setLocation } = useAppStore();
   const [qiblaDirection, setQiblaDirection] = useState<number | null>(null);
   const [deviceHeading, setDeviceHeading] = useState<number>(0);
   const [loading, setLoading] = useState(false);
@@ -69,22 +67,23 @@ export default function QiblaPage() {
   const compassRotation = qiblaDirection !== null ? qiblaDirection - deviceHeading : 0;
 
   return (
-    <div className="min-h-screen bg-background" dir={language === 'ar' ? 'rtl' : 'ltr'}>
-      <Header />
-      
-      <main className="pt-20 pb-12">
+    <div>
+      <main>
         <div className="container max-w-lg">
-          {/* Header */}
+          {/* Page Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center py-8"
+            className="text-center mb-8"
           >
-            <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-4">
+              <Compass className="w-8 h-8 text-primary" />
+            </div>
+            <h1 className="font-arabic text-3xl md:text-4xl font-bold text-foreground mb-2">
               {t('qibla')}
             </h1>
-            <p className="text-muted-foreground">
-              {language === 'ar' ? 'اتجاه القبلة نحو مكة المكرمة' : 'Direction towards Makkah Al-Mukarramah'}
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              {t('qiblaSubtitle')}
             </p>
           </motion.div>
 
@@ -98,13 +97,10 @@ export default function QiblaPage() {
                 <MapPin className="w-12 h-12 text-primary" />
               </div>
               <h2 className="text-xl font-semibold text-foreground mb-2">
-                {language === 'ar' ? 'تحديد موقعك' : 'Detect Your Location'}
+                {t('detectYourLocation')}
               </h2>
               <p className="text-muted-foreground mb-6 max-w-sm mx-auto">
-                {language === 'ar' 
-                  ? 'اسمح بالوصول إلى موقعك لتحديد اتجاه القبلة'
-                  : 'Allow location access to determine Qibla direction'
-                }
+                {t('allowLocationForQibla')}
               </p>
               <Button 
                 variant="emerald" 
@@ -115,7 +111,7 @@ export default function QiblaPage() {
                 {loading ? (
                   <>
                     <Loader2 className="w-5 h-5 animate-spin" />
-                    {language === 'ar' ? 'جاري التحديد...' : 'Detecting...'}
+                    {t('detecting')}
                   </>
                 ) : (
                   <>
@@ -180,7 +176,7 @@ export default function QiblaPage() {
 
                 {/* Center Point */}
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-4 h-4 rounded-full bg-accent shadow-glow" />
+                  <div className="w-4 h-4 rounded-full bg-primary shadow-glow" />
                 </div>
               </div>
 
@@ -188,23 +184,20 @@ export default function QiblaPage() {
               {qiblaDirection !== null && (
                 <div className="bg-card rounded-2xl p-6 border border-border/50">
                   <p className="text-sm text-muted-foreground mb-1">
-                    {language === 'ar' ? 'اتجاه القبلة' : 'Qibla Direction'}
+                    {t('qiblaDirection')}
                   </p>
                   <p className="text-4xl font-bold text-primary">
                     {Math.round(qiblaDirection)}°
                   </p>
                   <p className="text-sm text-muted-foreground mt-2">
-                    {language === 'ar' ? 'من الشمال' : 'from North'}
+                    {t('fromNorth')}
                   </p>
                 </div>
               )}
 
               {!hasCompass && (
                 <p className="text-sm text-muted-foreground mt-4">
-                  {language === 'ar' 
-                    ? 'البوصلة غير متوفرة على هذا الجهاز'
-                    : 'Compass is not available on this device'
-                  }
+                  {t('compassNotAvailable')}
                 </p>
               )}
             </motion.div>
@@ -212,7 +205,6 @@ export default function QiblaPage() {
         </div>
       </main>
       
-      <Footer />
     </div>
   );
 }

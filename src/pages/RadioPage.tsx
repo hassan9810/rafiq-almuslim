@@ -1,11 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Radio, Play, Pause, Volume2, VolumeX, Heart, Loader2 } from 'lucide-react';
-import { Header } from '@/components/Header';
-import { Footer } from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { useTranslation } from '@/hooks/useTranslation';
+import { useAppStore } from '@/store/useAppStore';
 
 interface RadioStation {
   id: number;
@@ -54,6 +53,7 @@ const radioStations: RadioStation[] = [
 
 export default function RadioPage() {
   const { t, language } = useTranslation();
+  const { direction } = useAppStore();
   const [currentStation, setCurrentStation] = useState<RadioStation | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(0.8);
@@ -100,25 +100,23 @@ export default function RadioPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background" dir={language === 'ar' ? 'rtl' : 'ltr'}>
-      <Header />
-      
-      <main className="pt-20 pb-32">
+    <div>
+      <main>
         <div className="container max-w-2xl">
-          {/* Header */}
+          {/* Page Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center py-8"
+            className="text-center mb-8"
           >
-            <div className="w-16 h-16 mx-auto mb-4 bg-primary/10 rounded-2xl flex items-center justify-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-4">
               <Radio className="w-8 h-8 text-primary" />
             </div>
-            <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
+            <h1 className="font-arabic text-3xl md:text-4xl font-bold text-foreground mb-2">
               {t('radio')}
             </h1>
-            <p className="text-muted-foreground">
-              {language === 'ar' ? 'استمع إلى إذاعات القرآن الكريم' : 'Listen to Quran Radio Stations'}
+            <p className="font-arabic text-muted-foreground max-w-2xl mx-auto">
+              {t('radioSubtitle')}
             </p>
           </motion.div>
 
@@ -179,9 +177,9 @@ export default function RadioPage() {
                     </h3>
                     {isActive && isPlaying && (
                       <div className="flex items-center gap-1 mt-1">
-                        <span className="w-2 h-2 bg-accent rounded-full animate-pulse" />
-                        <span className="text-xs text-accent">
-                          {language === 'ar' ? 'يعمل الآن' : 'Now Playing'}
+                        <span className="w-2 h-2 bg-primary rounded-full animate-pulse" />
+                        <span className="text-xs text-primary">
+                          {t('nowPlaying')}
                         </span>
                       </div>
                     )}
@@ -221,8 +219,8 @@ export default function RadioPage() {
                 </p>
                 {isPlaying && (
                   <div className="flex items-center gap-1">
-                    <span className="w-2 h-2 bg-accent rounded-full animate-pulse" />
-                    <span className="text-xs text-accent">Live</span>
+                    <span className="w-2 h-2 bg-primary rounded-full animate-pulse" />
+                    <span className="text-xs text-primary">Live</span>
                   </div>
                 )}
               </div>
@@ -259,7 +257,6 @@ export default function RadioPage() {
       )}
 
       <audio ref={audioRef} />
-      <Footer />
     </div>
   );
 }

@@ -22,8 +22,6 @@ import {
   FileText,
   List
 } from 'lucide-react';
-import { Header } from '@/components/Header';
-import { Footer } from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
@@ -89,7 +87,7 @@ interface TextMushafSettings {
 export default function TextMushafPage() {
   const { language } = useTranslation();
   const containerRef = useRef<HTMLDivElement>(null);
-  const { bookmarks, addBookmark, removeBookmark } = useAppStore();
+  const { direction, bookmarks, addBookmark, removeBookmark, setHideAppHeader } = useAppStore();
   
   // Page state
   const [currentPage, setCurrentPage] = useState(1);
@@ -229,11 +227,16 @@ export default function TextMushafPage() {
 
   useEffect(() => {
     const handleFullscreenChange = () => {
-      setIsFullscreen(!!document.fullscreenElement);
+      const fullscreen = !!document.fullscreenElement;
+      setIsFullscreen(fullscreen);
+      setHideAppHeader(fullscreen);
     };
     document.addEventListener('fullscreenchange', handleFullscreenChange);
-    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
-  }, []);
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      setHideAppHeader(false);
+    };
+  }, [setHideAppHeader]);
 
   // Keyboard navigation
   useEffect(() => {
@@ -304,7 +307,7 @@ export default function TextMushafPage() {
         className={`mushaf-page rounded-xl p-6 md:p-8 h-full overflow-y-auto ${
           settings.nightMode ? 'dark-mushaf-page' : ''
         }`}
-        dir="rtl"
+        dir={direction}
         style={{
           '--quran-font-size': `${actualFontSize}px`,
           '--quran-line-height': actualLineHeight,
@@ -317,7 +320,7 @@ export default function TextMushafPage() {
               {language === 'ar' ? toArabicNumerals(pageNum) : pageNum}
             </span>
             {isJuzStart && (
-              <span className="bg-accent/20 text-accent-foreground rounded-full px-2 py-0.5 text-xs juz-marker">
+              <span className="bg-primary/20 text-primary-foreground rounded-full px-2 py-0.5 text-xs juz-marker">
                 ۞ {language === 'ar' ? `الجزء ${toArabicNumerals(pageJuz)}` : `Juz ${pageJuz}`}
               </span>
             )}
@@ -401,14 +404,14 @@ export default function TextMushafPage() {
                 >
                   {ayahs.map((ayah, idx) => (
                     <span key={`${ayah.surah}-${ayah.ayah}`} className="inline">
-                      <span className="hover:bg-accent/10 rounded transition-colors">
+                      <span className="hover:bg-primary/10 rounded transition-colors">
                         {ayah.text}
                       </span>
                       <span className="ayah-number mx-1">
                         {ayah.ayah.toLocaleString('ar-SA')}
                       </span>
                       {settings.showTranslation && ayah.translation && (
-                        <div className="block text-sm text-muted-foreground mt-2 mb-4 text-right font-sans" style={{ direction: 'ltr', textAlign: 'left' }}>
+                        <div className="block text-sm text-muted-foreground mt-2 mb-4 text-right font-sans" dir={direction}>
                           {ayah.translation}
                         </div>
                       )}
@@ -436,15 +439,11 @@ export default function TextMushafPage() {
   return (
     <div 
       ref={containerRef}
-      className="min-h-screen flex flex-col bg-background"
-      dir={language === 'ar' ? 'rtl' : 'ltr'}
+      className="flex flex-col min-h-full"
     >
-      {/* Header - Always uses global theme, not affected by Text Mushaf night mode */}
-      {!isFullscreen && <Header />}
-      
       {/* Main content wrapper - Night mode applies only here */}
       <div className={`flex-1 flex flex-col ${settings.nightMode ? 'bg-neutral-950 text-neutral-100' : ''}`}>
-        <main className={`flex-1 flex flex-col ${isFullscreen ? '' : 'pt-20 pb-24'}`}>
+        <main className={`flex-1 flex flex-col ${isFullscreen ? '' : 'pb-24'}`}>
         {/* Page Header */}
         {!isFullscreen && (
           <motion.div
@@ -454,18 +453,9 @@ export default function TextMushafPage() {
           >
             <div className="flex items-center justify-between flex-wrap gap-4">
               <div className="flex items-center gap-3">
-                <Link to="/">
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className={settings.nightMode ? '!text-neutral-100 hover:!bg-neutral-800' : ''}
-                  >
-                    <Home className="w-5 h-5" />
-                  </Button>
-                </Link>
                 <div className="flex items-center gap-2">
                   <BookOpen className={`w-6 h-6 ${settings.nightMode ? 'text-emerald-400' : 'text-primary'}`} />
-                  <h1 className={`text-xl md:text-2xl font-bold ${settings.nightMode ? 'text-neutral-100' : 'text-foreground'}`}>
+                  <h1 className={`font-arabic text-xl md:text-2xl font-bold ${settings.nightMode ? 'text-neutral-100' : 'text-foreground'}`}>
                     {language === 'ar' ? 'المصحف النصي' : 'Text Mushaf'}
                   </h1>
                 </div>
@@ -561,7 +551,7 @@ export default function TextMushafPage() {
                           variant={isPageBookmarked ? 'default' : 'outline'}
                           size="icon"
                           onClick={toggleBookmark}
-                          className={`${isPageBookmarked ? 'bg-accent text-accent-foreground' : ''} ${settings.nightMode && !isPageBookmarked ? '!border-neutral-600 !text-neutral-100 !bg-neutral-800 hover:!bg-neutral-700' : ''}`}
+                          className={`${isPageBookmarked ? 'bg-primary text-primary-foreground' : ''} ${settings.nightMode && !isPageBookmarked ? '!border-neutral-600 !text-neutral-100 !bg-neutral-800 hover:!bg-neutral-700' : ''}`}
                         >
                           {isPageBookmarked ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
                         </Button>
@@ -693,7 +683,7 @@ export default function TextMushafPage() {
                 </div>
 
                 {/* Surah Select */}
-                <Select onValueChange={goToSurah} value={currentSurah?.number.toString()}>
+                <Select dir={direction} onValueChange={goToSurah} value={currentSurah?.number.toString()}>
                   <SelectTrigger className={`w-40 ${settings.nightMode ? '!bg-neutral-800 !border-neutral-600 !text-neutral-100' : ''}`}>
                     <SelectValue placeholder={language === 'ar' ? 'السورة' : 'Surah'} />
                   </SelectTrigger>
@@ -711,7 +701,7 @@ export default function TextMushafPage() {
                 </Select>
 
                 {/* Juz Select */}
-                <Select onValueChange={goToJuz} value={currentJuz.toString()}>
+                <Select dir={direction} onValueChange={goToJuz} value={currentJuz.toString()}>
                   <SelectTrigger className={`w-28 ${settings.nightMode ? '!bg-neutral-800 !border-neutral-600 !text-neutral-100' : ''}`}>
                     <SelectValue placeholder={language === 'ar' ? 'الجزء' : 'Juz'} />
                   </SelectTrigger>
@@ -781,7 +771,7 @@ export default function TextMushafPage() {
           )}
 
           {/* Pages */}
-          <div className={`flex ${viewMode === 'double' ? 'flex-row gap-4' : 'justify-center'} h-full min-h-[60vh]`} dir="rtl">
+          <div className={`flex ${viewMode === 'double' ? 'flex-row gap-4' : 'justify-center'} h-full min-h-[60vh]`} dir={direction}>
             <AnimatePresence mode="popLayout">
               {viewMode === 'single' ? (
                 <motion.div
@@ -905,6 +895,7 @@ export default function TextMushafPage() {
               <div className="space-y-2">
                 <Label>{language === 'ar' ? 'نسخة الترجمة' : 'Translation'}</Label>
                 <Select
+                  dir={direction}
                   value={settings.translationEdition}
                   onValueChange={(val) => setSettings(s => ({ ...s, translationEdition: val }))}
                 >
@@ -933,7 +924,7 @@ export default function TextMushafPage() {
           </DialogHeader>
           <ScrollArea className="max-h-96">
             {bookmarks.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
+              <div className="text-center mb-8 text-muted-foreground">
                 {language === 'ar' ? 'لا توجد علامات محفوظة' : 'No bookmarks saved'}
               </div>
             ) : (
@@ -979,8 +970,6 @@ export default function TextMushafPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Footer */}
-      {!isFullscreen && <Footer />}
     </div>
   );
 }

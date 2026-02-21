@@ -21,6 +21,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import { useAppStore } from '@/store/useAppStore';
 import { useMushafStore } from '@/hooks/useMushafStore';
 import { useTranslation } from '@/hooks/useTranslation';
 import { 
@@ -41,6 +42,7 @@ export const MushafNavigator = memo(function MushafNavigator({
   onPageChange
 }: MushafNavigatorProps) {
   const { language } = useTranslation();
+  const { direction } = useAppStore();
   const {
     currentPage,
     setCurrentPage,
@@ -114,7 +116,7 @@ export const MushafNavigator = memo(function MushafNavigator({
     >
       <div className="flex items-center justify-between gap-4 flex-wrap">
         {/* Edition Select */}
-        <Select value={currentEdition.id} onValueChange={handleEditionChange}>
+        <Select dir={direction} value={currentEdition.id} onValueChange={handleEditionChange}>
           <SelectTrigger className="w-48">
             <SelectValue />
           </SelectTrigger>
@@ -192,7 +194,7 @@ export const MushafNavigator = memo(function MushafNavigator({
         {/* Quick Navigation */}
         <div className="flex items-center gap-2">
           {/* Surah Select */}
-          <Select onValueChange={goToSurah} value={currentSurah?.number.toString()}>
+          <Select dir={direction} onValueChange={goToSurah} value={currentSurah?.number.toString()}>
             <SelectTrigger className="w-40">
               <SelectValue placeholder={language === 'ar' ? 'السورة' : 'Surah'} />
             </SelectTrigger>
@@ -206,7 +208,7 @@ export const MushafNavigator = memo(function MushafNavigator({
           </Select>
 
           {/* Juz Select */}
-          <Select onValueChange={goToJuz} value={currentJuz.toString()}>
+          <Select dir={direction} onValueChange={goToJuz} value={currentJuz.toString()}>
             <SelectTrigger className="w-28">
               <SelectValue placeholder={language === 'ar' ? 'الجزء' : 'Juz'} />
             </SelectTrigger>

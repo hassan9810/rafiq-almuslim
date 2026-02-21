@@ -18,18 +18,15 @@ export function Footer() {
               </div>
               <span className="text-xl font-bold text-foreground">{t('appName')}</span>
             </div>
-            <p className="text-sm text-muted-foreground">
-              {language === 'ar' 
-                ? 'رفيقك الروحي لتلاوة القرآن والتعلم والصلوات اليومية'
-                : 'Your spiritual companion for Quran recitation, learning, and daily prayers'
-              }
+            <p className="font-arabic text-sm text-muted-foreground">
+              {t('heroSubtitle')}
             </p>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h3 className="font-semibold text-foreground mb-4">
-              {language === 'ar' ? 'روابط سريعة' : 'Quick Links'}
+            <h3 className="font-arabic font-semibold text-foreground mb-4">
+              {t('quickLinks')}
             </h3>
             <ul className="space-y-2">
               <li><Link to="/quran" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t('quran')}</Link></li>
@@ -42,8 +39,8 @@ export function Footer() {
 
           {/* Features */}
           <div>
-            <h3 className="font-semibold text-foreground mb-4">
-              {language === 'ar' ? 'الميزات' : 'Features'}
+            <h3 className="font-arabic font-semibold text-foreground mb-4">
+              {t('features')}
             </h3>
             <ul className="space-y-2">
               <li><Link to="/hisn-muslim" className="text-sm text-muted-foreground hover:text-primary transition-colors">{language === 'ar' ? 'حصن المسلم' : 'Hisn Muslim'}</Link></li>
@@ -56,7 +53,7 @@ export function Footer() {
           {/* Social */}
           <div>
             <h3 className="font-semibold text-foreground mb-4">
-              {language === 'ar' ? 'تواصل معنا' : 'Connect'}
+              {t('connect')}
             </h3>
             <div className="flex gap-3">
               <a 
@@ -91,7 +88,7 @@ export function Footer() {
             © {currentYear} {t('appName')}.
           </p>
           <p className="text-sm text-muted-foreground flex items-center gap-1">
-            {language === 'ar' ? 'صُنع بـ' : 'Made with'} <Heart className="w-4 h-4 text-destructive fill-destructive" /> {language === 'ar' ? 'للمسلمين' : 'for the Ummah'}
+            {t('madeWith')} <Heart className="w-4 h-4 text-destructive fill-destructive" /> {t('forTheUmmah')}
           </p>
         </div>
       </div>

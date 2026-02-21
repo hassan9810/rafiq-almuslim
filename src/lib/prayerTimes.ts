@@ -25,14 +25,14 @@ export async function getCurrentLocation(): Promise<Location> {
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         const { latitude, longitude } = position.coords;
-        
+
         // Reverse geocode to get city name using Nominatim
         try {
           const response = await fetch(
             `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=10`
           );
           const data = await response.json();
-          
+
           resolve({
             latitude,
             longitude,
@@ -63,7 +63,7 @@ export async function searchCity(query: string): Promise<Location[]> {
       `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5&addressdetails=1`
     );
     const data = await response.json();
-    
+
     return data.map((result: any) => ({
       latitude: parseFloat(result.lat),
       longitude: parseFloat(result.lon),
@@ -79,10 +79,19 @@ export async function searchCity(query: string): Promise<Location[]> {
 // Calculate prayer times
 export function calculatePrayerTimes(latitude: number, longitude: number, date: Date = new Date()): PrayerTime[] {
   const coordinates = new Coordinates(latitude, longitude);
-  const params = CalculationMethod.MoonsightingCommittee();
+  const params = CalculationMethod.Egyptian();
   const prayerTimes = new PrayerTimes(coordinates, date, params);
+  const maghribTime = prayerTimes.maghrib.getTime();
 
-  const now = new Date();
+  let fajrTime = prayerTimes.fajr.getTime();
+  if (fajrTime <= maghribTime) {
+    fajrTime += 24 * 60 * 60 * 1000;
+  }
+
+  const nightDuration = fajrTime - maghribTime;
+  const midnight = new Date(maghribTime + nightDuration / 2);
+  const lastThird = new Date(maghribTime + (nightDuration * 2) / 3);
+
   const prayers: { name: string; nameArabic: string; time: Date }[] = [
     { name: 'Fajr', nameArabic: 'الفجر', time: prayerTimes.fajr },
     { name: 'Sunrise', nameArabic: 'الشروق', time: prayerTimes.sunrise },
@@ -90,11 +99,14 @@ export function calculatePrayerTimes(latitude: number, longitude: number, date: 
     { name: 'Asr', nameArabic: 'العصر', time: prayerTimes.asr },
     { name: 'Maghrib', nameArabic: 'المغرب', time: prayerTimes.maghrib },
     { name: 'Isha', nameArabic: 'العشاء', time: prayerTimes.isha },
+    { name: 'Midnight', nameArabic: 'منتصف الليل', time: midnight },
+    { name: 'LastThird', nameArabic: 'الثلث الأخير', time: lastThird },
   ];
+
 
   // Find next prayer
   const nextPrayer = prayerTimes.nextPrayer();
-  
+
   return prayers.map((prayer) => ({
     ...prayer,
     isNext: Prayer[nextPrayer] === prayer.name,
@@ -120,12 +132,12 @@ export function formatTime(date: Date, use24Hour: boolean = false): string {
 export function getTimeUntilNextPrayer(nextPrayerTime: Date): string {
   const now = new Date();
   const diff = nextPrayerTime.getTime() - now.getTime();
-  
+
   if (diff <= 0) return 'Now';
-  
+
   const hours = Math.floor(diff / (1000 * 60 * 60));
   const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-  
+
   if (hours > 0) {
     return `${hours}h ${minutes}m`;
   }

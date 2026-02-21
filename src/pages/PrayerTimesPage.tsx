@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { MapPin, Clock, Loader2, RefreshCw, Search, X } from 'lucide-react';
-import { Header } from '@/components/Header';
-import { Footer } from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -24,11 +22,14 @@ const prayerIcons = {
   Asr: '🌤️',
   Maghrib: '🌇',
   Isha: '🌃',
+  Midnight: '🌌',
+  LastThird: '✨',
 };
+
 
 export default function PrayerTimesPage() {
   const { t, language } = useTranslation();
-  const { location, setLocation } = useAppStore();
+  const { direction, location, setLocation } = useAppStore();
   const [prayerTimes, setPrayerTimes] = useState<PrayerTime[]>([]);
   const [loading, setLoading] = useState(false);
   const [timeUntilNext, setTimeUntilNext] = useState('');
@@ -90,18 +91,19 @@ export default function PrayerTimesPage() {
   const nextPrayer = prayerTimes.find(p => p.isNext);
 
   return (
-    <div className="min-h-screen bg-background" dir={language === 'ar' ? 'rtl' : 'ltr'}>
-      <Header />
-      
-      <main className="pt-20 pb-12">
+    <div>
+      <main>
         <div className="container max-w-2xl">
-          {/* Header */}
+          {/* Page Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center py-8"
+            className="text-center mb-8"
           >
-            <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-4">
+              <Clock className="w-8 h-8 text-primary" />
+            </div>
+            <h1 className="font-arabic text-3xl md:text-4xl font-bold text-foreground mb-2">
               {t('prayerTimes')}
             </h1>
             {location && (
@@ -121,7 +123,7 @@ export default function PrayerTimesPage() {
                   <div className="w-full max-w-sm mt-4 space-y-2">
                     <div className="flex gap-2">
                       <Input
-                        placeholder={language === 'ar' ? 'ابحث عن مدينة...' : 'Search city...'}
+                        placeholder={t('searchCityPlaceholder')}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         onKeyDown={(e) => e.key === 'Enter' && handleSearchCity()}
@@ -160,13 +162,10 @@ export default function PrayerTimesPage() {
                 <MapPin className="w-12 h-12 text-primary" />
               </div>
               <h2 className="text-xl font-semibold text-foreground mb-2">
-                {language === 'ar' ? 'تحديد موقعك' : 'Detect Your Location'}
+                {t('detectYourLocation')}
               </h2>
               <p className="text-muted-foreground mb-6 max-w-sm mx-auto">
-                {language === 'ar' 
-                  ? 'اسمح بالوصول إلى موقعك أو ابحث عن مدينتك يدوياً'
-                  : 'Allow location access or search for your city manually'
-                }
+                {t('allowLocationOrSearch')}
               </p>
               
               {/* Auto Detect Button */}
@@ -180,7 +179,7 @@ export default function PrayerTimesPage() {
                 {loading ? (
                   <>
                     <Loader2 className="w-5 h-5 animate-spin" />
-                    {language === 'ar' ? 'جاري التحديد...' : 'Detecting...'}
+                    {t('detecting')}
                   </>
                 ) : (
                   <>
@@ -193,18 +192,18 @@ export default function PrayerTimesPage() {
               {/* Or Divider */}
               <div className="flex items-center gap-4 max-w-sm mx-auto mb-6">
                 <div className="flex-1 h-px bg-border" />
-                <span className="text-muted-foreground text-sm">{language === 'ar' ? 'أو' : 'or'}</span>
+                <span className="text-muted-foreground text-sm">{t('or')}</span>
                 <div className="flex-1 h-px bg-border" />
               </div>
 
               {/* Manual Search */}
               <div className="max-w-sm mx-auto space-y-3">
                 <p className="text-sm text-muted-foreground mb-2">
-                  {language === 'ar' ? 'ابحث عن مدينتك:' : 'Search for your city:'}
+                  {t('searchForYourCity')}
                 </p>
                 <div className="flex gap-2">
                   <Input
-                    placeholder={language === 'ar' ? 'مثال: القاهرة، مكة، دبي...' : 'e.g., Cairo, Mecca, Dubai...'}
+                    placeholder={t('cityPlaceholderExample')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSearchCity()}
@@ -278,11 +277,11 @@ export default function PrayerTimesPage() {
                           {language === 'ar' ? prayer.nameArabic : prayer.name}
                         </h3>
                         {prayer.isNext && (
-                          <p className="text-xs text-accent">{language === 'ar' ? 'الصلاة القادمة' : 'Next Prayer'}</p>
+                          <p className="text-xs text-primary">{t('nextPrayer')}</p>
                         )}
                       </div>
                     </div>
-                    <p className={`text-2xl font-bold ${prayer.isNext ? 'text-primary' : 'text-foreground'}`}>
+                    <p className={`font-bold ${prayer.isNext ? 'text-primary' : 'text-foreground'}`}>
                       {formatTime(prayer.time)}
                     </p>
                   </motion.div>
@@ -292,8 +291,6 @@ export default function PrayerTimesPage() {
           )}
         </div>
       </main>
-      
-      <Footer />
     </div>
   );
 }

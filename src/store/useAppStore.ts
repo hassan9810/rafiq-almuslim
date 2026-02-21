@@ -33,11 +33,17 @@ interface PlayerState {
   repeatMode: 'none' | 'ayah' | 'surah';
 }
 
+export type ThemeColorId = 'emerald' | 'gold' | 'teal' | 'blue' | 'violet' | 'rose' | 'orange' | 'sky' | 'cyan' | 'lime';
+
 interface AppState {
   // Language & Theme
   language: 'ar' | 'en';
   direction: 'rtl' | 'ltr';
   theme: 'light' | 'dark';
+  /** App accent/primary color preset (applied across the app) */
+  themeColor: ThemeColorId;
+  /** Quran text font in Surah Reader (and any .arabic-quran) */
+  quranFont: 'uthmanic' | 'amiri' | 'noto' | 'noto-naskh' | 'scheherazade';
   
   // Quran Data
   surahs: Surah[];
@@ -51,10 +57,15 @@ interface AppState {
   
   // Location
   location: { latitude: number; longitude: number; city: string } | null;
+
+  // Layout (e.g. hide header in fullscreen mushaf)
+  hideAppHeader: boolean;
   
   // Actions
   setLanguage: (lang: 'ar' | 'en') => void;
   toggleTheme: () => void;
+  setThemeColor: (color: AppState['themeColor']) => void;
+  setQuranFont: (font: AppState['quranFont']) => void;
   setSurahs: (surahs: Surah[]) => void;
   setReciters: (reciters: Reciter[]) => void;
   toggleFavorite: (surahNumber: number) => void;
@@ -63,6 +74,7 @@ interface AppState {
   addRecentRead: (surah: number, ayah: number) => void;
   setPlayer: (player: Partial<PlayerState>) => void;
   setLocation: (location: { latitude: number; longitude: number; city: string }) => void;
+  setHideAppHeader: (hide: boolean) => void;
 }
 
 export const useAppStore = create<AppState>()(
@@ -72,6 +84,8 @@ export const useAppStore = create<AppState>()(
       language: 'ar',
       direction: 'rtl',
       theme: 'light',
+      themeColor: 'emerald',
+      quranFont: 'uthmanic',
       surahs: [],
       reciters: [],
       favorites: [],
@@ -88,7 +102,8 @@ export const useAppStore = create<AppState>()(
         repeatMode: 'none',
       },
       location: null,
-      
+      hideAppHeader: false,
+
       // Actions
       setLanguage: (lang) => set({ 
         language: lang, 
@@ -100,7 +115,14 @@ export const useAppStore = create<AppState>()(
         document.documentElement.classList.toggle('dark', newTheme === 'dark');
         set({ theme: newTheme });
       },
-      
+      setThemeColor: (color) => {
+        set({ themeColor: color });
+        document.documentElement.dataset.themeColor = color;
+      },
+      setQuranFont: (font) => {
+        set({ quranFont: font });
+        document.documentElement.dataset.quranFont = font;
+      },
       setSurahs: (surahs) => set({ surahs }),
       setReciters: (reciters) => set({ reciters }),
       
@@ -136,6 +158,7 @@ export const useAppStore = create<AppState>()(
       }),
       
       setLocation: (location) => set({ location }),
+      setHideAppHeader: (hide) => set({ hideAppHeader: hide }),
     }),
     {
       name: 'rafiq-muslim-storage',
@@ -143,6 +166,8 @@ export const useAppStore = create<AppState>()(
         language: state.language,
         direction: state.direction,
         theme: state.theme,
+        themeColor: state.themeColor,
+        quranFont: state.quranFont,
         favorites: state.favorites,
         bookmarks: state.bookmarks,
         recentReads: state.recentReads,

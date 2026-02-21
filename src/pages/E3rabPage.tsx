@@ -2,8 +2,6 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BookText, Search, ChevronRight, ChevronLeft, Loader2, BookOpen } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { Header } from '@/components/Header';
-import { Footer } from '@/components/Footer';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAppStore } from '@/store/useAppStore';
 import { Button } from '@/components/ui/button';
@@ -15,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { fetchE3rabBySurah, surahNames, E3rabItem } from '@/lib/e3rabApi';
 
 export default function E3rabPage() {
-  const { language } = useTranslation();
+  const { t } = useTranslation();
   const { direction } = useAppStore();
   const [selectedSurah, setSelectedSurah] = useState<number>(1);
   const [e3rabData, setE3rabData] = useState<E3rabItem[]>([]);
@@ -57,10 +55,8 @@ export default function E3rabPage() {
   };
 
   return (
-    <div className={`min-h-screen bg-background ${direction === 'rtl' ? 'rtl' : 'ltr'}`} dir={direction}>
-      <Header />
-      
-      <main className="pt-20 pb-16">
+    <div>
+      <main>
         <div className="container max-w-5xl">
           {/* Page Header */}
           <motion.div
@@ -71,11 +67,11 @@ export default function E3rabPage() {
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-4">
               <BookText className="w-8 h-8 text-primary" />
             </div>
-            <h1 className="text-3xl md:text-4xl font-bold font-arabic mb-2">
-              إعراب القرآن الكريم
+            <h1 className="font-arabic text-3xl md:text-4xl font-bold mb-2">
+              {t('e3rabTitle')}
             </h1>
-            <p className="text-muted-foreground max-w-2xl mx-auto font-arabic">
-              تعلم إعراب آيات القرآن الكريم مع شرح تفصيلي للقواعد النحوية والصرفية
+            <p className="font-arabic text-muted-foreground max-w-2xl mx-auto">
+              {t('e3rabSubtitle')}
             </p>
           </motion.div>
 
@@ -84,7 +80,7 @@ export default function E3rabPage() {
             <Link to="/quran">
               <Button variant="outline" className="gap-2">
                 <BookOpen className="w-4 h-4" />
-                {language === 'ar' ? 'العودة للقرآن' : 'Back to Quran'}
+                {t('backToQuran')}
               </Button>
             </Link>
           </div>
@@ -95,12 +91,12 @@ export default function E3rabPage() {
               <div className="flex flex-col md:flex-row gap-4">
                 {/* Surah Selector */}
                 <div className="flex-1">
-                  <Select
+                  <Select dir={direction}
                     value={selectedSurah.toString()}
                     onValueChange={(value) => setSelectedSurah(parseInt(value))}
                   >
                     <SelectTrigger className="w-full font-arabic">
-                      <SelectValue placeholder="اختر السورة" />
+                      <SelectValue placeholder={t('selectSurah')} />
                     </SelectTrigger>
                     <SelectContent className="max-h-80">
                       {surahNames.map((surah) => (
@@ -109,7 +105,7 @@ export default function E3rabPage() {
                           value={surah.number.toString()}
                           className="font-arabic"
                         >
-                          {surah.number}. {surah.name}
+                          {surah.number}. {direction === 'rtl' ? surah.name : surah.englishName}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -140,7 +136,7 @@ export default function E3rabPage() {
                 <div className="relative flex-1">
                   <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <Input
-                    placeholder={language === 'ar' ? 'البحث في الإعراب...' : 'Search in e3rab...'}
+                    placeholder={t('searchE3rabPlaceholder')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="pr-10 font-arabic"
@@ -168,7 +164,7 @@ export default function E3rabPage() {
                       <span className="font-arabic text-2xl">{currentSurah.name}</span>
                     </div>
                     <span className="text-muted-foreground text-sm">
-                      {e3rabData.length} {language === 'ar' ? 'آية' : 'verses'}
+                      {e3rabData.length} {t('verses')}
                     </span>
                   </CardTitle>
                 </CardHeader>
@@ -216,7 +212,7 @@ export default function E3rabPage() {
                                 className={`font-arabic text-base leading-loose prose prose-sm max-w-none ${
                                   expandedAyah === item.aya ? '' : 'line-clamp-3'
                                 }`}
-                                dir="rtl"
+                                dir={direction}
                                 dangerouslySetInnerHTML={{ __html: item.text }}
                               />
                               
@@ -231,8 +227,8 @@ export default function E3rabPage() {
                                   }}
                                 >
                                   {expandedAyah === item.aya 
-                                    ? (language === 'ar' ? 'عرض أقل' : 'Show less')
-                                    : (language === 'ar' ? 'عرض المزيد' : 'Show more')
+                                    ? t('showLess')
+                                    : t('showMore')
                                   }
                                 </Button>
                               )}
@@ -249,8 +245,8 @@ export default function E3rabPage() {
                     <BookText className="w-12 h-12 mx-auto text-muted-foreground/50 mb-4" />
                     <p className="text-muted-foreground font-arabic">
                       {searchQuery 
-                        ? (language === 'ar' ? 'لا توجد نتائج للبحث' : 'No search results')
-                        : (language === 'ar' ? 'لا يوجد إعراب لهذه السورة' : 'No e3rab available for this surah')
+                        ? t('noSearchResults')
+                        : t('noE3rabForSurah')
                       }
                     </p>
                   </div>
@@ -261,7 +257,6 @@ export default function E3rabPage() {
         </div>
       </main>
 
-      <Footer />
     </div>
   );
 }

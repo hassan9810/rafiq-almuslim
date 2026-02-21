@@ -193,7 +193,7 @@ export const MushafSearch = memo(function MushafSearch({
                     {surah.number}
                   </div>
                   <div className="flex-1">
-                    <div className="font-semibold">
+                    <div className="font-arabic font-semibold">
                       {language === 'ar' ? surah.nameAr : surah.name}
                     </div>
                     <div className="text-sm text-muted-foreground">
@@ -231,7 +231,7 @@ export const MushafSearch = memo(function MushafSearch({
               ))}
               
               {results.length === 0 && query && !isSearching && searchType === 'text' && (
-                <div className="text-center py-8 text-muted-foreground">
+                <div className="text-center mb-8 text-muted-foreground">
                   {language === 'ar' ? 'لا توجد نتائج' : 'No results found'}
                 </div>
               )}
