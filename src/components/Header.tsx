@@ -45,7 +45,7 @@ const navItems = [
   { path: '/qibla', icon: Compass, labelKey: 'qibla' as const },
   { path: '/radio', icon: Radio, labelKey: 'radio' as const },
 ];
-
+ 
 type QuranFontId = 'uthmanic' | 'amiri' | 'noto' | 'noto-naskh' | 'scheherazade';
 
 const THEME_COLOR_SWATCHES: { id: ThemeColorId; swatch: string }[] = [
