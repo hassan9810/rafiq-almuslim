@@ -353,7 +353,52 @@
   .surah-header-text {
     font-family: 'Surah Names', 'Amiri', serif;
   }
-  
+
+  /* Bookmark ayah: blink highlight twice then back to normal */
+  .ayah-blink {
+    animation: ayah-blink-twice 1.4s ease-in-out forwards;
+  }
+  .ayah-blink.ayah-highlight {
+    animation-name: ayah-blink-twice-card;
+  }
+  @keyframes ayah-blink-twice {
+    0% {
+      background-color: hsl(var(--primary) / 0.2);
+      box-shadow: 0 0 0 1px hsl(var(--primary) / 0.5);
+    }
+    25% {
+      background-color: transparent;
+      box-shadow: none;
+    }
+    50% {
+      background-color: hsl(var(--primary) / 0.2);
+      box-shadow: 0 0 0 1px hsl(var(--primary) / 0.5);
+    }
+    75%,
+    100% {
+      background-color: transparent;
+      box-shadow: none;
+    }
+  }
+  @keyframes ayah-blink-twice-card {
+    0% {
+      background-color: hsl(var(--primary) / 0.15);
+      box-shadow: 0 0 0 2px hsl(var(--primary));
+    }
+    25% {
+      background-color: hsl(var(--card));
+      box-shadow: none;
+    }
+    50% {
+      background-color: hsl(var(--primary) / 0.15);
+      box-shadow: 0 0 0 2px hsl(var(--primary));
+    }
+    75%,
+    100% {
+      background-color: hsl(var(--card));
+      box-shadow: none;
+    }
+  }
 
   
   /* Scrollbar Styling */
