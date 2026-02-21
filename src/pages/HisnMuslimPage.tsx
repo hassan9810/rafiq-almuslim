@@ -90,6 +90,17 @@ export default function HisnMuslimPage() {
     if (!selectedChapter) setRepeatCount(0);
   }, [selectedChapter]);
 
+  // Stop audio when modal is closed (quit azkar)
+  useEffect(() => {
+    if (!selectedChapter && audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+      audioRef.current.removeAttribute('src');
+      audioRef.current.load();
+      setIsPlaying(false);
+    }
+  }, [selectedChapter]);
+
   // Load chapters on mount
   useEffect(() => {
     const loadData = async () => {
@@ -123,13 +134,10 @@ export default function HisnMuslimPage() {
 
   // Open chapter modal and fetch adhkar from API
   const openChapter = async (chapter: HisnChapter) => {
+    stopAudio();
     setSelectedChapter(chapter);
     setCurrentDhikrIndex(0);
     setRepeatCount(0);
-    setIsPlaying(false);
-    if (audioRef.current) {
-      audioRef.current.pause();
-    }
 
     // Fetch adhkar from API if not cached
     if (chapter.adhkar.length === 0) {
@@ -196,25 +204,35 @@ export default function HisnMuslimPage() {
     }
   };
 
+  // Fully stop current audio (used when changing dhikr or closing)
+  const stopAudio = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+      audioRef.current.removeAttribute('src');
+      audioRef.current.load();
+    }
+    setIsPlaying(false);
+  };
+
   // Navigate dhikr
   const nextDhikr = () => {
     if (selectedChapter && currentDhikrIndex < selectedChapter.adhkar.length - 1) {
+      stopAudio();
       setCurrentDhikrIndex(prev => prev + 1);
-      setIsPlaying(false);
-      if (audioRef.current) {
-        audioRef.current.pause();
-      }
     }
   };
 
   const prevDhikr = () => {
     if (currentDhikrIndex > 0) {
+      stopAudio();
       setCurrentDhikrIndex(prev => prev - 1);
-      setIsPlaying(false);
-      if (audioRef.current) {
-        audioRef.current.pause();
-      }
     }
+  };
+
+  const closeChapter = () => {
+    stopAudio();
+    setSelectedChapter(null);
   };
 
   const currentDhikr = selectedChapter?.adhkar[currentDhikrIndex];
@@ -262,21 +280,21 @@ export default function HisnMuslimPage() {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
-                onClick={() => setSelectedChapter(null)}
+                onClick={closeChapter}
               >
                 <motion.div
                   initial={{ scale: 0.9, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   exit={{ scale: 0.9, opacity: 0 }}
-                  className="bg-background rounded-2xl w-full max-w-4xl max-h-[85vh] overflow-hidden"
+                  className="bg-background rounded-2xl max-w-4xl max-h-[85vh] overflow-hidden"
                   onClick={(e) => e.stopPropagation()}
                 >
                   {/* Header */}
-                  <div className="bg-primary text-primary-foreground p-4 flex items-center justify-between">
+                  <div className={`bg-primary text-primary-foreground p-4 flex items-center justify-between ${!hasMultipleAdhkar ? 'w-full' : ''}`}>
                     <Button
                       variant="ghost"
                       size="icon"
-                      onClick={() => setSelectedChapter(null)}
+                      onClick={closeChapter}
                       className="text-primary-foreground hover:bg-primary-foreground/20"
                     >
                       <X className="h-5 w-5" />
@@ -305,7 +323,7 @@ export default function HisnMuslimPage() {
                   </div>
 
                   {/* Content: list scrolls; main azkar fixed; center when single azkar */}
-                  <div className={`h-[calc(85vh-140px)] p-6 flex flex-row gap-6 overflow-hidden ${!hasMultipleAdhkar ? 'justify-center' : ''}`} dir={direction}>
+                  <div className={`p-6 flex flex-row gap-6 overflow-hidden ${!hasMultipleAdhkar ? 'justify-center' : 'h-[calc(85vh-140px)]'}`} dir={direction}>
                     {selectedChapter.adhkar.length > 0 ? (
                       <>
                         {/* Adhkar list — only when more than one azkar */}
@@ -327,9 +345,8 @@ export default function HisnMuslimPage() {
                                         : 'hover:bg-muted/50'
                                         }`}
                                       onClick={() => {
+                                        stopAudio();
                                         setCurrentDhikrIndex(idx);
-                                        setIsPlaying(false);
-                                        if (audioRef.current) audioRef.current.pause();
                                       }}
                                     >
                                       <CardContent className="p-3">
@@ -355,12 +372,12 @@ export default function HisnMuslimPage() {
                           </aside>
                         )}
 
-                        {/* Main azkar content — centered when single azkar */}
+                        {/* Main azkar content — centered when single azkar; card fits content height when single */}
                         <div className={`flex flex-col min-h-0 ${hasMultipleAdhkar ? 'flex-1 min-w-0' : 'max-w-2xl w-full mx-auto'}`}>
-                          <Card className="border-2 border-primary/20 bg-primary/5 flex-1 flex flex-col min-h-0 overflow-hidden">
-                            <CardContent className="p-6 flex flex-col flex-1 min-h-0 text-center">
-                              {/* الذكر، التكرار وعددها من القائمة — وسطنهم رأسياً */}
-                              <div className="flex-1 flex flex-col justify-center min-h-0 gap-4">
+                          <Card className={`border-2 border-primary/20 bg-primary/5 flex flex-col overflow-hidden ${hasMultipleAdhkar ? 'flex-1 min-h-0' : 'flex-initial'}`}>
+                            <CardContent className={`p-6 flex flex-col text-center ${hasMultipleAdhkar ? 'flex-1 min-h-0' : 'py-6'}`}>
+                              {/* الذكر، التكرار وعددها من القائمة — وسطنهم رأسياً؛ single: من الأعلى مع تباعد مريح */}
+                              <div className={`flex flex-col min-h-0 gap-4 ${hasMultipleAdhkar ? 'flex-1 justify-center' : 'justify-start'}`}>
                                 {/* Badges row: current/total (start) and repeat (end) */}
                                 <div className="flex justify-between items-center w-full shrink-0" dir={direction}>
                                   <div>
@@ -379,8 +396,8 @@ export default function HisnMuslimPage() {
                                   </div>
                                 </div>
 
-                                {/* Scrollable text — wrap + scroll when long; centered */}
-                                <ScrollArea className="min-h-0 max-h-[min(40vh,320px)] -mx-1 px-1 shrink-0">
+                                {/* Scrollable text — wrap + scroll when long; centered; single azkar: tighter max height */}
+                                <ScrollArea className={`min-h-0 -mx-1 px-1 shrink-0 ${hasMultipleAdhkar ? 'max-h-[min(40vh,320px)]' : 'max-h-[min(28vh,240px)]'}`}>
                                   <div className="space-y-4 pr-2 flex flex-col items-center text-center max-w-full">
                                     <p
                                       className={`font-arabic text-foreground w-full ${(currentDhikr?.ARABIC_TEXT?.length ?? 0) > 400 ? 'text-lg md:text-xl' : (currentDhikr?.ARABIC_TEXT?.length ?? 0) > 200 ? 'text-xl md:text-2xl' : 'text-2xl md:text-3xl'}`}
@@ -533,7 +550,6 @@ export default function HisnMuslimPage() {
                                 <Badge variant="outline" className="text-xs">
                                   {chapter.adhkar.length}
                                 </Badge>
-                                <Play className="h-4 w-4 text-muted-foreground shrink-0" />
                               </div>
                             </div>
                           </CardContent>
