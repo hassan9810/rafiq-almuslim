@@ -171,14 +171,14 @@ export default function BookmarksPage() {
                   transition={{ delay: index * 0.03 }}
                 >
                   <Link
-                    to={`/quran/${bookmark.surah}`}
+                    to={`/quran/${bookmark.surah}?ayah=${bookmark.ayah}`}
                     className="group flex items-center gap-4 p-4 rounded-2xl border border-border/50 bg-card hover:border-primary/30 hover:bg-card/80 transition-all block"
                   >
                     <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
                       <Bookmark className="w-6 h-6 text-primary fill-primary" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="  font-semibold text-foreground truncate">
+                      <p className="font-semibold text-foreground truncate">
                         {getSurahName(bookmark.surah)}
                       </p>
                       <p className="text-sm text-muted-foreground">
@@ -198,7 +198,10 @@ export default function BookmarksPage() {
                     >
                       <BookmarkMinus className="w-4 h-4" />
                     </Button>
-                    <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors flex-shrink-0" />
+                    <span className="flex items-center gap-1.5 text-sm text-muted-foreground group-hover:text-primary transition-colors flex-shrink-0" title={t('goToAyah')}>
+                      <span className="font-medium">{t('ayah')} {bookmark.ayah.toLocaleString(language === 'ar' ? 'ar-EG' : 'en-US')}</span>
+                      <ChevronRight className="w-4 h-4" />
+                    </span>
                   </Link>
                 </motion.div>
               ))}

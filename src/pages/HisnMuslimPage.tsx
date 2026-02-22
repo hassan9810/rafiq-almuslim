@@ -74,21 +74,30 @@ export default function HisnMuslimPage() {
   const [isMuted, setIsMuted] = useState(false);
   const [currentDhikrIndex, setCurrentDhikrIndex] = useState(0);
   const [repeatCount, setRepeatCount] = useState(0);
+  /** Per-adhkar count for the current chapter (for progress bars in the list) */
+  const [adhkarCounts, setAdhkarCounts] = useState<number[]>([]);
   const [loadingChapter, setLoadingChapter] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
 
   const isArabic = language === 'ar';
   const hasMultipleAdhkar = (selectedChapter?.adhkar.length ?? 0) > 1;
 
-  // Reset repeat count when changing dhikr
+  // Init per-adhkar counts when chapter opens; clear when closed
   useEffect(() => {
-    setRepeatCount(0);
-  }, [currentDhikrIndex]);
-
-  // Reset repeat count when popup closed or switching to another category
-  useEffect(() => {
-    if (!selectedChapter) setRepeatCount(0);
+    if (selectedChapter) {
+      setAdhkarCounts(selectedChapter.adhkar.map(() => 0));
+    } else {
+      setAdhkarCounts([]);
+      setRepeatCount(0);
+    }
   }, [selectedChapter]);
+
+  // Sync repeat count from stored adhkar count when switching dhikr
+  useEffect(() => {
+    if (selectedChapter && adhkarCounts.length === selectedChapter.adhkar.length) {
+      setRepeatCount(adhkarCounts[currentDhikrIndex] ?? 0);
+    }
+  }, [currentDhikrIndex, adhkarCounts, selectedChapter]);
 
   // Stop audio when modal is closed (quit azkar)
   useEffect(() => {
@@ -337,10 +346,14 @@ export default function HisnMuslimPage() {
                               </div>
                               <ScrollArea className="flex-1 min-h-0">
                                 <div className="p-3 space-y-2">
-                                  {selectedChapter.adhkar.map((dhikr, idx) => (
+                                  {selectedChapter.adhkar.map((dhikr, idx) => {
+                                    const targetRepeat = Number(dhikr.REPEAT) || 1;
+                                    const current = adhkarCounts[idx] ?? 0;
+                                    const progress = Math.min(current / targetRepeat, 1);
+                                    return (
                                     <Card
                                       key={dhikr.ID || idx}
-                                      className={`cursor-pointer transition-all ${idx === currentDhikrIndex
+                                      className={`relative overflow-hidden cursor-pointer transition-all ${idx === currentDhikrIndex
                                         ? 'ring-2 ring-primary'
                                         : 'hover:bg-muted/50'
                                         }`}
@@ -349,7 +362,19 @@ export default function HisnMuslimPage() {
                                         setCurrentDhikrIndex(idx);
                                       }}
                                     >
-                                      <CardContent className="p-3">
+                                      {/* Card background fill as progress (transparent); RTL: fill from right */}
+                                      <div
+                                        className="absolute inset-0 bg-primary/20 transition-all duration-300"
+                                        style={{
+                                          width: `${progress * 100}%`,
+                                          ...(direction === 'rtl' ? { left: 'auto', right: 0 } : {}),
+                                        }}
+                                        role="progressbar"
+                                        aria-valuenow={current}
+                                        aria-valuemin={0}
+                                        aria-valuemax={targetRepeat}
+                                      />
+                                      <CardContent className="relative z-10 p-3">
                                         <div className="flex items-start gap-2">
                                           <Badge variant="outline" className="shrink-0 text-xs">
                                             {idx + 1}
@@ -365,7 +390,8 @@ export default function HisnMuslimPage() {
                                         )}
                                       </CardContent>
                                     </Card>
-                                  ))}
+                                    );
+                                  })}
                                 </div>
                               </ScrollArea>
                             </Card>
@@ -427,7 +453,16 @@ export default function HisnMuslimPage() {
                                   size="lg"
                                   className="min-w-[120px] text-lg font-semibold"
                                   onClick={() => {
-                                    setRepeatCount(prev => (targetRepeat > 0 ? Math.min(prev + 1, targetRepeat) : prev + 1));
+                                    const next = targetRepeat > 0 ? Math.min(repeatCount + 1, targetRepeat) : repeatCount + 1;
+                                    setRepeatCount(next);
+                                    setAdhkarCounts(prev => {
+                                      if (selectedChapter && prev.length === selectedChapter.adhkar.length) {
+                                        const n = [...prev];
+                                        n[currentDhikrIndex] = next;
+                                        return n;
+                                      }
+                                      return prev;
+                                    });
                                   }}
                                 >
                                   {targetRepeat > 0 ? `${repeatCount} / ${targetRepeat}` : repeatCount}
