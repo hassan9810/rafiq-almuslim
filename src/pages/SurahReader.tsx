@@ -603,6 +603,26 @@ export default function SurahReader() {
         </DialogContent>
       </Dialog>
 
+          {/* Bottom Navigation */}
+          <div className="flex items-center justify-between w-full mt-10 mb-16">
+            <Button
+              variant="outline"
+              onClick={handlePrevSurah}
+              disabled={surahNum <= 1}
+            >
+              {direction === 'rtl' ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
+              {t('previousSurah')}
+            </Button>
+            <Button
+              variant="outline"
+              onClick={handleNextSurah}
+              disabled={surahNum >= 114}
+            >
+              {t('nextSurah')}
+              {direction === 'rtl' ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+            </Button>
+          </div>
+
       {/* Audio Player */}
       <div className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-md border-t border-border z-50">
         <div className="container max-w-4xl py-4">
