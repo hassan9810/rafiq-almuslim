@@ -337,7 +337,7 @@ export default function HisnMuslimPage() {
                       <>
                         {/* Adhkar list — only when more than one azkar */}
                         {hasMultipleAdhkar && (
-                          <aside className="w-full md:w-72 shrink-0 max-h-[40vh] md:max-h-none" dir={direction}>
+                          <aside className="hidden md:block w-full md:w-72 shrink-0 max-h-[40vh] md:max-h-none" dir={direction}>
                             <Card className="h-full flex flex-col overflow-hidden border border-border">
                               <div className="px-4 py-3 border-b border-border bg-muted/30 shrink-0">
                                 <h3 className="font-semibold text-muted-foreground">
@@ -401,7 +401,7 @@ export default function HisnMuslimPage() {
                         {/* Main azkar content — centered when single azkar; card fits content height when single */}
                         <div className={`flex flex-col min-h-0 ${hasMultipleAdhkar ? 'flex-1 min-w-0' : 'max-w-2xl w-full mx-auto'}`}>
                           <Card className={`border-2 border-primary/20 bg-primary/5 flex flex-col overflow-hidden ${hasMultipleAdhkar ? 'flex-1 min-h-0' : 'flex-initial'}`}>
-                            <CardContent className={`p-6 flex flex-col text-center ${hasMultipleAdhkar ? 'flex-1 min-h-0' : 'py-6'}`}>
+                            <CardContent className={`p-4 md:p-6 flex flex-col text-center ${hasMultipleAdhkar ? 'flex-1 min-h-0' : 'py-6'}`}>
                               {/* الذكر، التكرار وعددها من القائمة — وسطنهم رأسياً؛ single: من الأعلى مع تباعد مريح */}
                               <div className={`flex flex-col min-h-0 gap-4 ${hasMultipleAdhkar ? 'flex-1 justify-center' : 'justify-start'}`}>
                                 {/* Badges row: current/total (start) and repeat (end) */}
