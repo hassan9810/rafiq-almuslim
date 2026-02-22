@@ -288,14 +288,14 @@ export default function HisnMuslimPage() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+                className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-0 md:p-4"
                 onClick={closeChapter}
               >
                 <motion.div
                   initial={{ scale: 0.9, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   exit={{ scale: 0.9, opacity: 0 }}
-                  className="bg-background rounded-2xl max-w-4xl max-h-[85vh] overflow-hidden"
+                  className="bg-background rounded-none md:rounded-2xl w-full h-full md:w-auto md:max-w-4xl md:max-h-[85vh] md:h-auto overflow-hidden flex flex-col"
                   onClick={(e) => e.stopPropagation()}
                 >
                   {/* Header */}
@@ -332,12 +332,12 @@ export default function HisnMuslimPage() {
                   </div>
 
                   {/* Content: list scrolls; main azkar fixed; center when single azkar */}
-                  <div className={`p-6 flex flex-row gap-6 overflow-hidden ${!hasMultipleAdhkar ? 'justify-center' : 'h-[calc(85vh-140px)]'}`} dir={direction}>
+                  <div className={`p-3 md:p-6 flex flex-col md:flex-row gap-4 md:gap-6 overflow-hidden flex-1 min-h-0 ${!hasMultipleAdhkar ? 'justify-center' : 'md:h-[calc(85vh-140px)]'}`} dir={direction}>
                     {selectedChapter.adhkar.length > 0 ? (
                       <>
                         {/* Adhkar list — only when more than one azkar */}
                         {hasMultipleAdhkar && (
-                          <aside className="w-72 shrink-0" dir={direction}>
+                          <aside className="w-full md:w-72 shrink-0 max-h-[40vh] md:max-h-none" dir={direction}>
                             <Card className="h-full flex flex-col overflow-hidden border border-border">
                               <div className="px-4 py-3 border-b border-border bg-muted/30 shrink-0">
                                 <h3 className="font-semibold text-muted-foreground">
