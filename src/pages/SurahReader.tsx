@@ -512,9 +512,9 @@ export default function SurahReader() {
 
       {/* Flowing view: ayah popup (card style with bookmark) */}
       <Dialog open={flowingAyahPopupIndex !== null} onOpenChange={(open) => !open && setFlowingAyahPopupIndex(null)}>
-        <DialogContent className="container max-w-4xl p-0 gap-0 overflow-hidden rounded-2xl border border-border/50" hideClose>
+        <DialogContent className="container max-w-4xl p-0 gap-0 overflow-hidden rounded-2xl border border-border/50 max-h-[90vh] md:max-h-[85vh]" hideClose>
           {flowingAyahPopupIndex !== null && arabic.ayahs[flowingAyahPopupIndex] && (
-            <div className="p-6 rounded-2xl border-0 bg-card">
+            <div className="p-4 md:p-6 rounded-2xl border-0 bg-card overflow-y-auto max-h-[88vh] md:max-h-[83vh]">
               <div className="flex items-start justify-between mb-4" dir={direction}>
                 <div className="flex items-center gap-2">
                   <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
