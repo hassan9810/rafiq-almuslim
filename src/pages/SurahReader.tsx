@@ -284,9 +284,6 @@ export default function SurahReader() {
                   >
                     <Star className={`w-5 h-5 ${isFavorite ? 'fill-primary text-primary' : ''}`} />
                   </Button>
-                  <Button variant="ghost" size="icon">
-                    <Share2 className="w-5 h-5" />
-                  </Button>
                 </div>
                 <div className="flex rounded-lg border border-border overflow-hidden">
                   <Button
