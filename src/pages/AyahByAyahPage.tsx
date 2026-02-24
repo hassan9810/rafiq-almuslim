@@ -207,12 +207,7 @@ export default function AyahByAyahPage() {
           </div>
 
           {/* Ayah Image */}
-          <motion.div
-            key={`${surah}-${ayah}`}
-            initial={{ opacity: 0, scale: 0.98 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="relative bg-card rounded-2xl border border-border/50 overflow-hidden mb-6"
-          >
+          <div className="relative bg-card rounded-2xl border border-border/50 overflow-hidden mb-6 min-h-[120px] max-h-[300px] flex items-center justify-center">
             {imgLoading && (
               <div className="absolute inset-0 flex items-center justify-center bg-card z-10">
                 <Loader2 className="w-8 h-8 animate-spin text-primary" />
@@ -221,11 +216,11 @@ export default function AyahByAyahPage() {
             <img
               src={getAyahImageUrl(surah, ayah)}
               alt={`${isAr ? 'آية' : 'Ayah'} ${ayah}`}
-              className="w-full h-auto"
+              className="max-w-full max-h-[280px] h-auto object-contain"
               onLoad={() => setImgLoading(false)}
               onError={() => setImgLoading(false)}
             />
-          </motion.div>
+          </div>
 
           {/* Ayah Number & Navigation */}
           <div className="flex items-center justify-between mb-4">
@@ -313,11 +308,28 @@ export default function AyahByAyahPage() {
             </div>
           </div>
 
-          {/* Quick Ayah Slider */}
-          <div className="mt-6">
-            <p className="text-sm text-muted-foreground text-center mb-2">
-              {isAr ? 'انتقل إلى آية:' : 'Jump to Ayah:'}
-            </p>
+          {/* Quick Ayah Jump */}
+          <div className="mt-6 space-y-3">
+            <div className="flex items-center justify-center gap-3">
+              <label className="text-sm text-muted-foreground whitespace-nowrap">
+                {isAr ? 'انتقل إلى آية:' : 'Jump to Ayah:'}
+              </label>
+              <input
+                type="number"
+                min={1}
+                max={totalAyahs}
+                value={ayah}
+                onChange={e => {
+                  const v = parseInt(e.target.value);
+                  if (!isNaN(v) && v >= 1 && v <= totalAyahs) {
+                    setAyah(v);
+                    setImgLoading(true);
+                  }
+                }}
+                className="w-20 h-9 rounded-lg border border-input bg-background px-3 text-center text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+              />
+              <span className="text-xs text-muted-foreground">/ {totalAyahs}</span>
+            </div>
             <Slider
               value={[ayah]}
               min={1}
