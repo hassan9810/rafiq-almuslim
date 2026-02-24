@@ -191,5 +191,11 @@
   "searchHadiths": "البحث في الأحاديث",
   "searchHadithHint": "للبحث، يرجى استخدام رقم الحديث في تبويب \"تصفح\"",
   "readingStyleFlow": "نمط المصحف",
-  "readingStyleCards": "نمط البطاقات"
+  "readingStyleCards": "نمط البطاقات",
+  "searchRadioPlaceholder": "ابحث عن إذاعة أو قارئ...",
+  "loadingRadio": "جاري تحميل الإذاعات...",
+  "errorLoadingRadio": "حدث خطأ في تحميل الإذاعات",
+  "retry": "إعادة المحاولة",
+  "noRadioResults": "لا توجد إذاعات مطابقة",
+  "stationsCount": "إذاعة"
 }
