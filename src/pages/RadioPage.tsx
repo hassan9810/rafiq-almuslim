@@ -7,27 +7,50 @@ import { Slider } from '@/components/ui/slider';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAppStore } from '@/store/useAppStore';
 import { useQuery } from '@tanstack/react-query';
-import { fetchRadioStations, type RadioStation } from '@/lib/radioApi';
+import { fetchRadioStations, type RadioStation as ApiRadioStation } from '@/lib/radioApi';
 
-// Featured stations that appear at the top (by URL slug match)
-const FEATURED_SLUGS = [
-  'mix', // General mixed
-  'maher', // Maher Al-Muaiqly
-  'mishary_alafasi',
-  'abdulbasit_abdulsamad_mojawwad',
-  'mahmoud_khalil_alhussary_mojawwad',
-  'mohammed_siddiq_alminshawi_mojawwad',
-  'mahmoud_ali__albanna_mojawwad',
-  'abdulrahman_alsudaes',
-  'saud_alshuraim',
-  'khalid_aljileel',
-  'nasser_alqatami',
-  'yasser_aldosari',
-  'fares_abbad',
-  'salma', // Humbling recitations
-  'roqiah', // Ruqyah
-  'eid', // Eid Takbeer
+interface RadioStation {
+  id: string;
+  name: string;
+  nameAr?: string;
+  url: string;
+  img?: string;
+}
+
+// Original curated stations with images - keep order
+const curatedStations: RadioStation[] = [
+  { id: 'c1', name: 'Quran Radio from Cairo', nameAr: 'إذاعة القرآن الكريم من القاهرة', url: 'https://n02.radiojar.com/8s5u5tpdtwzuv?rj-ttl=5&rj-tok=AAABnBQSJywA7FMGmXdoGdldAA' },
+  { id: 'c2', name: 'Makkah Live', nameAr: 'إذاعة مكة المكرمة', url: 'https://stream.radiojar.com/0tpy1h0kxtzuv' },
+  { id: 'c3', name: 'Madinah Live', nameAr: 'إذاعة المدينة المنورة', url: 'https://stream.radiojar.com/4wqre23fytzuv' },
+  { id: 'c4', name: 'Muhammad Siddiq Al-Minshawi', nameAr: 'إذاعة محمد صديق المنشاوي', url: 'https://backup.qurango.net/radio/mohammed_siddiq_alminshawi_mojawwad', img: 'https://i1.sndcdn.com/artworks-000284633237-7gdg9t-t200x200.jpg' },
+  { id: 'c5', name: 'Mahmoud Ali Al-Banna', nameAr: 'إذاعة محمود علي البنا', url: 'https://backup.qurango.net/radio/mahmoud_ali__albanna_mojawwad', img: 'https://i.pinimg.com/200x/29/67/b3/2967b3fbc1ce1f5a70874288d34317bf.jpg' },
+  { id: 'c6', name: 'Mahmoud Khalil Al-Hussary', nameAr: 'إذاعة محمود خليل الحصري', url: 'https://backup.qurango.net/radio/mahmoud_khalil_alhussary_mojawwad', img: 'https://watanimg.elwatannews.com/image_archive/original_lower_quality/18194265071637693809.jpg' },
+  { id: 'c7', name: 'Abdul Basit Abdul Samad', nameAr: 'إذاعة عبدالباسط عبدالصمد', url: 'https://backup.qurango.net/radio/abdulbasit_abdulsamad_mojawwad', img: 'https://cdns-images.dzcdn.net/images/talk/06b711ac6da4cde0eb698e244f5e27b8/300x300.jpg' },
+  { id: 'c8', name: 'Maher Al-Muaiqly', nameAr: 'إذاعة ماهر المعيقلي', url: 'https://backup.qurango.net/radio/maher', img: 'https://is1-ssl.mzstatic.com/image/thumb/Podcasts113/v4/4b/80/58/4b80582d-78ca-a466-0341-0869bc611745/mza_5280524847349008894.jpg/250x250bb.jpg' },
+  { id: 'c9', name: 'Mishary Al-Afasy', nameAr: 'إذاعة مشاري العفاسي', url: 'https://backup.qurango.net/radio/mishary_alafasi', img: 'https://i1.sndcdn.com/artworks-000019055020-yr9cjc-t200x200.jpg' },
+  { id: 'c10', name: 'Abu Bakr Al-Shatri', nameAr: 'إذاعة أبو بكر الشاطري', url: 'https://backup.qurango.net/radio/shaik_abu_bakr_al_shatri', img: 'https://i1.sndcdn.com/artworks-000663801097-wb0y31-t200x200.jpg' },
+  { id: 'c11', name: 'Khalid Al-Jaleel', nameAr: 'إذاعة خالد الجليل', url: 'https://backup.qurango.net/radio/khalid_aljileel', img: 'https://i1.sndcdn.com/avatars-ubX3f7yLm5eGyphJ-A4ysyA-t500x500.jpg' },
+  { id: 'c12', name: 'Nasser Al-Qatami', nameAr: 'إذاعة ناصر القطامي', url: 'https://backup.qurango.net/radio/nasser_alqatami', img: 'https://i1.sndcdn.com/artworks-000096282703-s9wldh-t200x200.jpg' },
+  { id: 'c13', name: 'Yasser Al-Dosari', nameAr: 'إذاعة ياسر الدوسري', url: 'https://backup.qurango.net/radio/yasser_aldosari', img: 'https://www.almowaten.net/wp-content/uploads/2022/06/%D9%8A%D8%A7%D8%B3%D8%B1-%D8%A7%D9%84%D8%AF%D9%88%D8%B3%D8%B1%D9%8A.jpg' },
+  { id: 'c14', name: 'Fares Abbad', nameAr: 'إذاعة فارس عباد', url: 'https://backup.qurango.net/radio/fares_abbad', img: 'https://static.suratmp3.com/pics/reciters/thumbs/15_600_600.jpg' },
+  { id: 'c15', name: 'Ibrahim Al-Akhdar', nameAr: 'إذاعة إبراهيم الأخضر', url: 'https://backup.qurango.net/radio/ibrahim_alakdar', img: 'https://static.suratmp3.com/pics/reciters/thumbs/44_600_600.jpg' },
+  { id: 'c16', name: 'Salah Bu Khatir', nameAr: 'إذاعة صلاح بو خاطر', url: 'https://backup.qurango.net/radio/slaah_bukhatir', img: 'https://pbs.twimg.com/profile_images/1306502829251624960/uHKIJQpq_200x200.jpg' },
+  { id: 'c17', name: 'Haitham Al-Jadani', nameAr: 'إذاعة هيثم الجدعاني', url: 'https://backup.qurango.net/radio/hitham_aljadani', img: 'https://ar.islamway.net/uploads/authors/3948.jpg' },
+  { id: 'c18', name: 'Ahmad Khader Al-Tarabulsi', nameAr: 'إذاعة أحمد خضر الطرابلسي', url: 'https://backup.qurango.net/radio/ahmad_khader_altarabulsi', img: 'https://i.pinimg.com/564x/d3/c2/9c/d3c29cc03198c3c15d380af048b2d68b.jpg' },
+  { id: 'c19', name: 'Salah Al-Hashim', nameAr: 'إذاعة صلاح الهاشم', url: 'https://backup.qurango.net/radio/salah_alhashim', img: 'https://i.pinimg.com/564x/e9/22/1b/e9221b5ffd484937dc70c3eabe350c6f.jpg' },
+  { id: 'c20', name: 'Abdul Aziz Suhaim', nameAr: 'إذاعة عبد العزيز سحيم', url: 'https://backup.qurango.net/radio/a_sheim', img: 'https://i.pinimg.com/564x/a7/37/47/a73747375897de4897da372a0fd921a0.jpg' },
+  { id: 'c21', name: 'Nabil Al-Rifai', nameAr: 'إذاعة نبيل الرفاعي', url: 'https://backup.qurango.net/radio/nabil_al_rifay', img: 'https://i1.sndcdn.com/artworks-000161140408-wh6nhw-t200x200.jpg' },
+  { id: 'c22', name: 'Sunnah Radio', nameAr: 'إذاعة السنة النبوية', url: 'https://n01.radiojar.com/x0vs2vzy6k0uv?rj-ttl=5&rj-tok=AAABjW751GcA4NgCI8-5DCpCHQ', img: 'https://i.pinimg.com/564x/55/16/ab/5516abd3744c3d0b0a7b28bedd5474c0.jpg' },
+  { id: 'c23', name: 'Humbling Recitations', nameAr: 'إذاعة تلاوات خاشعة', url: 'https://backup.qurango.net/radio/salma', img: 'https://pbs.twimg.com/profile_images/1396812808659079169/5ft2haLD_400x400.jpg' },
+  { id: 'c24', name: 'Ruqyah Radio', nameAr: 'إذاعة الرقية الشرعية', url: 'https://backup.qurango.net/radio/roqiah', img: 'https://i1.sndcdn.com/artworks-zygACgAd2NKwuohE-UF2Piw-t500x500.jpg' },
+  { id: 'c25', name: 'Quran Tafsir Summary', nameAr: 'المختصر في تفسير القرآن الكريم', url: 'https://backup.qurango.net/radio/mukhtasartafsir', img: 'https://areejquran.net/wp-content/uploads/2015/12/unnamed.jpg' },
+  { id: 'c26', name: 'Eid Takbeer', nameAr: 'إذاعة تكبيرات العيد', url: 'https://backup.qurango.net/radio/eid', img: 'https://i.pinimg.com/736x/3c/b3/fc/3cb3fc494b9f8332a7b7b3256e3d9822.jpg' },
 ];
+
+// Extract URL slugs from curated stations to avoid duplicates
+const curatedSlugs = new Set(curatedStations.map(s => {
+  try { return new URL(s.url).pathname.split('/').pop(); } catch { return s.url; }
+}));
 
 export default function RadioPage() {
   const { t, language } = useTranslation();
@@ -37,53 +60,44 @@ export default function RadioPage() {
   const [volume, setVolume] = useState(0.8);
   const [isMuted, setIsMuted] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [favorites, setFavorites] = useState<number[]>(() => {
-    try {
-      return JSON.parse(localStorage.getItem('radio-favorites') || '[]');
-    } catch { return []; }
+  const [favorites, setFavorites] = useState<string[]>(() => {
+    try { return JSON.parse(localStorage.getItem('radio-favorites-v2') || '[]'); } catch { return []; }
   });
   const [searchQuery, setSearchQuery] = useState('');
   const audioRef = useRef<HTMLAudioElement>(null);
 
-  const { data: stations = [], isLoading, isError, refetch } = useQuery({
+  const { data: apiStations = [], isLoading } = useQuery({
     queryKey: ['radio-stations', language],
     queryFn: () => fetchRadioStations(language),
     staleTime: 1000 * 60 * 30,
   });
 
-  // Sort: featured first, then alphabetical
-  const sortedStations = useMemo(() => {
-    if (!stations.length) return [];
-    const featured: RadioStation[] = [];
-    const rest: RadioStation[] = [];
-
-    for (const station of stations) {
-      const slug = station.url.split('/').pop() || '';
-      if (FEATURED_SLUGS.includes(slug)) {
-        featured.push(station);
-      } else {
-        rest.push(station);
-      }
-    }
-
-    // Sort featured by FEATURED_SLUGS order
-    featured.sort((a, b) => {
-      const slugA = a.url.split('/').pop() || '';
-      const slugB = b.url.split('/').pop() || '';
-      return FEATURED_SLUGS.indexOf(slugA) - FEATURED_SLUGS.indexOf(slugB);
-    });
-
-    return [...featured, ...rest];
-  }, [stations]);
+  // Merge: curated first, then API stations that aren't duplicates
+  const allStations = useMemo(() => {
+    const apiConverted: RadioStation[] = apiStations
+      .filter(s => {
+        const slug = s.url.split('/').pop() || '';
+        return !curatedSlugs.has(slug);
+      })
+      .map(s => ({
+        id: `api-${s.id}`,
+        name: s.name,
+        url: s.url,
+      }));
+    return [...curatedStations, ...apiConverted];
+  }, [apiStations]);
 
   const filteredStations = useMemo(() => {
-    if (!searchQuery.trim()) return sortedStations;
+    if (!searchQuery.trim()) return allStations;
     const q = searchQuery.trim().toLowerCase();
-    return sortedStations.filter(s => s.name.toLowerCase().includes(q));
-  }, [sortedStations, searchQuery]);
+    return allStations.filter(s =>
+      s.name.toLowerCase().includes(q) ||
+      (s.nameAr && s.nameAr.includes(q))
+    );
+  }, [allStations, searchQuery]);
 
   useEffect(() => {
-    localStorage.setItem('radio-favorites', JSON.stringify(favorites));
+    localStorage.setItem('radio-favorites-v2', JSON.stringify(favorites));
   }, [favorites]);
 
   useEffect(() => {
@@ -113,12 +127,17 @@ export default function RadioPage() {
     }
   };
 
-  const toggleFavorite = (stationId: number) => {
+  const toggleFavorite = (stationId: string) => {
     setFavorites(prev =>
       prev.includes(stationId)
         ? prev.filter(id => id !== stationId)
         : [...prev, stationId]
     );
+  };
+
+  const getDisplayName = (station: RadioStation) => {
+    if (language === 'ar' && station.nameAr) return station.nameAr;
+    return station.name;
   };
 
   return (
@@ -163,31 +182,14 @@ export default function RadioPage() {
             )}
           </div>
 
-          {/* Station count */}
-          {!isLoading && !isError && (
-            <p className="text-xs text-muted-foreground mb-3">
-              {filteredStations.length} {t('stationsCount')}
-            </p>
-          )}
-
-          {/* Loading */}
-          {isLoading && (
-            <div className="flex flex-col items-center gap-3 py-16">
-              <Loader2 className="w-8 h-8 animate-spin text-primary" />
-              <p className="text-muted-foreground">{t('loadingRadio')}</p>
-            </div>
-          )}
-
-          {/* Error */}
-          {isError && (
-            <div className="flex flex-col items-center gap-3 py-16">
-              <p className="text-muted-foreground">{t('errorLoadingRadio')}</p>
-              <Button variant="outline" onClick={() => refetch()}>{t('retry')}</Button>
-            </div>
-          )}
+          {/* Count */}
+          <p className="text-xs text-muted-foreground mb-3">
+            {filteredStations.length} {t('stationsCount')}
+            {isLoading && <Loader2 className="inline w-3 h-3 animate-spin ms-2" />}
+          </p>
 
           {/* No results */}
-          {!isLoading && !isError && filteredStations.length === 0 && (
+          {filteredStations.length === 0 && (
             <div className="text-center py-16">
               <p className="text-muted-foreground">{t('noRadioResults')}</p>
             </div>
@@ -201,7 +203,7 @@ export default function RadioPage() {
 
               return (
                 <motion.div
-                  key={`${station.id}-${station.url}`}
+                  key={station.id}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: Math.min(index * 0.02, 0.3) }}
@@ -212,16 +214,25 @@ export default function RadioPage() {
                   }`}
                   onClick={() => handlePlayStation(station)}
                 >
-                  {/* Icon */}
-                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                    <Radio className="w-4 h-4 text-primary" />
-                  </div>
+                  {/* Station Image */}
+                  {station.img ? (
+                    <img
+                      src={station.img}
+                      alt={station.name}
+                      className="w-12 h-12 rounded-xl object-cover shrink-0"
+                      onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                    />
+                  ) : (
+                    <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                      <Radio className="w-5 h-5 text-primary" />
+                    </div>
+                  )}
 
                   {/* Play Button */}
                   <Button
                     variant={isActive && isPlaying ? 'emerald' : 'outline'}
                     size="icon"
-                    className="shrink-0 h-9 w-9"
+                    className="shrink-0 h-10 w-10"
                   >
                     {loading && isActive ? (
                       <Loader2 className="w-4 h-4 animate-spin" />
@@ -234,12 +245,12 @@ export default function RadioPage() {
 
                   {/* Station Info */}
                   <div className="flex-1 min-w-0">
-                    <h3 className={`font-medium text-sm truncate ${isActive ? 'text-primary' : 'text-foreground'}`}>
-                      {station.name}
+                    <h3 className={`font-medium truncate ${isActive ? 'text-primary' : 'text-foreground'}`}>
+                      {getDisplayName(station)}
                     </h3>
                     {isActive && isPlaying && (
-                      <div className="flex items-center gap-1 mt-0.5">
-                        <span className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse" />
+                      <div className="flex items-center gap-1 mt-1">
+                        <span className="w-2 h-2 bg-primary rounded-full animate-pulse" />
                         <span className="text-xs text-primary">{t('nowPlaying')}</span>
                       </div>
                     )}
@@ -273,12 +284,12 @@ export default function RadioPage() {
           <div className="container max-w-2xl py-4">
             <div className="flex items-center gap-4">
               <div className="flex-1 min-w-0">
-                <p className="font-medium text-foreground truncate text-sm">
-                  {currentStation.name}
+                <p className="font-medium text-foreground truncate">
+                  {getDisplayName(currentStation)}
                 </p>
                 {isPlaying && (
                   <div className="flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse" />
+                    <span className="w-2 h-2 bg-primary rounded-full animate-pulse" />
                     <span className="text-xs text-primary">Live</span>
                   </div>
                 )}
