@@ -211,6 +211,11 @@ Distributed under the MIT License. See `LICENSE` for more information.
 - Email: [ahmed.hassan.shehatah@gmail.com](mailto:ahmed.hassan.shehatah@gmail.com)
 - Portfolio: [ahmed-hassan-portfolio.lovable.app](https://ahmed-hassan-portfolio.lovable.app)
 
+**Amr Allam**
+- Email:
+[amr.i.allam@hotmail.com](mailto:amr.i.allam@hotmail.com)
+- GitHub: [https://github.com/amriallam](https://github.com/amriallam)
+
 Project Link: [https://github.com/hassan9810/rafiq-almuslim](https://github.com/hassan9810/rafiq-almuslim)
 
 Live Demo: [https://rafiqalmuslim.lovable.app](https://rafiqalmuslim.lovable.app)
@@ -304,6 +309,7 @@ npm run dev
 ### 📧 التواصل
 
 البريد الإلكتروني: [ahmed.hassan.shehatah@gmail.com](mailto:ahmed.hassan.shehatah@gmail.com)
+[amr.i.allam@hotmail.com](mailto:amr.i.allam@hotmail.com)
 
 رابط المشروع: [https://github.com/hassan9810/rafiq-almuslim](https://github.com/hassan9810/rafiq-almuslim)
 
