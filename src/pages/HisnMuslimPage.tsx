@@ -20,7 +20,8 @@ import {
   Users,
   Compass,
   Loader2,
-  Shield
+  Shield,
+  List
 } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAppStore } from '@/store/useAppStore';
@@ -30,6 +31,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { cn } from '@/lib/utils';
 import {
   HisnChapter,
   HisnDhikr,
@@ -77,6 +80,7 @@ export default function HisnMuslimPage() {
   /** Per-adhkar count for the current chapter (for progress bars in the list) */
   const [adhkarCounts, setAdhkarCounts] = useState<number[]>([]);
   const [loadingChapter, setLoadingChapter] = useState(false);
+  const [adhkarListSheetOpen, setAdhkarListSheetOpen] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
 
   const isArabic = language === 'ar';
@@ -295,11 +299,11 @@ export default function HisnMuslimPage() {
                   initial={{ scale: 0.9, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   exit={{ scale: 0.9, opacity: 0 }}
-                  className="bg-background rounded-2xl max-w-4xl max-h-[85vh] overflow-hidden"
+                  className="relative bg-background rounded-2xl w-full max-w-4xl max-h-[85vh] md:max-h-[85vh] overflow-hidden"
                   onClick={(e) => e.stopPropagation()}
                 >
                   {/* Header */}
-                  <div className={`bg-primary text-primary-foreground p-4 flex items-center justify-between ${!hasMultipleAdhkar ? 'w-full' : ''}`}>
+                  <div className={`bg-primary text-primary-foreground p-3 md:p-4 flex items-center justify-between gap-2 ${!hasMultipleAdhkar ? 'w-full' : ''}`}>
                     <Button
                       variant="ghost"
                       size="icon"
@@ -308,7 +312,7 @@ export default function HisnMuslimPage() {
                     >
                       <X className="h-5 w-5" />
                     </Button>
-                    <h2 className="font-arabic text-lg font-bold flex-1 text-center">
+                    <h2 className="font-arabic text-base md:text-lg font-bold flex-1 text-center truncate min-w-0">
                       {selectedChapter.title}
                     </h2>
                     <div className="flex gap-2">
@@ -332,12 +336,12 @@ export default function HisnMuslimPage() {
                   </div>
 
                   {/* Content: list scrolls; main azkar fixed; center when single azkar */}
-                  <div className={`p-6 flex flex-row gap-6 overflow-hidden ${!hasMultipleAdhkar ? 'justify-center' : 'h-[calc(85vh-140px)]'}`} dir={direction}>
+                  <div className={cn('relative p-4 md:p-6 flex flex-row gap-6 overflow-hidden', !hasMultipleAdhkar ? 'justify-center' : 'h-[calc(85vh-120px)] md:h-[calc(85vh-140px)]')} dir={direction}>
                     {selectedChapter.adhkar.length > 0 ? (
                       <>
-                        {/* Adhkar list — only when more than one azkar */}
+                        {/* Adhkar list — only when more than one; hidden on mobile (use FAB + sheet) */}
                         {hasMultipleAdhkar && (
-                          <aside className="w-72 shrink-0" dir={direction}>
+                          <aside className="hidden md:block w-72 shrink-0" dir={direction}>
                             <Card className="h-full flex flex-col overflow-hidden border border-border">
                               <div className="px-4 py-3 border-b border-border bg-muted/30 shrink-0">
                                 <h3 className="font-semibold text-muted-foreground">
@@ -399,9 +403,9 @@ export default function HisnMuslimPage() {
                         )}
 
                         {/* Main azkar content — centered when single azkar; card fits content height when single */}
-                        <div className={`flex flex-col min-h-0 ${hasMultipleAdhkar ? 'flex-1 min-w-0' : 'max-w-2xl w-full mx-auto'}`}>
+                        <div className={cn('flex flex-col min-h-0', hasMultipleAdhkar ? 'flex-1 min-w-0' : 'max-w-2xl w-full mx-auto')}>
                           <Card className={`border-2 border-primary/20 bg-primary/5 flex flex-col overflow-hidden ${hasMultipleAdhkar ? 'flex-1 min-h-0' : 'flex-initial'}`}>
-                            <CardContent className={`p-6 flex flex-col text-center ${hasMultipleAdhkar ? 'flex-1 min-h-0' : 'py-6'}`}>
+                            <CardContent className={`p-4 md:p-6 flex flex-col text-center ${hasMultipleAdhkar ? 'flex-1 min-h-0' : 'py-6'}`}>
                               {/* الذكر، التكرار وعددها من القائمة — وسطنهم رأسياً؛ single: من الأعلى مع تباعد مريح */}
                               <div className={`flex flex-col min-h-0 gap-4 ${hasMultipleAdhkar ? 'flex-1 justify-center' : 'justify-start'}`}>
                                 {/* Badges row: current/total (start) and repeat (end) */}
@@ -473,22 +477,26 @@ export default function HisnMuslimPage() {
                           </Card>
 
                           {hasMultipleAdhkar && (
-                            <div className="flex justify-center gap-4 mt-6 shrink-0">
+                            <div className="flex flex-wrap justify-center gap-2 md:gap-4 mt-4 md:mt-6 shrink-0">
                               <Button
                                 variant="outline"
+                                size="sm"
+                                className="md:h-10 md:px-4"
                                 onClick={prevDhikr}
                                 disabled={currentDhikrIndex === 0}
                               >
-                                <ChevronRight className="h-4 w-4 ml-2" />
+                                <ChevronRight className="h-4 w-4 ml-1 md:ml-2" />
                                 {t('previous')}
                               </Button>
                               <Button
                                 variant="outline"
+                                size="sm"
+                                className="md:h-10 md:px-4"
                                 onClick={nextDhikr}
                                 disabled={currentDhikrIndex === selectedChapter.adhkar.length - 1}
                               >
                                 {t('next')}
-                                <ChevronLeft className="h-4 w-4 mr-2" />
+                                <ChevronLeft className="h-4 w-4 mr-1 md:mr-2" />
                               </Button>
                             </div>
                           )}
@@ -510,6 +518,89 @@ export default function HisnMuslimPage() {
                       </div>
                     )}
                   </div>
+
+                  {/* Mobile: floating list button — fixed to viewport (screen), not card/modal */}
+                  {hasMultipleAdhkar && (
+                    <div
+                      className={cn(
+                        'fixed z-[60] md:hidden',
+                        direction === 'rtl' ? 'left-4 bottom-4' : 'right-4 bottom-4'
+                      )}
+                    >
+                      <Button
+                        size="icon"
+                        className="h-12 w-12 rounded-full shadow-lg"
+                        onClick={() => setAdhkarListSheetOpen(true)}
+                        aria-label={t('allAdhkar')}
+                      >
+                        <List className="h-5 w-5" />
+                      </Button>
+                    </div>
+                  )}
+
+                  {/* Mobile: sheet with adhkar list */}
+                  {hasMultipleAdhkar && selectedChapter && (
+                    <Sheet open={adhkarListSheetOpen} onOpenChange={setAdhkarListSheetOpen}>
+                      <SheetContent
+                        side={direction === 'rtl' ? 'right' : 'left'}
+                        className="flex flex-col p-0 w-[85vw] max-w-sm"
+                      >
+                        <SheetHeader className="p-4 pb-2 border-b border-border shrink-0">
+                          <SheetTitle className="text-start">{t('allAdhkar')}</SheetTitle>
+                        </SheetHeader>
+                        <ScrollArea className="flex-1 min-h-0">
+                          <div className="p-3 space-y-2">
+                            {selectedChapter.adhkar.map((dhikr, idx) => {
+                              const targetRepeat = Number(dhikr.REPEAT) || 1;
+                              const current = adhkarCounts[idx] ?? 0;
+                              const progress = Math.min(current / targetRepeat, 1);
+                              return (
+                                <Card
+                                  key={dhikr.ID || idx}
+                                  className={cn(
+                                    'relative overflow-hidden cursor-pointer transition-all',
+                                    idx === currentDhikrIndex ? 'ring-2 ring-primary' : 'hover:bg-muted/50'
+                                  )}
+                                  onClick={() => {
+                                    stopAudio();
+                                    setCurrentDhikrIndex(idx);
+                                    setAdhkarListSheetOpen(false);
+                                  }}
+                                >
+                                  <div
+                                    className="absolute inset-0 bg-primary/20 transition-all duration-300"
+                                    style={{
+                                      width: `${progress * 100}%`,
+                                      ...(direction === 'rtl' ? { left: 'auto', right: 0 } : {}),
+                                    }}
+                                    role="progressbar"
+                                    aria-valuenow={current}
+                                    aria-valuemin={0}
+                                    aria-valuemax={targetRepeat}
+                                  />
+                                  <CardContent className="relative z-10 p-3">
+                                    <div className="flex items-start gap-2">
+                                      <Badge variant="outline" className="shrink-0 text-xs">
+                                        {idx + 1}
+                                      </Badge>
+                                      <p className="font-arabic text-sm leading-relaxed line-clamp-2" dir="rtl">
+                                        {dhikr.ARABIC_TEXT}
+                                      </p>
+                                    </div>
+                                    {dhikr.REPEAT && (
+                                      <Badge variant="secondary" className="mt-1.5 text-xs">
+                                        {dhikr.REPEAT} {t('times')}
+                                      </Badge>
+                                    )}
+                                  </CardContent>
+                                </Card>
+                              );
+                            })}
+                          </div>
+                        </ScrollArea>
+                      </SheetContent>
+                    </Sheet>
+                  )}
                 </motion.div>
               </motion.div>
             )}
