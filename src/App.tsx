@@ -19,6 +19,7 @@ import HisnMuslimPage from "./pages/HisnMuslimPage";
 import TranslationsPage from "./pages/TranslationsPage";
 import TranslationReaderPage from "./pages/TranslationReaderPage";
 import E3rabPage from "./pages/E3rabPage";
+import AyahByAyahPage from "./pages/AyahByAyahPage";
 import BookmarksPage from "./pages/BookmarksPage";
 import NotFound from "./pages/NotFound";
 
@@ -44,6 +45,8 @@ const App = () => (
             <Route path="/translations" element={<TranslationsPage />} />
             <Route path="/translations/:translationKey/:surahNumber" element={<TranslationReaderPage />} />
             <Route path="/e3rab" element={<E3rabPage />} />
+            <Route path="/ayah-player" element={<AyahByAyahPage />} />
+            <Route path="/ayah-player/:surahNumber" element={<AyahByAyahPage />} />
             <Route path="/prayer-times" element={<PrayerTimesPage />} />
             <Route path="/qibla" element={<QiblaPage />} />
             <Route path="/radio" element={<RadioPage />} />

@@ -325,6 +325,16 @@ export default function SurahReader() {
               </Badge>
             </div>
 
+            {/* Ayah by Ayah Button */}
+            <div className="mt-4">
+              <Link to={`/ayah-player/${surahNum}`}>
+                <Button variant="outline" className="gap-2 border-primary/30 hover:bg-primary/10">
+                  <Play className="w-4 h-4 text-primary" />
+                  {t('ayahByAyah')}
+                </Button>
+              </Link>
+            </div>
+
             {/* Navigation */}
             <div className="flex items-center justify-between w-full mx-auto mt-6">
               <Button

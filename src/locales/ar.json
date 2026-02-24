@@ -197,5 +197,6 @@
   "errorLoadingRadio": "حدث خطأ في تحميل الإذاعات",
   "retry": "إعادة المحاولة",
   "noRadioResults": "لا توجد إذاعات مطابقة",
-  "stationsCount": "إذاعة"
+  "stationsCount": "إذاعة",
+  "ayahByAyah": "تشغيل آية بآية"
 }
