@@ -191,5 +191,11 @@
   "searchHadiths": "Search Hadiths",
   "searchHadithHint": "To search, please use the hadith number in the \"Browse\" tab",
   "readingStyleFlow": "Quran style",
-  "readingStyleCards": "Card style"
+  "readingStyleCards": "Card style",
+  "searchRadioPlaceholder": "Search for a station or reciter...",
+  "loadingRadio": "Loading radio stations...",
+  "errorLoadingRadio": "Error loading radio stations",
+  "retry": "Retry",
+  "noRadioResults": "No matching stations",
+  "stationsCount": "stations"
 }
