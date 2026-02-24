@@ -7,62 +7,17 @@ import { Slider } from '@/components/ui/slider';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAppStore } from '@/store/useAppStore';
 import { useQuery } from '@tanstack/react-query';
-import { fetchRadioStations, type RadioStation as ApiRadioStation } from '@/lib/radioApi';
-
-interface RadioStation {
-  id: string;
-  name: string;
-  nameAr?: string;
-  url: string;
-  img?: string;
-}
-
-// Original curated stations with images - keep order
-const curatedStations: RadioStation[] = [
-  { id: 'c1', name: 'Quran Radio from Cairo', nameAr: 'إذاعة القرآن الكريم من القاهرة', url: 'https://n02.radiojar.com/8s5u5tpdtwzuv?rj-ttl=5&rj-tok=AAABnBQSJywA7FMGmXdoGdldAA' },
-  { id: 'c2', name: 'Makkah Live', nameAr: 'إذاعة مكة المكرمة', url: 'https://stream.radiojar.com/0tpy1h0kxtzuv' },
-  { id: 'c3', name: 'Madinah Live', nameAr: 'إذاعة المدينة المنورة', url: 'https://stream.radiojar.com/4wqre23fytzuv' },
-  { id: 'c4', name: 'Muhammad Siddiq Al-Minshawi', nameAr: 'إذاعة محمد صديق المنشاوي', url: 'https://backup.qurango.net/radio/mohammed_siddiq_alminshawi_mojawwad', img: 'https://i1.sndcdn.com/artworks-000284633237-7gdg9t-t200x200.jpg' },
-  { id: 'c5', name: 'Mahmoud Ali Al-Banna', nameAr: 'إذاعة محمود علي البنا', url: 'https://backup.qurango.net/radio/mahmoud_ali__albanna_mojawwad', img: 'https://i.pinimg.com/200x/29/67/b3/2967b3fbc1ce1f5a70874288d34317bf.jpg' },
-  { id: 'c6', name: 'Mahmoud Khalil Al-Hussary', nameAr: 'إذاعة محمود خليل الحصري', url: 'https://backup.qurango.net/radio/mahmoud_khalil_alhussary_mojawwad', img: 'https://watanimg.elwatannews.com/image_archive/original_lower_quality/18194265071637693809.jpg' },
-  { id: 'c7', name: 'Abdul Basit Abdul Samad', nameAr: 'إذاعة عبدالباسط عبدالصمد', url: 'https://backup.qurango.net/radio/abdulbasit_abdulsamad_mojawwad', img: 'https://cdns-images.dzcdn.net/images/talk/06b711ac6da4cde0eb698e244f5e27b8/300x300.jpg' },
-  { id: 'c7a', name: 'Mustafa Ismail', nameAr: 'إذاعة مصطفى إسماعيل', url: 'https://backup.qurango.net/radio/mustafa_ismail' },
-  { id: 'c7b', name: 'Ahmad Nauina', nameAr: 'إذاعة أحمد نعينع', url: 'https://backup.qurango.net/radio/ahmad_nauina' },
-  { id: 'c7c', name: 'Abdul Basit Abdul Samad (Murattal)', nameAr: 'إذاعة عبدالباسط عبدالصمد', url: 'https://backup.qurango.net/radio/abdulbasit_abdulsamad' },
-  { id: 'c7d', name: 'Abdul Basit Abdul Samad (Warsh)', nameAr: 'إذاعة عبدالباسط عبدالصمد', url: 'https://backup.qurango.net/radio/abdulbasit_abdulsamad_warsh' },
-  { id: 'c7e', name: 'Mohammad Al-Tablaway', nameAr: 'إذاعة محمد الطبلاوي', url: 'https://backup.qurango.net/radio/mohammad_altablaway' },
-  { id: 'c7f', name: 'Mohammed Jibreel', nameAr: 'إذاعة محمد جبريل', url: 'https://backup.qurango.net/radio/mohammed_jibreel' },
-  { id: 'c7g', name: 'Muhammad Siddiq Al-Minshawi (Murattal)', nameAr: 'إذاعة محمد صديق المنشاوي', url: 'https://backup.qurango.net/radio/mohammed_siddiq_alminshawi' },
-  { id: 'c7h', name: 'Mahmoud Khalil Al-Hussary', nameAr: 'إذاعة محمود خليل الحصري', url: 'https://backup.qurango.net/radio/mahmoud_khalil_alhussary' },
-  { id: 'c7i', name: 'Mahmoud Khalil Al-Hussary (Warsh)', nameAr: 'إذاعة محمود خليل الحصري', url: 'https://backup.qurango.net/radio/mahmoud_khalil_alhussary_warsh' },
-  { id: 'c7j', name: 'Mahmoud Ali Al-Banna (Murattal)', nameAr: 'إذاعة محمود علي البنا', url: 'https://backup.qurango.net/radio/mahmoud_ali__albanna' },
-  { id: 'c7k', name: 'Ahmad Amer', nameAr: 'إذاعة أحمد عامر', url: 'https://backup.qurango.net/radio/ahmed_amer' },
-  { id: 'c7l', name: 'Ahmad Khalil Shaheen', nameAr: 'إذاعة أحمد خليل شاهين', url: 'https://backup.qurango.net/radio/ahmad_shaheen' },
-  { id: 'c8', name: 'Maher Al-Muaiqly', nameAr: 'إذاعة ماهر المعيقلي', url: 'https://backup.qurango.net/radio/maher', img: 'https://is1-ssl.mzstatic.com/image/thumb/Podcasts113/v4/4b/80/58/4b80582d-78ca-a466-0341-0869bc611745/mza_5280524847349008894.jpg/250x250bb.jpg' },
-  { id: 'c9', name: 'Mishary Al-Afasy', nameAr: 'إذاعة مشاري العفاسي', url: 'https://backup.qurango.net/radio/mishary_alafasi', img: 'https://i1.sndcdn.com/artworks-000019055020-yr9cjc-t200x200.jpg' },
-  { id: 'c10', name: 'Abu Bakr Al-Shatri', nameAr: 'إذاعة أبو بكر الشاطري', url: 'https://backup.qurango.net/radio/shaik_abu_bakr_al_shatri', img: 'https://i1.sndcdn.com/artworks-000663801097-wb0y31-t200x200.jpg' },
-  { id: 'c11', name: 'Khalid Al-Jaleel', nameAr: 'إذاعة خالد الجليل', url: 'https://backup.qurango.net/radio/khalid_aljileel', img: 'https://i1.sndcdn.com/avatars-ubX3f7yLm5eGyphJ-A4ysyA-t500x500.jpg' },
-  { id: 'c12', name: 'Nasser Al-Qatami', nameAr: 'إذاعة ناصر القطامي', url: 'https://backup.qurango.net/radio/nasser_alqatami', img: 'https://i1.sndcdn.com/artworks-000096282703-s9wldh-t200x200.jpg' },
-  { id: 'c13', name: 'Yasser Al-Dosari', nameAr: 'إذاعة ياسر الدوسري', url: 'https://backup.qurango.net/radio/yasser_aldosari', img: 'https://www.almowaten.net/wp-content/uploads/2022/06/%D9%8A%D8%A7%D8%B3%D8%B1-%D8%A7%D9%84%D8%AF%D9%88%D8%B3%D8%B1%D9%8A.jpg' },
-  { id: 'c14', name: 'Fares Abbad', nameAr: 'إذاعة فارس عباد', url: 'https://backup.qurango.net/radio/fares_abbad', img: 'https://static.suratmp3.com/pics/reciters/thumbs/15_600_600.jpg' },
-  { id: 'c15', name: 'Ibrahim Al-Akhdar', nameAr: 'إذاعة إبراهيم الأخضر', url: 'https://backup.qurango.net/radio/ibrahim_alakdar', img: 'https://static.suratmp3.com/pics/reciters/thumbs/44_600_600.jpg' },
-  { id: 'c16', name: 'Salah Bu Khatir', nameAr: 'إذاعة صلاح بو خاطر', url: 'https://backup.qurango.net/radio/slaah_bukhatir', img: 'https://pbs.twimg.com/profile_images/1306502829251624960/uHKIJQpq_200x200.jpg' },
-  { id: 'c17', name: 'Haitham Al-Jadani', nameAr: 'إذاعة هيثم الجدعاني', url: 'https://backup.qurango.net/radio/hitham_aljadani', img: 'https://ar.islamway.net/uploads/authors/3948.jpg' },
-  { id: 'c18', name: 'Ahmad Khader Al-Tarabulsi', nameAr: 'إذاعة أحمد خضر الطرابلسي', url: 'https://backup.qurango.net/radio/ahmad_khader_altarabulsi', img: 'https://i.pinimg.com/564x/d3/c2/9c/d3c29cc03198c3c15d380af048b2d68b.jpg' },
-  { id: 'c19', name: 'Salah Al-Hashim', nameAr: 'إذاعة صلاح الهاشم', url: 'https://backup.qurango.net/radio/salah_alhashim', img: 'https://i.pinimg.com/564x/e9/22/1b/e9221b5ffd484937dc70c3eabe350c6f.jpg' },
-  { id: 'c20', name: 'Abdul Aziz Suhaim', nameAr: 'إذاعة عبد العزيز سحيم', url: 'https://backup.qurango.net/radio/a_sheim', img: 'https://i.pinimg.com/564x/a7/37/47/a73747375897de4897da372a0fd921a0.jpg' },
-  { id: 'c21', name: 'Nabil Al-Rifai', nameAr: 'إذاعة نبيل الرفاعي', url: 'https://backup.qurango.net/radio/nabil_al_rifay', img: 'https://i1.sndcdn.com/artworks-000161140408-wh6nhw-t200x200.jpg' },
-  { id: 'c22', name: 'Sunnah Radio', nameAr: 'إذاعة السنة النبوية', url: 'https://n01.radiojar.com/x0vs2vzy6k0uv?rj-ttl=5&rj-tok=AAABjW751GcA4NgCI8-5DCpCHQ', img: 'https://i.pinimg.com/564x/55/16/ab/5516abd3744c3d0b0a7b28bedd5474c0.jpg' },
-  { id: 'c23', name: 'Humbling Recitations', nameAr: 'إذاعة تلاوات خاشعة', url: 'https://backup.qurango.net/radio/salma', img: 'https://pbs.twimg.com/profile_images/1396812808659079169/5ft2haLD_400x400.jpg' },
-  { id: 'c24', name: 'Ruqyah Radio', nameAr: 'إذاعة الرقية الشرعية', url: 'https://backup.qurango.net/radio/roqiah', img: 'https://i1.sndcdn.com/artworks-zygACgAd2NKwuohE-UF2Piw-t500x500.jpg' },
-  { id: 'c25', name: 'Quran Tafsir Summary', nameAr: 'المختصر في تفسير القرآن الكريم', url: 'https://backup.qurango.net/radio/mukhtasartafsir', img: 'https://areejquran.net/wp-content/uploads/2015/12/unnamed.jpg' },
-  { id: 'c26', name: 'Eid Takbeer', nameAr: 'إذاعة تكبيرات العيد', url: 'https://backup.qurango.net/radio/eid', img: 'https://i.pinimg.com/736x/3c/b3/fc/3cb3fc494b9f8332a7b7b3256e3d9822.jpg' },
-];
-
-// Extract URL slugs from curated stations to avoid duplicates
-const curatedSlugs = new Set(curatedStations.map(s => {
-  try { return new URL(s.url).pathname.split('/').pop(); } catch { return s.url; }
-}));
+import { fetchRadioStations } from '@/lib/radioApi';
+import {
+  curatedStations,
+  curatedSlugs,
+  apiSlugCategories,
+  getSlugFromUrl,
+  RADIO_CATEGORIES,
+  type RadioStation,
+  type RadioCategory,
+} from '@/data/radioStations';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 
 export default function RadioPage() {
   const { t, language } = useTranslation();
@@ -76,6 +31,7 @@ export default function RadioPage() {
     try { return JSON.parse(localStorage.getItem('radio-favorites-v2') || '[]'); } catch { return []; }
   });
   const [searchQuery, setSearchQuery] = useState('');
+  const [activeCategory, setActiveCategory] = useState<RadioCategory>('all');
   const audioRef = useRef<HTMLAudioElement>(null);
 
   const { data: apiStations = [], isLoading } = useQuery({
@@ -91,22 +47,38 @@ export default function RadioPage() {
         const slug = s.url.split('/').pop() || '';
         return !curatedSlugs.has(slug);
       })
-      .map(s => ({
-        id: `api-${s.id}`,
-        name: s.name,
-        url: s.url,
-      }));
+      .map(s => {
+        const slug = getSlugFromUrl(s.url);
+        const cats = apiSlugCategories[slug];
+        return {
+          id: `api-${s.id}`,
+          name: s.name,
+          url: s.url,
+          categories: cats || ['other'],
+        };
+      });
     return [...curatedStations, ...apiConverted];
   }, [apiStations]);
 
   const filteredStations = useMemo(() => {
-    if (!searchQuery.trim()) return allStations;
-    const q = searchQuery.trim().toLowerCase();
-    return allStations.filter(s =>
-      s.name.toLowerCase().includes(q) ||
-      (s.nameAr && s.nameAr.includes(q))
-    );
-  }, [allStations, searchQuery]);
+    let stations = allStations;
+
+    // Filter by category
+    if (activeCategory !== 'all') {
+      stations = stations.filter(s => s.categories.includes(activeCategory));
+    }
+
+    // Filter by search
+    if (searchQuery.trim()) {
+      const q = searchQuery.trim().toLowerCase();
+      stations = stations.filter(s =>
+        s.name.toLowerCase().includes(q) ||
+        (s.nameAr && s.nameAr.includes(q))
+      );
+    }
+
+    return stations;
+  }, [allStations, searchQuery, activeCategory]);
 
   useEffect(() => {
     localStorage.setItem('radio-favorites-v2', JSON.stringify(favorites));
@@ -152,6 +124,10 @@ export default function RadioPage() {
     return station.name;
   };
 
+  const getCategoryLabel = (cat: typeof RADIO_CATEGORIES[number]) => {
+    return language === 'ar' ? cat.labelAr : cat.labelEn;
+  };
+
   return (
     <div>
       <main>
@@ -174,7 +150,7 @@ export default function RadioPage() {
           </motion.div>
 
           {/* Search */}
-          <div className="relative mb-4">
+          <div className="relative mb-3">
             <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
               value={searchQuery}
@@ -193,6 +169,24 @@ export default function RadioPage() {
               </Button>
             )}
           </div>
+
+          {/* Category Tabs */}
+          <ScrollArea className="w-full mb-4">
+            <div className="flex gap-2 pb-2">
+              {RADIO_CATEGORIES.map(cat => (
+                <Button
+                  key={cat.key}
+                  variant={activeCategory === cat.key ? 'default' : 'outline'}
+                  size="sm"
+                  className="shrink-0 rounded-full text-xs font-medium"
+                  onClick={() => setActiveCategory(cat.key)}
+                >
+                  {getCategoryLabel(cat)}
+                </Button>
+              ))}
+            </div>
+            <ScrollBar orientation="horizontal" />
+          </ScrollArea>
 
           {/* Count */}
           <p className="text-xs text-muted-foreground mb-3">
