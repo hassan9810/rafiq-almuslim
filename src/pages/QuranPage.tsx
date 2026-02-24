@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { BookOpen, BookText } from 'lucide-react';
+import { BookOpen, BookText, Play } from 'lucide-react';
 import { SurahList } from '@/components/SurahList';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -30,6 +30,12 @@ export default function QuranPage() {
               <Button className="gap-3 bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 h-auto text-base font-semibold shadow-lg hover:shadow-xl transition-all">
                 <BookOpen className="w-5 h-5" />
                 {t('browseMushaf')}
+              </Button>
+            </Link>
+            <Link to="/ayah-player">
+              <Button variant="outline" className="gap-3 px-6 py-3 h-auto text-base font-semibold border-primary/30 hover:bg-primary/10 hover:border-primary transition-all">
+                <Play className="w-5 h-5 text-primary" />
+                {t('ayahByAyah')}
               </Button>
             </Link>
             <Link to="/e3rab">

@@ -197,5 +197,6 @@
   "errorLoadingRadio": "Error loading radio stations",
   "retry": "Retry",
   "noRadioResults": "No matching stations",
-  "stationsCount": "stations"
+  "stationsCount": "stations",
+  "ayahByAyah": "Ayah by Ayah"
 }
