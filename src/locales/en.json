@@ -198,5 +198,14 @@
   "retry": "Retry",
   "noRadioResults": "No matching stations",
   "stationsCount": "stations",
-  "ayahByAyah": "Ayah by Ayah"
+  "ayahByAyah": "Ayah by Ayah",
+  "memorization": "Memorization",
+  "readingPlan": "Reading Plan",
+  "prayerNotifications": "Prayer Notifications",
+  "enableNotifications": "Enable Notifications",
+  "disableNotifications": "Disable Notifications",
+  "notificationsEnabled": "Notifications enabled",
+  "notificationsDisabled": "Notifications disabled",
+  "notificationsNotSupported": "Notifications not supported in this browser",
+  "notificationsDenied": "Notification permission denied"
 }

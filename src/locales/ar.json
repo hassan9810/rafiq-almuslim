@@ -198,5 +198,14 @@
   "retry": "إعادة المحاولة",
   "noRadioResults": "لا توجد إذاعات مطابقة",
   "stationsCount": "إذاعة",
-  "ayahByAyah": "تشغيل آية بآية"
+  "ayahByAyah": "تشغيل آية بآية",
+  "memorization": "الحفظ",
+  "readingPlan": "خطة القراءة",
+  "prayerNotifications": "إشعارات الصلاة",
+  "enableNotifications": "تفعيل الإشعارات",
+  "disableNotifications": "إيقاف الإشعارات",
+  "notificationsEnabled": "الإشعارات مفعّلة",
+  "notificationsDisabled": "الإشعارات معطّلة",
+  "notificationsNotSupported": "الإشعارات غير مدعومة في هذا المتصفح",
+  "notificationsDenied": "تم رفض إذن الإشعارات"
 }
