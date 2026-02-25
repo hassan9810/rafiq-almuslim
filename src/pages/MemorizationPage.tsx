@@ -227,32 +227,60 @@ export default function MemorizationPage() {
             </h3>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-xs text-muted-foreground">{isAr ? 'من آية' : 'From Ayah'}</label>
-                <input
-                  type="number" min={1} max={totalAyahs}
-                  value={startAyah}
-                  onChange={e => {
-                    const v = parseInt(e.target.value);
-                    if (v >= 1 && v <= totalAyahs) {
-                      setStartAyah(v);
-                      if (v > endAyah) setEndAyah(v);
-                      setCurrentAyah(v);
-                    }
-                  }}
-                  className="w-full h-9 rounded-lg border border-input bg-background px-3 text-center text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-                />
+                <label className="text-xs text-muted-foreground mb-1 block">{isAr ? 'من آية' : 'From Ayah'}</label>
+                <div className="flex gap-2">
+                  <Select dir={direction} value={startAyah.toString()} onValueChange={v => {
+                    const val = parseInt(v);
+                    setStartAyah(val);
+                    if (val > endAyah) setEndAyah(val);
+                    setCurrentAyah(val);
+                  }}>
+                    <SelectTrigger className="flex-1 h-9"><SelectValue /></SelectTrigger>
+                    <SelectContent className="max-h-60 overflow-y-auto bg-popover">
+                      {Array.from({ length: totalAyahs }, (_, i) => i + 1).map(n => (
+                        <SelectItem key={n} value={n.toString()}>{n}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <input
+                    type="number" min={1} max={totalAyahs}
+                    value={startAyah}
+                    onChange={e => {
+                      const val = parseInt(e.target.value);
+                      if (val >= 1 && val <= totalAyahs) {
+                        setStartAyah(val);
+                        if (val > endAyah) setEndAyah(val);
+                        setCurrentAyah(val);
+                      }
+                    }}
+                    className="w-16 h-9 rounded-lg border border-input bg-background px-2 text-center text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                  />
+                </div>
               </div>
               <div>
-                <label className="text-xs text-muted-foreground">{isAr ? 'إلى آية' : 'To Ayah'}</label>
-                <input
-                  type="number" min={1} max={totalAyahs}
-                  value={endAyah}
-                  onChange={e => {
-                    const v = parseInt(e.target.value);
-                    if (v >= startAyah && v <= totalAyahs) setEndAyah(v);
-                  }}
-                  className="w-full h-9 rounded-lg border border-input bg-background px-3 text-center text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-                />
+                <label className="text-xs text-muted-foreground mb-1 block">{isAr ? 'إلى آية' : 'To Ayah'}</label>
+                <div className="flex gap-2">
+                  <Select dir={direction} value={endAyah.toString()} onValueChange={v => {
+                    const val = parseInt(v);
+                    if (val >= startAyah) setEndAyah(val);
+                  }}>
+                    <SelectTrigger className="flex-1 h-9"><SelectValue /></SelectTrigger>
+                    <SelectContent className="max-h-60 overflow-y-auto bg-popover">
+                      {Array.from({ length: totalAyahs - startAyah + 1 }, (_, i) => startAyah + i).map(n => (
+                        <SelectItem key={n} value={n.toString()}>{n}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <input
+                    type="number" min={startAyah} max={totalAyahs}
+                    value={endAyah}
+                    onChange={e => {
+                      const val = parseInt(e.target.value);
+                      if (val >= startAyah && val <= totalAyahs) setEndAyah(val);
+                    }}
+                    className="w-16 h-9 rounded-lg border border-input bg-background px-2 text-center text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                  />
+                </div>
               </div>
             </div>
             <div className="flex items-center gap-3 mt-3">
@@ -363,6 +391,38 @@ export default function MemorizationPage() {
                 <div
                   className="h-full bg-primary rounded-full transition-all"
                   style={{ width: `${((currentAyah - startAyah + 1) / (endAyah - startAyah + 1)) * 100}%` }}
+                />
+              </div>
+              {/* Jump to ayah */}
+              <div className="flex items-center gap-2 mt-3">
+                <span className="text-xs text-muted-foreground whitespace-nowrap">
+                  {isAr ? 'أكمل من آية:' : 'Continue from:'}
+                </span>
+                <Select dir={direction} value={currentAyah.toString()} onValueChange={v => {
+                  const val = parseInt(v);
+                  setCurrentAyah(val);
+                  setCurrentRepeat(0);
+                }}>
+                  <SelectTrigger className="w-24 h-8"><SelectValue /></SelectTrigger>
+                  <SelectContent className="max-h-60 overflow-y-auto bg-popover">
+                    {Array.from({ length: endAyah - startAyah + 1 }, (_, i) => startAyah + i).map(n => (
+                      <SelectItem key={n} value={n.toString()}>
+                        {isAr ? `آية ${n}` : `Ayah ${n}`}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <input
+                  type="number" min={startAyah} max={endAyah}
+                  value={currentAyah}
+                  onChange={e => {
+                    const val = parseInt(e.target.value);
+                    if (val >= startAyah && val <= endAyah) {
+                      setCurrentAyah(val);
+                      setCurrentRepeat(0);
+                    }
+                  }}
+                  className="w-16 h-8 rounded-lg border border-input bg-background px-2 text-center text-sm focus:outline-none focus:ring-2 focus:ring-ring"
                 />
               </div>
             </div>
