@@ -236,6 +236,7 @@ Live Demo: [https://rafiqalmuslim.lovable.app](https://rafiqalmuslim.lovable.app
 - [Aladhan](https://aladhan.com/) for Prayer Times API
 - [Sunnah.com](https://sunnah.com/) for Hadith API
 - [EveryAyah.com](https://everyayah.com/) for verse-by-verse audio and images
+- [quran-search-engine](https://github.com/adelpro/quran-search-engine) for advanced linguistic Quran search
 - [shadcn/ui](https://ui.shadcn.com/) for beautiful components
 - All contributors and users of this project
 
@@ -337,6 +338,7 @@ npm run dev
 - [Alquran Cloud](https://alquran.cloud/) لواجهة برمجة تطبيقات القرآن
 - [Aladhan](https://aladhan.com/) لواجهة برمجة تطبيقات أوقات الصلاة
 - [Sunnah.com](https://sunnah.com/) لواجهة برمجة تطبيقات الأحاديث
+- [quran-search-engine](https://github.com/adelpro/quran-search-engine) لمحرك البحث اللغوي المتقدم في القرآن الكريم
 - جميع المساهمين ومستخدمي هذا المشروع
 
 ---
