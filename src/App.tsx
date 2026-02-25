@@ -21,6 +21,7 @@ import TranslationReaderPage from "./pages/TranslationReaderPage";
 import E3rabPage from "./pages/E3rabPage";
 import AyahByAyahPage from "./pages/AyahByAyahPage";
 import BookmarksPage from "./pages/BookmarksPage";
+import SearchPage from "./pages/SearchPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -38,6 +39,7 @@ const App = () => (
             <Route path="/quran/:surahNumber" element={<SurahReader />} />
             <Route path="/mushaf" element={<MushafPage />} />
             <Route path="/mushaf-text" element={<TextMushafPage />} />
+            <Route path="/search" element={<SearchPage />} />
             <Route path="/tafsir" element={<TafsirPage />} />
             <Route path="/hadith" element={<HadithPage />} />
             <Route path="/azkar" element={<AzkarPage />} />
