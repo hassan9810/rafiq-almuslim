@@ -22,6 +22,8 @@ import E3rabPage from "./pages/E3rabPage";
 import AyahByAyahPage from "./pages/AyahByAyahPage";
 import BookmarksPage from "./pages/BookmarksPage";
 import SearchPage from "./pages/SearchPage";
+import MemorizationPage from "./pages/MemorizationPage";
+import ReadingPlanPage from "./pages/ReadingPlanPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -52,6 +54,8 @@ const App = () => (
             <Route path="/prayer-times" element={<PrayerTimesPage />} />
             <Route path="/qibla" element={<QiblaPage />} />
             <Route path="/radio" element={<RadioPage />} />
+            <Route path="/memorization" element={<MemorizationPage />} />
+            <Route path="/reading-plan" element={<ReadingPlanPage />} />
             <Route path="/bookmarks" element={<BookmarksPage />} />
             <Route path="*" element={<NotFound />} />
           </Route>

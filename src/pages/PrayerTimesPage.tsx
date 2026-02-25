@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { MapPin, Clock, Loader2, RefreshCw, Search, X } from 'lucide-react';
+import { MapPin, Clock, Loader2, RefreshCw, Search, X, Bell, BellOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAppStore } from '@/store/useAppStore';
+import { useToast } from '@/hooks/use-toast';
 import { 
   calculatePrayerTimes, 
   getCurrentLocation, 
@@ -14,6 +15,14 @@ import {
   type PrayerTime,
   type Location
 } from '@/lib/prayerTimes';
+import {
+  isNotificationSupported,
+  requestNotificationPermission,
+  getNotificationPermission,
+  isNotificationsEnabled,
+  setNotificationsEnabled,
+  checkAndNotifyPrayers,
+} from '@/lib/prayerNotifications';
 
 const prayerIcons = {
   Fajr: '🌙',
@@ -29,6 +38,7 @@ const prayerIcons = {
 
 export default function PrayerTimesPage() {
   const { t, language } = useTranslation();
+  const { toast } = useToast();
   const { direction, location, setLocation } = useAppStore();
   const [prayerTimes, setPrayerTimes] = useState<PrayerTime[]>([]);
   const [loading, setLoading] = useState(false);
@@ -37,6 +47,39 @@ export default function PrayerTimesPage() {
   const [searchResults, setSearchResults] = useState<Location[]>([]);
   const [searching, setSearching] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
+  const [notifEnabled, setNotifEnabled] = useState(isNotificationsEnabled());
+
+  // Prayer notification check interval
+  useEffect(() => {
+    if (!notifEnabled || !location) return;
+    const interval = setInterval(() => {
+      checkAndNotifyPrayers(location.latitude, location.longitude, language);
+    }, 30_000);
+    // Check immediately too
+    checkAndNotifyPrayers(location.latitude, location.longitude, language);
+    return () => clearInterval(interval);
+  }, [notifEnabled, location, language]);
+
+  const handleToggleNotifications = async () => {
+    if (!isNotificationSupported()) {
+      toast({ title: t('notificationsNotSupported'), variant: 'destructive' });
+      return;
+    }
+    if (notifEnabled) {
+      setNotificationsEnabled(false);
+      setNotifEnabled(false);
+      toast({ title: t('notificationsDisabled') });
+      return;
+    }
+    const granted = await requestNotificationPermission();
+    if (granted) {
+      setNotificationsEnabled(true);
+      setNotifEnabled(true);
+      toast({ title: t('notificationsEnabled') });
+    } else {
+      toast({ title: t('notificationsDenied'), variant: 'destructive' });
+    }
+  };
 
   useEffect(() => {
     if (location) {
@@ -116,6 +159,14 @@ export default function PrayerTimesPage() {
                   </Button>
                   <Button variant="ghost" size="icon-sm" onClick={() => setShowSearch(!showSearch)}>
                     {showSearch ? <X className="w-4 h-4" /> : <Search className="w-4 h-4" />}
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="icon-sm" 
+                    onClick={handleToggleNotifications}
+                    className={notifEnabled ? 'text-primary' : ''}
+                  >
+                    {notifEnabled ? <Bell className="w-4 h-4" /> : <BellOff className="w-4 h-4" />}
                   </Button>
                 </div>
                 
