@@ -139,9 +139,15 @@ export default function MemorizationPage() {
 
   // Auto-play when currentAyah changes (if auto-advance)
   useEffect(() => {
-    if (autoAdvance && isPlaying) {
-      playCurrentAyah();
+    if (autoAdvance && isPlaying && audioRef.current) {
+      const url = getAyahAudioUrl(reciter, surah, currentAyah);
+      audioRef.current.src = url;
+      setIsLoading(true);
+      audioRef.current.play()
+        .then(() => { setIsLoading(false); })
+        .catch(() => setIsLoading(false));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentAyah]);
 
   const cycleHideLevel = () => {
