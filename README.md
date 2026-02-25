@@ -29,6 +29,7 @@
 #### 📕 Quran & Islamic Texts
 - **Complete Quran Reader** - Read all 114 Surahs with beautiful Arabic typography
 - **Mushaf Mode** - Traditional page-by-page Quran reading experience
+- **Ayah by Ayah Player** - Listen to and view individual verses with 79+ reciters, verse images, auto-play, and repeat modes
 - **90+ Translations** - Quran translations in multiple languages from trusted sources
 - **Tafsir (Exegesis)** - Deep understanding with multiple tafsir sources
 - **Audio Recitations** - Listen to various renowned Qaris
@@ -173,10 +174,19 @@ rafiq-almuslim/
 #### 4. Islamic Radio
 - Live streams from Makkah and Madinah
 - Multiple Quran radio stations
+- **Category-based filtering** (Official, Egyptian Reciters, Haramain, Tafsir, Azkar, Audiobooks, Translations & more)
 - Background playback support
 - Volume control
 
-#### 5. Azkar & Duas
+#### 5. Ayah by Ayah Player
+- Verse-by-verse audio playback with 79+ reciters from everyayah.com
+- Visual verse image display for each ayah
+- Auto-play sequential progression through surahs
+- Ayah repeat mode for memorization
+- Direct ayah number input and slider navigation
+- Categorized reciter selection (Egyptian, Haramain, Other, Translations)
+
+#### 6. Azkar & Duas
 - Categorized by time and occasion
 - Audio recitations
 - Progress tracking
@@ -225,6 +235,7 @@ Live Demo: [https://rafiqalmuslim.lovable.app](https://rafiqalmuslim.lovable.app
 - [Alquran Cloud](https://alquran.cloud/) for Quran API
 - [Aladhan](https://aladhan.com/) for Prayer Times API
 - [Sunnah.com](https://sunnah.com/) for Hadith API
+- [EveryAyah.com](https://everyayah.com/) for verse-by-verse audio and images
 - [shadcn/ui](https://ui.shadcn.com/) for beautiful components
 - All contributors and users of this project
 
@@ -251,9 +262,15 @@ Live Demo: [https://rafiqalmuslim.lovable.app](https://rafiqalmuslim.lovable.app
 #### 📕 القرآن الكريم والنصوص الإسلامية
 - **قارئ القرآن الكامل** - اقرأ جميع السور الـ 114 بخط عربي جميل
 - **وضع المصحف** - تجربة قراءة تقليدية صفحة بصفحة
+- **مشغّل آية بآية** - استمع وشاهد كل آية على حدة مع أكثر من 79 قارئ، مع التشغيل التلقائي والتكرار
 - **أكثر من 90 ترجمة** - ترجمات القرآن بلغات متعددة من مصادر موثوقة
 - **التفسير** - فهم عميق مع مصادر تفسير متعددة
 - **التلاوات الصوتية** - استمع لمختلف القراء المشهورين
+
+#### 📻 الإذاعات الإسلامية
+- **تصنيفات متعددة** - محطات رسمية، قراء مصريون، قراء الحرمين، تفسير، أذكار، كتب مسموعة، ترجمات والمزيد
+- بث مباشر من مكة والمدينة
+- البحث والتصفية حسب التصنيف
 
 #### 🕌 الممارسات الإسلامية اليومية
 - **أوقات الصلاة** - أوقات صلاة دقيقة بناءً على موقعك مع العد التنازلي
