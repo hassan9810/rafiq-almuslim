@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, X, Loader2, BookOpen, Hash, ArrowRight, AlertCircle } from 'lucide-react';
+import { Search, X, Loader2, BookOpen, Hash, ArrowRight, AlertCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -106,7 +106,8 @@ function HighlightedVerse({ verse }: { verse: ScoredQuranText }) {
 }
 
 export default function SearchPage() {
-  const { t, language, direction } = useTranslation();
+  const { t, language } = useTranslation();
+  const direction = language === 'ar' ? 'rtl' : 'ltr';
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const initialQuery = searchParams.get('q') || '';
@@ -115,6 +116,8 @@ export default function SearchPage() {
   const [results, setResults] = useState<ScoredQuranText[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [isEnglishWarning, setIsEnglishWarning] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const RESULTS_PER_PAGE = 20;
   const inputRef = useRef<HTMLInputElement>(null);
 
   const { data: searchContext, isLoading: isLoadingDataset } = useQuery({
@@ -149,6 +152,7 @@ export default function SearchPage() {
           .sort((a, b) => b.finalScore - a.finalScore);
 
         setResults(sortedResults as ScoredQuranText[]);
+        setCurrentPage(1);
         setSearchParams({ q: query }, { replace: true });
       } catch (error) {
         console.error('Search error:', error);
@@ -275,48 +279,116 @@ export default function SearchPage() {
               </p>
             </div>
           ) : results.length > 0 ? (
-            <ScrollArea className="h-auto">
-              <div className="grid gap-4 pb-10">
-                {results.map((result, index) => (
-                  <motion.button
-                    key={`${result.sura_id}:${result.aya_id}:${index}`}
-                    initial={{ opacity: 0, y: 15 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: Math.min(index * 0.04, 0.4) }}
-                    onClick={() => handleResultClick(result)}
-                    className="w-full text-right p-5 md:p-6 rounded-2xl border border-border/50 bg-card hover:border-primary/40 hover:shadow-md transition-all group relative overflow-hidden flex flex-col gap-4"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Badge variant="outline" className="text-[10px] py-0 h-5 border-primary/20 text-primary">
-                          {t('juz')} {result.juz_id}
-                        </Badge>
-                        {result.matchType && result.matchType !== 'exact' && (
-                          <Badge variant="outline" className="text-[10px] py-0 h-5 bg-amber-50 text-amber-700 border-amber-200">
-                            {result.matchType === 'lemma' ? (language === 'ar' ? 'كلمة' : 'lemma') : (language === 'ar' ? 'جذر' : 'root')}
-                          </Badge>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-2 text-base font-bold text-foreground group-hover:text-primary transition-colors">
-                        <span className="font-arabic">{result.sura_name}</span>
-                        <span className="text-sm opacity-60 font-medium">({result.aya_id})</span>
-                      </div>
-                    </div>
+            (() => {
+              const totalPages = Math.ceil(results.length / RESULTS_PER_PAGE);
+              const startIdx = (currentPage - 1) * RESULTS_PER_PAGE;
+              const paginatedResults = results.slice(startIdx, startIdx + RESULTS_PER_PAGE);
 
-                    <p className="text-2xl leading-relaxed arabic-text text-foreground/90 font-medium">
-                      <HighlightedVerse verse={result} />
-                    </p>
+              return (
+                <>
+                  <div className="grid gap-4 pb-4">
+                    {paginatedResults.map((result, index) => (
+                      <motion.button
+                        key={`${result.sura_id}:${result.aya_id}:${startIdx + index}`}
+                        initial={{ opacity: 0, y: 15 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: Math.min(index * 0.04, 0.4) }}
+                        onClick={() => handleResultClick(result)}
+                        className="w-full text-right p-5 md:p-6 rounded-2xl border border-border/50 bg-card hover:border-primary/40 hover:shadow-md transition-all group relative overflow-hidden flex flex-col gap-4"
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <Badge variant="outline" className="text-[10px] py-0 h-5 border-primary/20 text-primary">
+                              {t('juz')} {result.juz_id}
+                            </Badge>
+                            {result.matchType && result.matchType !== 'exact' && (
+                              <Badge variant="outline" className="text-[10px] py-0 h-5 bg-amber-50 text-amber-700 border-amber-200">
+                                {result.matchType === 'lemma' ? (language === 'ar' ? 'كلمة' : 'lemma') : (language === 'ar' ? 'جذر' : 'root')}
+                              </Badge>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2 text-base font-bold text-foreground group-hover:text-primary transition-colors">
+                            <span className="font-arabic">{result.sura_name}</span>
+                            <span className="text-sm opacity-60 font-medium">({result.aya_id})</span>
+                          </div>
+                        </div>
 
-                    <div className="flex justify-end opacity-0 group-hover:opacity-100 transition-opacity">
-                      <span className="text-xs text-primary font-medium flex items-center gap-1">
-                        {language === 'ar' ? 'عرض السورة' : 'View Surah'}
-                        <ArrowRight className={`w-3 h-3 ${direction === 'rtl' ? 'rotate-180' : ''}`} />
-                      </span>
+                        <p className="text-2xl leading-relaxed arabic-text text-foreground/90 font-medium">
+                          <HighlightedVerse verse={result} />
+                        </p>
+
+                        <div className="flex justify-end opacity-0 group-hover:opacity-100 transition-opacity">
+                          <span className="text-xs text-primary font-medium flex items-center gap-1">
+                            {language === 'ar' ? 'عرض السورة' : 'View Surah'}
+                            <ArrowRight className={`w-3 h-3 ${direction === 'rtl' ? 'rotate-180' : ''}`} />
+                          </span>
+                        </div>
+                      </motion.button>
+                    ))}
+                  </div>
+
+                  {/* Pagination Controls */}
+                  {totalPages > 1 && (
+                    <div className="flex items-center justify-center gap-2 py-6">
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        disabled={currentPage === 1}
+                        onClick={() => { setCurrentPage(p => p - 1); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                      >
+                        <ChevronRight className="w-4 h-4" />
+                      </Button>
+
+                      {(() => {
+                        const pages: number[] = [];
+                        const maxVisible = 5;
+                        let start = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+                        let end = Math.min(totalPages, start + maxVisible - 1);
+                        if (end - start + 1 < maxVisible) start = Math.max(1, end - maxVisible + 1);
+                        for (let i = start; i <= end; i++) pages.push(i);
+
+                        return (
+                          <>
+                            {start > 1 && (
+                              <>
+                                <Button variant="outline" size="sm" onClick={() => { setCurrentPage(1); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>1</Button>
+                                {start > 2 && <span className="text-muted-foreground px-1">...</span>}
+                              </>
+                            )}
+                            {pages.map(p => (
+                              <Button
+                                key={p}
+                                variant={p === currentPage ? 'default' : 'outline'}
+                                size="sm"
+                                className="min-w-[36px]"
+                                onClick={() => { setCurrentPage(p); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                              >
+                                {p}
+                              </Button>
+                            ))}
+                            {end < totalPages && (
+                              <>
+                                {end < totalPages - 1 && <span className="text-muted-foreground px-1">...</span>}
+                                <Button variant="outline" size="sm" onClick={() => { setCurrentPage(totalPages); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>{totalPages}</Button>
+                              </>
+                            )}
+                          </>
+                        );
+                      })()}
+
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        disabled={currentPage === totalPages}
+                        onClick={() => { setCurrentPage(p => p + 1); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                      >
+                        <ChevronLeft className="w-4 h-4" />
+                      </Button>
                     </div>
-                  </motion.button>
-                ))}
-              </div>
-            </ScrollArea>
+                  )}
+                </>
+              );
+            })()
           ) : query.trim().length >= 2 ? (
             <div className="flex flex-col items-center justify-center py-20 text-center bg-card rounded-3xl border border-dashed border-border/60">
               <div className="w-16 h-16 rounded-2xl bg-muted flex items-center justify-center mb-4">
