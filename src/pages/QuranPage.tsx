@@ -1,8 +1,9 @@
 import { Link } from 'react-router-dom';
-import { BookOpen, BookText, Play } from 'lucide-react';
+import { BookOpen, BookText, Play, Search } from 'lucide-react';
 import { SurahList } from '@/components/SurahList';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/hooks/useTranslation';
+
 export default function QuranPage() {
   const { t } = useTranslation();
 
@@ -23,12 +24,19 @@ export default function QuranPage() {
             </p>
           </div>
         </div>
+
         {/* Action Buttons */}
         <div className="container max-w-6xl">
           <div className="flex flex-wrap gap-3 justify-center">
-            <Link to="/mushaf">
+            <Link to="/search">
               <Button className="gap-3 bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 h-auto text-base font-semibold shadow-lg hover:shadow-xl transition-all">
-                <BookOpen className="w-5 h-5" />
+                <Search className="w-5 h-5" />
+                {t('search')}
+              </Button>
+            </Link>
+            <Link to="/mushaf">
+              <Button variant="outline" className="gap-3 px-6 py-3 h-auto text-base font-semibold border-primary/30 hover:bg-primary/10 hover:border-primary transition-all">
+                <BookOpen className="w-5 h-5 text-primary" />
                 {t('browseMushaf')}
               </Button>
             </Link>
