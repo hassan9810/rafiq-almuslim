@@ -35,7 +35,7 @@ export async function performAdvancedQuranSearch(
   query: string,
   context: QuranSearchContext,
   page: number = 1,
-  limit: number = 50
+  limit: number = 6236
 ): Promise<SearchResponse> {
   if (!query || query.trim().length < 2) {
     return {
