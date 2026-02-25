@@ -24,6 +24,8 @@ import BookmarksPage from "./pages/BookmarksPage";
 import SearchPage from "./pages/SearchPage";
 import MemorizationPage from "./pages/MemorizationPage";
 import ReadingPlanPage from "./pages/ReadingPlanPage";
+import TasbeehPage from "./pages/TasbeehPage";
+import ShareAyahPage from "./pages/ShareAyahPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -56,6 +58,8 @@ const App = () => (
             <Route path="/radio" element={<RadioPage />} />
             <Route path="/memorization" element={<MemorizationPage />} />
             <Route path="/reading-plan" element={<ReadingPlanPage />} />
+            <Route path="/tasbeeh" element={<TasbeehPage />} />
+            <Route path="/share-ayah" element={<ShareAyahPage />} />
             <Route path="/bookmarks" element={<BookmarksPage />} />
             <Route path="*" element={<NotFound />} />
           </Route>

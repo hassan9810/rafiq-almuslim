@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { BookOpen, BookText, Play, Search, Brain, Calendar } from 'lucide-react';
+import { BookOpen, BookText, Play, Search, Brain, Calendar, Share2 } from 'lucide-react';
 import { SurahList } from '@/components/SurahList';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -62,6 +62,12 @@ export default function QuranPage() {
               <Button variant="outline" className="gap-3 px-6 py-3 h-auto text-base font-semibold border-primary/30 hover:bg-primary/10 hover:border-primary transition-all">
                 <Calendar className="w-5 h-5 text-primary" />
                 {t('readingPlan')}
+              </Button>
+            </Link>
+            <Link to="/share-ayah">
+              <Button variant="outline" className="gap-3 px-6 py-3 h-auto text-base font-semibold border-primary/30 hover:bg-primary/10 hover:border-primary transition-all">
+                <Share2 className="w-5 h-5 text-primary" />
+                {t('shareAyah')}
               </Button>
             </Link>
           </div>
