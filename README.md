@@ -226,6 +226,12 @@ Distributed under the MIT License. See `LICENSE` for more information.
 [amr.i.allam@hotmail.com](mailto:amr.i.allam@hotmail.com)
 - GitHub: [https://github.com/amriallam](https://github.com/amriallam)
 
+**Ahmed Shams**
+- Email:
+[Ahmedtaha757@gmail.com](mailto:Ahmedtaha757@gmail.com)
+- GitHub: [https://github.com/Ahhmedshams](https://github.com/Ahhmedshams)
+
+
 Project Link: [https://github.com/hassan9810/rafiq-almuslim](https://github.com/hassan9810/rafiq-almuslim)
 
 Live Demo: [https://rafiqalmuslim.lovable.app](https://rafiqalmuslim.lovable.app)
@@ -328,6 +334,7 @@ npm run dev
 
 البريد الإلكتروني: [ahmed.hassan.shehatah@gmail.com](mailto:ahmed.hassan.shehatah@gmail.com)
 [amr.i.allam@hotmail.com](mailto:amr.i.allam@hotmail.com)
+[Ahmedtaha757@gmail.com](mailto:Ahmedtaha757@gmail.com)
 
 رابط المشروع: [https://github.com/hassan9810/rafiq-almuslim](https://github.com/hassan9810/rafiq-almuslim)
 
