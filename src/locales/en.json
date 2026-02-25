@@ -207,5 +207,7 @@
   "notificationsEnabled": "Notifications enabled",
   "notificationsDisabled": "Notifications disabled",
   "notificationsNotSupported": "Notifications not supported in this browser",
-  "notificationsDenied": "Notification permission denied"
+  "notificationsDenied": "Notification permission denied",
+  "tasbeeh": "Tasbeeh",
+  "shareAyah": "Share Ayah"
 }

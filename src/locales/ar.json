@@ -207,5 +207,7 @@
   "notificationsEnabled": "الإشعارات مفعّلة",
   "notificationsDisabled": "الإشعارات معطّلة",
   "notificationsNotSupported": "الإشعارات غير مدعومة في هذا المتصفح",
-  "notificationsDenied": "تم رفض إذن الإشعارات"
+  "notificationsDenied": "تم رفض إذن الإشعارات",
+  "tasbeeh": "التسبيح",
+  "shareAyah": "مشاركة آية"
 }
