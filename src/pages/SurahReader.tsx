@@ -255,7 +255,7 @@ export default function SurahReader() {
   if (!surahData) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-muted-foreground">Could not load surah data</p>
+        <p className="text-muted-foreground">{t('couldNotLoadSurah')}</p>
       </div>
     );
   }
@@ -281,10 +281,11 @@ export default function SurahReader() {
                     variant="ghost"
                     size="icon"
                     onClick={() => toggleFavorite(surahNum)}
+                    aria-label={isFavorite ? t('removeFavorite') : t('favorite')}
                   >
                     <Star className={`w-5 h-5 ${isFavorite ? 'fill-primary text-primary' : ''}`} />
                   </Button>
-                  <Button variant="ghost" size="icon">
+                  <Button variant="ghost" size="icon" aria-label={t('shareAyah')}>
                     <Share2 className="w-5 h-5" />
                   </Button>
                 </div>
@@ -420,7 +421,7 @@ export default function SurahReader() {
                       >
                         {translationAyah?.text}
                         {ayah && (
-                          <span className="text-xs text-muted-foreground/80 ml-1" aria-hidden>
+                          <span className="text-xs text-muted-foreground/80 ms-1" aria-hidden>
                             ({ayah.numberInSurah})
                           </span>
                         )}
@@ -443,7 +444,7 @@ export default function SurahReader() {
                       id={`ayah-${ayah.numberInSurah}`}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.02 }}
+                      transition={{ delay: Math.min(index * 0.02, 0.3) }}
                       className={`ayah-highlight p-6 rounded-2xl border transition-all border-border/50 bg-card hover:border-primary/30 hover:bg-primary/5 ${isActive ? 'playing' : ''} ${blinkAyah === ayah.numberInSurah ? 'ayah-blink' : ''}`}
                       onAnimationEnd={blinkAyah === ayah.numberInSurah ? () => setBlinkAyah(null) : undefined}
                     >
@@ -592,7 +593,7 @@ export default function SurahReader() {
                   {popupTafsirLoading ? (
                     <div className="flex items-center gap-2 text-sm text-muted-foreground py-2">
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>{language === 'ar' ? 'جاري التحميل...' : 'Loading...'}</span>
+                      <span>{t('loading')}</span>
                     </div>
                   ) : popupTafsirText ? (
                     <p
@@ -603,7 +604,7 @@ export default function SurahReader() {
                     </p>
                   ) : (
                     <p className="text-sm text-muted-foreground py-2">
-                      {language === 'ar' ? 'لا يوجد تفسير متاح لهذه الآية.' : 'No tafsir available for this ayah.'}
+                      {t('noContentAvailable')}
                     </p>
                   )}
                 </div>
@@ -635,8 +636,8 @@ export default function SurahReader() {
 
       {/* Audio Player */}
       <div className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-md border-t border-border z-50">
-        <div className="container max-w-4xl py-4">
-          <div className="flex items-center gap-4">
+        <div className="container max-w-4xl py-3 md:py-4">
+          <div className="flex items-center gap-2 md:gap-4">
             {/* Reciter Select */}
             <Select
               dir={direction}
@@ -646,7 +647,7 @@ export default function SurahReader() {
                 if (reciter) setSelectedReciter(reciter);
               }}
             >
-              <SelectTrigger className="w-48">
+              <SelectTrigger className="w-28 md:w-48 text-xs md:text-sm">
                 <SelectValue placeholder={t('selectReciter')} />
               </SelectTrigger>
               <SelectContent className="max-h-80 bg-background">
@@ -659,24 +660,25 @@ export default function SurahReader() {
             </Select>
 
             {/* Controls */}
-            <div className="flex items-center gap-2 flex-1 justify-center">
-              <Button variant="ghost" size="icon" onClick={handlePrevSurah}>
+            <div className="flex items-center gap-1 md:gap-2 flex-1 justify-center">
+              <Button variant="ghost" size="icon" onClick={handlePrevSurah} aria-label={t('previousSurah')}>
                 <SkipBack className="w-4 h-4" />
               </Button>
-              <Button variant="emerald" size="icon-lg" onClick={handlePlay}>
+              <Button variant="emerald" size="icon-lg" onClick={handlePlay} aria-label={player.isPlaying ? t('pause') : t('play')}>
                 {player.isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
               </Button>
-              <Button variant="ghost" size="icon" onClick={handleNextSurah}>
+              <Button variant="ghost" size="icon" onClick={handleNextSurah} aria-label={t('nextSurah')}>
                 <SkipForward className="w-4 h-4" />
               </Button>
             </div>
 
-            {/* Volume */}
-            <div className="flex items-center gap-2 w-32">
+            {/* Volume - hidden on mobile */}
+            <div className="hidden md:flex items-center gap-2 w-32">
               <Button
                 variant="ghost"
                 size="icon-sm"
                 onClick={() => setIsMuted(!isMuted)}
+                aria-label={isMuted ? 'Unmute' : 'Mute'}
               >
                 {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
               </Button>

@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { MapPin, Clock, Loader2, RefreshCw, Search, X, Bell, BellOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAppStore } from '@/store/useAppStore';
 import { useToast } from '@/hooks/use-toast';
@@ -13,7 +14,8 @@ import {
   formatTime, 
   getTimeUntilNextPrayer,
   type PrayerTime,
-  type Location
+  type Location,
+  type CalcMethodKey,
 } from '@/lib/prayerTimes';
 import {
   isNotificationSupported,
@@ -39,7 +41,7 @@ const prayerIcons = {
 export default function PrayerTimesPage() {
   const { t, language } = useTranslation();
   const { toast } = useToast();
-  const { direction, location, setLocation } = useAppStore();
+  const { direction, location, setLocation, calculationMethod, setCalculationMethod } = useAppStore();
   const [prayerTimes, setPrayerTimes] = useState<PrayerTime[]>([]);
   const [loading, setLoading] = useState(false);
   const [timeUntilNext, setTimeUntilNext] = useState('');
@@ -83,10 +85,10 @@ export default function PrayerTimesPage() {
 
   useEffect(() => {
     if (location) {
-      const times = calculatePrayerTimes(location.latitude, location.longitude);
+      const times = calculatePrayerTimes(location.latitude, location.longitude, new Date(), calculationMethod);
       setPrayerTimes(times);
     }
-  }, [location]);
+  }, [location, calculationMethod]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -168,6 +170,29 @@ export default function PrayerTimesPage() {
                   >
                     {notifEnabled ? <Bell className="w-4 h-4" /> : <BellOff className="w-4 h-4" />}
                   </Button>
+                </div>
+
+                {/* Calculation Method Selector */}
+                <div className="flex items-center gap-2 mt-2">
+                  <span className="text-xs text-muted-foreground">{t('calculationMethod')}:</span>
+                  <Select value={calculationMethod} onValueChange={(v) => setCalculationMethod(v as CalcMethodKey)}>
+                    <SelectTrigger className="w-48 h-8 text-xs">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Egyptian">{t('calcEgyptian')}</SelectItem>
+                      <SelectItem value="MuslimWorldLeague">{t('calcMuslimWorldLeague')}</SelectItem>
+                      <SelectItem value="NorthAmerica">{t('calcNorthAmerica')}</SelectItem>
+                      <SelectItem value="UmmAlQura">{t('calcUmmAlQura')}</SelectItem>
+                      <SelectItem value="Dubai">{t('calcDubai')}</SelectItem>
+                      <SelectItem value="Qatar">{t('calcQatar')}</SelectItem>
+                      <SelectItem value="Kuwait">{t('calcKuwait')}</SelectItem>
+                      <SelectItem value="MoonsightingCommittee">{t('calcMoonsighting')}</SelectItem>
+                      <SelectItem value="Singapore">{t('calcSingapore')}</SelectItem>
+                      <SelectItem value="Karachi">{t('calcKarachi')}</SelectItem>
+                      <SelectItem value="Tehran">{t('calcTehran')}</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 
                 {showSearch && (

@@ -165,9 +165,7 @@ export default function MemorizationPage() {
     }
   };
 
-  const hideLevelLabels = isAr
-    ? ['إظهار الكل', 'إخفاء جزئي', 'إخفاء النصف', 'إخفاء الكل']
-    : ['Show All', 'Hide Partial', 'Hide Half', 'Hide All'];
+  const hideLevelLabels = [t('showAll'), t('hidePartial'), t('hideHalf'), t('hideAll')];
 
   return (
     <div>
@@ -178,7 +176,7 @@ export default function MemorizationPage() {
             <Link to="/quran">
               <Button variant="ghost" size="sm" className="gap-2">
                 <ArrowLeft className="w-4 h-4" />
-                {isAr ? 'رجوع' : 'Back'}
+                {t('back')}
               </Button>
             </Link>
           </div>
@@ -189,10 +187,10 @@ export default function MemorizationPage() {
               <BookOpen className="w-7 h-7 text-primary" />
             </div>
             <h1 className="font-arabic text-2xl md:text-3xl font-bold text-foreground mb-1">
-              {isAr ? 'وضع الحفظ' : 'Memorization Mode'}
+              {t('memorizationMode')}
             </h1>
             <p className="text-muted-foreground text-sm">
-              {isAr ? 'حفظ القرآن بتكرار الآيات وإخفاء تدريجي للنص' : 'Memorize Quran with verse repetition and gradual text hiding'}
+              {t('memorizationSubtitle')}
             </p>
           </div>
 
@@ -229,11 +227,11 @@ export default function MemorizationPage() {
           {/* Range Selection */}
           <div className="bg-card rounded-2xl border border-border/50 p-4 mb-4">
             <h3 className="text-sm font-semibold text-foreground mb-3">
-              {isAr ? 'نطاق الحفظ' : 'Memorization Range'}
+              {t('memorizationRange')}
             </h3>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-xs text-muted-foreground mb-1 block">{isAr ? 'من آية' : 'From Ayah'}</label>
+                <label className="text-xs text-muted-foreground mb-1 block">{t('fromAyah')}</label>
                 <div className="flex gap-2">
                   <Select dir={direction} value={startAyah.toString()} onValueChange={v => {
                     const val = parseInt(v);
@@ -264,7 +262,7 @@ export default function MemorizationPage() {
                 </div>
               </div>
               <div>
-                <label className="text-xs text-muted-foreground mb-1 block">{isAr ? 'إلى آية' : 'To Ayah'}</label>
+                <label className="text-xs text-muted-foreground mb-1 block">{t('toAyah')}</label>
                 <div className="flex gap-2">
                   <Select dir={direction} value={endAyah.toString()} onValueChange={v => {
                     const val = parseInt(v);
@@ -291,7 +289,7 @@ export default function MemorizationPage() {
             </div>
             <div className="flex items-center gap-3 mt-3">
               <label className="text-xs text-muted-foreground whitespace-nowrap">
-                {isAr ? 'عدد التكرار:' : 'Repeat count:'}
+                {t('repeatCount')}
               </label>
               <Select value={repeatCount.toString()} onValueChange={v => setRepeatCount(parseInt(v))}>
                 <SelectTrigger className="w-20 h-8"><SelectValue /></SelectTrigger>
@@ -320,9 +318,9 @@ export default function MemorizationPage() {
                   className="text-center"
                 >
                   <Badge variant="secondary" className="mb-4">
-                    {isAr ? `آية ${currentAyah}` : `Ayah ${currentAyah}`}
+                    {t('ayah')} {currentAyah}
                     {' • '}
-                    {isAr ? `تكرار ${currentRepeat + 1}/${repeatCount}` : `Rep ${currentRepeat + 1}/${repeatCount}`}
+                    {t('repeat')} {currentRepeat + 1}/{repeatCount}
                   </Badge>
                   <p className="font-arabic text-2xl md:text-3xl leading-loose text-foreground" dir="rtl">
                     {getDisplayText(currentAyahData.text, hideLevel)}
@@ -331,7 +329,7 @@ export default function MemorizationPage() {
               </AnimatePresence>
             ) : (
               <p className="text-center text-muted-foreground">
-                {isAr ? 'جاري التحميل...' : 'Loading...'}
+                {t('loading')}
               </p>
             )}
           </div>
@@ -371,11 +369,11 @@ export default function MemorizationPage() {
 
             <div className="flex flex-wrap items-center justify-center gap-2">
               <Button variant={autoAdvance ? 'default' : 'outline'} size="sm" onClick={() => setAutoAdvance(!autoAdvance)}>
-                {isAr ? 'تقدم تلقائي' : 'Auto-advance'}
+                {t('autoAdvance')}
               </Button>
               <Button variant="outline" size="sm" onClick={resetSession} className="gap-1">
                 <RotateCcw className="w-3.5 h-3.5" />
-                {isAr ? 'إعادة' : 'Reset'}
+                {t('reset')}
               </Button>
               <div className="flex items-center gap-2">
                 <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setIsMuted(!isMuted)}>
@@ -390,7 +388,7 @@ export default function MemorizationPage() {
             {/* Progress */}
             <div className="mt-3">
               <div className="flex justify-between text-xs text-muted-foreground mb-1">
-                <span>{isAr ? 'التقدم' : 'Progress'}</span>
+                <span>{t('progress')}</span>
                 <span>{currentAyah - startAyah + 1} / {endAyah - startAyah + 1}</span>
               </div>
               <div className="h-2 bg-muted rounded-full overflow-hidden">
@@ -402,7 +400,7 @@ export default function MemorizationPage() {
               {/* Jump to ayah */}
               <div className="flex items-center gap-2 mt-3">
                 <span className="text-xs text-muted-foreground whitespace-nowrap">
-                  {isAr ? 'أكمل من آية:' : 'Continue from:'}
+                  {t('continueFrom')}
                 </span>
                 <Select dir={direction} value={currentAyah.toString()} onValueChange={v => {
                   const val = parseInt(v);
@@ -413,7 +411,7 @@ export default function MemorizationPage() {
                   <SelectContent className="max-h-60 overflow-y-auto bg-popover">
                     {Array.from({ length: endAyah - startAyah + 1 }, (_, i) => startAyah + i).map(n => (
                       <SelectItem key={n} value={n.toString()}>
-                        {isAr ? `آية ${n}` : `Ayah ${n}`}
+                        {t('ayah')} {n}
                       </SelectItem>
                     ))}
                   </SelectContent>

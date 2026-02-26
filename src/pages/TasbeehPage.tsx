@@ -13,17 +13,7 @@ import {
 } from '@/components/ui/select';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAppStore } from '@/store/useAppStore';
-
-interface TasbeehStats {
-  totalToday: number;
-  totalAllTime: number;
-  dailyGoal: number;
-  streak: number;
-  lastDate: string;
-  history: { date: string; count: number }[];
-  selectedDhikr: string;
-  currentCount: number;
-}
+import { useTasbeehStore } from '@/store/useTasbeehStore';
 
 const DEFAULT_ADHKAR = [
   { id: 'subhanallah', ar: 'سبحان الله', en: 'SubhanAllah', target: 33 },
@@ -43,98 +33,52 @@ function getToday() {
   return new Date().toISOString().split('T')[0];
 }
 
-function loadStats(): TasbeehStats {
-  try {
-    const raw = localStorage.getItem('tasbeeh-stats');
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      // Reset daily count if new day
-      if (parsed.lastDate !== getToday()) {
-        // Save yesterday's count to history
-        if (parsed.lastDate && parsed.totalToday > 0) {
-          parsed.history = [
-            { date: parsed.lastDate, count: parsed.totalToday },
-            ...(parsed.history || []),
-          ].slice(0, 30);
-          // Update streak
-          const yesterday = new Date();
-          yesterday.setDate(yesterday.getDate() - 1);
-          if (parsed.lastDate === yesterday.toISOString().split('T')[0]) {
-            parsed.streak = (parsed.streak || 0) + 1;
-          } else {
-            parsed.streak = 0;
-          }
-        }
-        parsed.totalToday = 0;
-        parsed.currentCount = 0;
-        parsed.lastDate = getToday();
-      }
-      return parsed;
-    }
-  } catch { /* ignore */ }
-  return {
-    totalToday: 0,
-    totalAllTime: 0,
-    dailyGoal: 100,
-    streak: 0,
-    lastDate: getToday(),
-    history: [],
-    selectedDhikr: 'subhanallah',
-    currentCount: 0,
-  };
-}
-
-function saveStats(stats: TasbeehStats) {
-  localStorage.setItem('tasbeeh-stats', JSON.stringify(stats));
-}
-
 export default function TasbeehPage() {
-  const { language } = useTranslation();
+  const { t, language } = useTranslation();
   const { direction } = useAppStore();
   const isAr = language === 'ar';
 
-  const [stats, setStats] = useState<TasbeehStats>(loadStats);
+  const stats = useTasbeehStore();
+  const setStats = stats.setStats;
   const [vibrateEnabled, setVibrateEnabled] = useState(true);
   const [showStats, setShowStats] = useState(false);
+
+  // Roll over day on mount
+  useEffect(() => { stats.rolloverDay(); }, []);
 
   const currentDhikr = useMemo(
     () => DEFAULT_ADHKAR.find(d => d.id === stats.selectedDhikr) || DEFAULT_ADHKAR[0],
     [stats.selectedDhikr]
   );
 
-  useEffect(() => { saveStats(stats); }, [stats]);
-
   const handleTap = useCallback(() => {
-    setStats(prev => {
-      const newCount = prev.currentCount + 1;
-      const newTotalToday = prev.totalToday + 1;
-      const newTotalAll = prev.totalAllTime + 1;
+    const newCount = stats.currentCount + 1;
+    const newTotalToday = stats.totalToday + 1;
+    const newTotalAll = stats.totalAllTime + 1;
 
-      // Vibrate at milestones
-      if (vibrateEnabled && navigator.vibrate) {
-        if (newCount === currentDhikr.target || newCount % 100 === 0) {
-          navigator.vibrate([100, 50, 100]);
-        } else if (newCount % 33 === 0) {
-          navigator.vibrate(50);
-        }
+    // Vibrate at milestones
+    if (vibrateEnabled && navigator.vibrate) {
+      if (newCount === currentDhikr.target || newCount % 100 === 0) {
+        navigator.vibrate([100, 50, 100]);
+      } else if (newCount % 33 === 0) {
+        navigator.vibrate(50);
       }
+    }
 
-      return {
-        ...prev,
-        currentCount: newCount,
-        totalToday: newTotalToday,
-        totalAllTime: newTotalAll,
-        lastDate: getToday(),
-      };
+    setStats({
+      currentCount: newCount,
+      totalToday: newTotalToday,
+      totalAllTime: newTotalAll,
+      lastDate: getToday(),
     });
-  }, [vibrateEnabled, currentDhikr.target]);
+  }, [vibrateEnabled, currentDhikr.target, stats.currentCount, stats.totalToday, stats.totalAllTime, setStats]);
 
   const resetCurrent = () => {
-    setStats(prev => ({ ...prev, currentCount: 0 }));
+    setStats({ currentCount: 0 });
   };
 
   const changeDhikr = (id: string) => {
-    setStats(prev => ({ ...prev, selectedDhikr: id, currentCount: 0 }));
+    setStats({ selectedDhikr: id, currentCount: 0 });
   };
 
   const goalProgress = Math.min((stats.totalToday / stats.dailyGoal) * 100, 100);
@@ -166,10 +110,10 @@ export default function TasbeehPage() {
         <div className="container max-w-lg py-6">
           {/* Back */}
           <div className="mb-4">
-            <Link to="/">
+            <Link to="/azkar">
               <Button variant="ghost" size="sm" className="gap-2">
                 <ArrowLeft className="w-4 h-4" />
-                {isAr ? 'رجوع' : 'Back'}
+                {t('back')}
               </Button>
             </Link>
           </div>
@@ -180,10 +124,10 @@ export default function TasbeehPage() {
               <span className="text-2xl">📿</span>
             </div>
             <h1 className="font-arabic text-2xl md:text-3xl font-bold text-foreground mb-1">
-              {isAr ? 'التسبيح الإلكتروني' : 'Digital Tasbeeh'}
+              {t('digitalTasbeeh')}
             </h1>
             <p className="text-muted-foreground text-sm">
-              {isAr ? 'سبّح واذكر الله مع تتبع أهدافك اليومية' : 'Remember Allah with daily goal tracking'}
+              {t('tasbeehSubtitle')}
             </p>
           </div>
 
@@ -245,7 +189,7 @@ export default function TasbeehPage() {
             <div className="flex items-center gap-3 mt-4">
               <Button variant="outline" size="sm" onClick={resetCurrent} className="gap-1">
                 <RotateCcw className="w-3.5 h-3.5" />
-                {isAr ? 'إعادة' : 'Reset'}
+                {t('reset')}
               </Button>
               <Button
                 variant={vibrateEnabled ? 'default' : 'outline'}
@@ -254,7 +198,7 @@ export default function TasbeehPage() {
                 className="gap-1"
               >
                 <Vibrate className="w-3.5 h-3.5" />
-                {isAr ? 'اهتزاز' : 'Vibrate'}
+                {t('vibrate')}
               </Button>
             </div>
           </div>
@@ -265,11 +209,11 @@ export default function TasbeehPage() {
               <div className="flex items-center gap-2">
                 <Target className="w-4 h-4 text-primary" />
                 <span className="text-sm font-semibold text-foreground">
-                  {isAr ? 'الهدف اليومي' : 'Daily Goal'}
+                  {t('dailyGoal')}
                 </span>
               </div>
               <Select value={stats.dailyGoal.toString()} onValueChange={v =>
-                setStats(prev => ({ ...prev, dailyGoal: parseInt(v) }))
+                setStats({ dailyGoal: parseInt(v) })
               }>
                 <SelectTrigger className="w-24 h-8"><SelectValue /></SelectTrigger>
                 <SelectContent className="bg-popover">
@@ -291,7 +235,7 @@ export default function TasbeehPage() {
                 className="flex items-center gap-2 mt-2 text-primary text-sm font-semibold"
               >
                 <Trophy className="w-4 h-4" />
-                {isAr ? 'أحسنت! أكملت هدف اليوم 🎉' : 'Great job! Daily goal achieved 🎉'}
+                {t('dailyGoalAchieved')}
               </motion.div>
             )}
           </div>
@@ -304,10 +248,10 @@ export default function TasbeehPage() {
               </div>
               <div>
                 <p className="text-sm font-semibold text-foreground">
-                  {isAr ? `سلسلة ${stats.streak} يوم` : `${stats.streak}-day streak`}
+                  {t('streakDays', { count: stats.streak })}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  {isAr ? 'استمر في الذكر يومياً!' : 'Keep remembering Allah daily!'}
+                  {t('keepRemembering')}
                 </p>
               </div>
             </div>
@@ -320,7 +264,7 @@ export default function TasbeehPage() {
             onClick={() => setShowStats(!showStats)}
           >
             <TrendingUp className="w-4 h-4" />
-            {isAr ? 'الإحصائيات' : 'Statistics'}
+            {t('statistics')}
             {showStats ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
           </Button>
 
@@ -337,21 +281,21 @@ export default function TasbeehPage() {
                   <div className="grid grid-cols-3 gap-3 mb-4">
                     <div className="text-center p-3 bg-muted/50 rounded-xl">
                       <p className="text-lg font-bold text-foreground">{stats.totalToday}</p>
-                      <p className="text-xs text-muted-foreground">{isAr ? 'اليوم' : 'Today'}</p>
+                      <p className="text-xs text-muted-foreground">{t('today')}</p>
                     </div>
                     <div className="text-center p-3 bg-muted/50 rounded-xl">
                       <p className="text-lg font-bold text-foreground">{stats.totalAllTime.toLocaleString()}</p>
-                      <p className="text-xs text-muted-foreground">{isAr ? 'الإجمالي' : 'All Time'}</p>
+                      <p className="text-xs text-muted-foreground">{t('allTime')}</p>
                     </div>
                     <div className="text-center p-3 bg-muted/50 rounded-xl">
                       <p className="text-lg font-bold text-foreground">{stats.streak}</p>
-                      <p className="text-xs text-muted-foreground">{isAr ? 'سلسلة' : 'Streak'}</p>
+                      <p className="text-xs text-muted-foreground">{t('streak')}</p>
                     </div>
                   </div>
 
                   {/* Bar Chart - Last 7 days */}
                   <h4 className="text-sm font-semibold text-foreground mb-3">
-                    {isAr ? 'آخر 7 أيام' : 'Last 7 Days'}
+                    {t('last7Days')}
                   </h4>
                   <div className="flex items-end justify-between gap-1 h-24">
                     {last7Days.map(day => (
@@ -378,7 +322,7 @@ export default function TasbeehPage() {
           {/* Suggested Adhkar */}
           <div className="bg-card rounded-2xl border border-border/50 p-4">
             <h3 className="text-sm font-semibold text-foreground mb-3">
-              {isAr ? 'أذكار مقترحة' : 'Suggested Adhkar'}
+              {t('suggestedAdhkar')}
             </h3>
             <div className="grid grid-cols-1 gap-2">
               {DEFAULT_ADHKAR.filter(d => d.id !== stats.selectedDhikr).slice(0, 4).map(d => (

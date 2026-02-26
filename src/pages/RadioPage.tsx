@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAppStore } from '@/store/useAppStore';
+import { useRadioStore } from '@/store/useRadioStore';
 import { useQuery } from '@tanstack/react-query';
 import { fetchRadioStations } from '@/lib/radioApi';
 import {
@@ -27,9 +28,7 @@ export default function RadioPage() {
   const [volume, setVolume] = useState(0.8);
   const [isMuted, setIsMuted] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [favorites, setFavorites] = useState<string[]>(() => {
-    try { return JSON.parse(localStorage.getItem('radio-favorites-v2') || '[]'); } catch { return []; }
-  });
+  const { favorites, toggleFavorite } = useRadioStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState<RadioCategory>('all');
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -81,10 +80,6 @@ export default function RadioPage() {
   }, [allStations, searchQuery, activeCategory]);
 
   useEffect(() => {
-    localStorage.setItem('radio-favorites-v2', JSON.stringify(favorites));
-  }, [favorites]);
-
-  useEffect(() => {
     if (audioRef.current) {
       audioRef.current.volume = isMuted ? 0 : volume;
     }
@@ -109,14 +104,6 @@ export default function RadioPage() {
       }
       setLoading(false);
     }
-  };
-
-  const toggleFavorite = (stationId: string) => {
-    setFavorites(prev =>
-      prev.includes(stationId)
-        ? prev.filter(id => id !== stationId)
-        : [...prev, stationId]
-    );
   };
 
   const getDisplayName = (station: RadioStation) => {
@@ -219,6 +206,10 @@ export default function RadioPage() {
                       : 'bg-card border-border/50 hover:border-primary/20'
                   }`}
                   onClick={() => handlePlayStation(station)}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handlePlayStation(station); } }}
+                  tabIndex={0}
+                  role="button"
+                  aria-label={getDisplayName(station)}
                 >
                   {/* Station Image */}
                   {station.img ? (
@@ -296,7 +287,7 @@ export default function RadioPage() {
                 {isPlaying && (
                   <div className="flex items-center gap-1">
                     <span className="w-2 h-2 bg-primary rounded-full animate-pulse" />
-                    <span className="text-xs text-primary">Live</span>
+                    <span className="text-xs text-primary">{t('live')}</span>
                   </div>
                 )}
               </div>
@@ -305,6 +296,7 @@ export default function RadioPage() {
                 variant="emerald"
                 size="icon"
                 onClick={() => handlePlayStation(currentStation)}
+                aria-label={isPlaying ? t('pause') : t('play')}
               >
                 {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
               </Button>

@@ -192,7 +192,7 @@ export default function SearchPage() {
 
         <div className="sticky top-24 z-30 bg-background/95 backdrop-blur-sm pb-4 -mx-2 px-2">
           <div className="relative group">
-            <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+            <div className="absolute inset-y-0 start-4 flex items-center pointer-events-none">
               <Search className="w-5 h-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
             </div>
             <Input
@@ -201,13 +201,13 @@ export default function SearchPage() {
               value={query}
               onChange={handleInputChange}
               placeholder={t('searchPlaceholder')}
-              className="pl-12 pr-12 h-14 text-xl rounded-2xl border-primary/20 shadow-sm focus-visible:ring-primary/30 transition-all bg-card"
+              className="ps-12 pe-12 h-14 text-xl rounded-2xl border-primary/20 shadow-sm focus-visible:ring-primary/30 transition-all bg-card"
             />
             {query && (
               <Button
                 variant="ghost"
                 size="icon"
-                className="absolute right-2 top-1/2 -translate-y-1/2 h-10 w-10 hover:bg-transparent"
+                className="absolute end-2 top-1/2 -translate-y-1/2 h-10 w-10 hover:bg-transparent"
                 onClick={() => {
                   setQuery('');
                   setIsEnglishWarning(false);

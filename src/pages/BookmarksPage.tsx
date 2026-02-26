@@ -3,24 +3,41 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Bookmark, BookmarkMinus, ChevronRight, BookOpen, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAppStore } from '@/store/useAppStore';
 import { fetchSurahs, type Surah } from '@/lib/quranApi';
 
 export default function BookmarksPage() {
   const { t, language } = useTranslation();
-  const { direction, bookmarks, removeBookmark, favorites, toggleFavorite } = useAppStore();
-  const [surahs, setSurahs] = useState<Surah[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { direction, bookmarks, removeBookmark, favorites, toggleFavorite, surahs: cachedSurahs, setSurahs } = useAppStore();
+  const [surahs, setSurahsLocal] = useState<Surah[]>(cachedSurahs);
+  const [loading, setLoading] = useState(cachedSurahs.length === 0);
+  const [confirmRemove, setConfirmRemove] = useState<{ surah: number; ayah: number } | null>(null);
 
   useEffect(() => {
+    if (cachedSurahs.length > 0) {
+      setSurahsLocal(cachedSurahs);
+      setLoading(false);
+      return;
+    }
     const loadSurahs = async () => {
       const data = await fetchSurahs();
+      setSurahsLocal(data);
       setSurahs(data);
       setLoading(false);
     };
     loadSurahs();
-  }, []);
+  }, [cachedSurahs, setSurahs]);
 
   const getSurahName = (surahNum: number) => {
     const surah = surahs.find((s) => s.number === surahNum);
@@ -191,17 +208,14 @@ export default function BookmarksPage() {
                       onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
-                        removeBookmark(bookmark.surah, bookmark.ayah);
+                        setConfirmRemove({ surah: bookmark.surah, ayah: bookmark.ayah });
                       }}
                       className="opacity-70 hover:opacity-100 hover:text-destructive flex-shrink-0"
                       title={t('removeBookmark')}
                     >
                       <BookmarkMinus className="w-4 h-4" />
                     </Button>
-                    <span className="flex items-center gap-1.5 text-sm text-muted-foreground group-hover:text-primary transition-colors flex-shrink-0" title={t('goToAyah')}>
-                      <span className="font-medium">{t('ayah')} {bookmark.ayah.toLocaleString(language === 'ar' ? 'ar-EG' : 'en-US')}</span>
-                      <ChevronRight className="w-4 h-4" />
-                    </span>
+                    <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors flex-shrink-0" />
                   </Link>
                 </motion.div>
               ))}
@@ -211,6 +225,31 @@ export default function BookmarksPage() {
           </div>
         </div>
       </main>
+
+      {/* Remove Bookmark Confirmation */}
+      <AlertDialog open={!!confirmRemove} onOpenChange={(open) => !open && setConfirmRemove(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('confirmRemoveBookmark')}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {confirmRemove && `${getSurahName(confirmRemove.surah)} - ${t('ayah')} ${confirmRemove.ayah}`}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (confirmRemove) {
+                  removeBookmark(confirmRemove.surah, confirmRemove.ayah);
+                  setConfirmRemove(null);
+                }
+              }}
+            >
+              {t('confirm')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

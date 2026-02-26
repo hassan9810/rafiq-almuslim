@@ -1,11 +1,14 @@
 import { Link } from 'react-router-dom';
 import { BookOpen, BookText, Play, Search, Brain, Calendar, Share2 } from 'lucide-react';
 import { SurahList } from '@/components/SurahList';
-import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/hooks/useTranslation';
 
 export default function QuranPage() {
   const { t } = useTranslation();
+
+  const linkClasses = "inline-flex items-center justify-center gap-3 rounded-md text-base font-semibold transition-all h-auto px-6 py-3";
+  const primaryLinkClasses = `${linkClasses} bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl`;
+  const outlineLinkClasses = `${linkClasses} border border-primary/30 hover:bg-primary/10 hover:border-primary bg-background`;
 
   return (
     <div>
@@ -28,47 +31,33 @@ export default function QuranPage() {
         {/* Action Buttons */}
         <div className="container max-w-6xl">
           <div className="flex flex-wrap gap-3 justify-center">
-            <Link to="/search">
-              <Button className="gap-3 bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 h-auto text-base font-semibold shadow-lg hover:shadow-xl transition-all">
-                <Search className="w-5 h-5" />
-                {t('search')}
-              </Button>
+            <Link to="/search" className={primaryLinkClasses}>
+              <Search className="w-5 h-5" />
+              {t('search')}
             </Link>
-            <Link to="/mushaf">
-              <Button variant="outline" className="gap-3 px-6 py-3 h-auto text-base font-semibold border-primary/30 hover:bg-primary/10 hover:border-primary transition-all">
-                <BookOpen className="w-5 h-5 text-primary" />
-                {t('browseMushaf')}
-              </Button>
+            <Link to="/mushaf" className={outlineLinkClasses}>
+              <BookOpen className="w-5 h-5 text-primary" />
+              {t('browseMushaf')}
             </Link>
-            <Link to="/ayah-player">
-              <Button variant="outline" className="gap-3 px-6 py-3 h-auto text-base font-semibold border-primary/30 hover:bg-primary/10 hover:border-primary transition-all">
-                <Play className="w-5 h-5 text-primary" />
-                {t('ayahByAyah')}
-              </Button>
+            <Link to="/ayah-player" className={outlineLinkClasses}>
+              <Play className="w-5 h-5 text-primary" />
+              {t('ayahByAyah')}
             </Link>
-            <Link to="/e3rab">
-              <Button variant="outline" className="gap-3 px-6 py-3 h-auto text-base font-semibold border-primary/30 hover:bg-primary/10 hover:border-primary transition-all">
-                <BookText className="w-5 h-5 text-primary" />
-                {t('quranGrammar')}
-              </Button>
+            <Link to="/e3rab" className={outlineLinkClasses}>
+              <BookText className="w-5 h-5 text-primary" />
+              {t('quranGrammar')}
             </Link>
-            <Link to="/memorization">
-              <Button variant="outline" className="gap-3 px-6 py-3 h-auto text-base font-semibold border-primary/30 hover:bg-primary/10 hover:border-primary transition-all">
-                <Brain className="w-5 h-5 text-primary" />
-                {t('memorization')}
-              </Button>
+            <Link to="/memorization" className={outlineLinkClasses}>
+              <Brain className="w-5 h-5 text-primary" />
+              {t('memorization')}
             </Link>
-            <Link to="/reading-plan">
-              <Button variant="outline" className="gap-3 px-6 py-3 h-auto text-base font-semibold border-primary/30 hover:bg-primary/10 hover:border-primary transition-all">
-                <Calendar className="w-5 h-5 text-primary" />
-                {t('readingPlan')}
-              </Button>
+            <Link to="/reading-plan" className={outlineLinkClasses}>
+              <Calendar className="w-5 h-5 text-primary" />
+              {t('readingPlan')}
             </Link>
-            <Link to="/share-ayah">
-              <Button variant="outline" className="gap-3 px-6 py-3 h-auto text-base font-semibold border-primary/30 hover:bg-primary/10 hover:border-primary transition-all">
-                <Share2 className="w-5 h-5 text-primary" />
-                {t('shareAyah')}
-              </Button>
+            <Link to="/share-ayah" className={outlineLinkClasses}>
+              <Share2 className="w-5 h-5 text-primary" />
+              {t('shareAyah')}
             </Link>
           </div>
         </div>

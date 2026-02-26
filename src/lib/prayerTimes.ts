@@ -76,10 +76,37 @@ export async function searchCity(query: string): Promise<Location[]> {
   }
 }
 
+export type CalcMethodKey =
+  | 'Egyptian'
+  | 'MuslimWorldLeague'
+  | 'NorthAmerica'
+  | 'UmmAlQura'
+  | 'Dubai'
+  | 'Qatar'
+  | 'Kuwait'
+  | 'MoonsightingCommittee'
+  | 'Singapore'
+  | 'Karachi'
+  | 'Tehran';
+
+const calcMethodMap: Record<CalcMethodKey, () => ReturnType<typeof CalculationMethod.Egyptian>> = {
+  Egyptian: () => CalculationMethod.Egyptian(),
+  MuslimWorldLeague: () => CalculationMethod.MuslimWorldLeague(),
+  NorthAmerica: () => CalculationMethod.NorthAmerica(),
+  UmmAlQura: () => CalculationMethod.UmmAlQura(),
+  Dubai: () => CalculationMethod.Dubai(),
+  Qatar: () => CalculationMethod.Qatar(),
+  Kuwait: () => CalculationMethod.Kuwait(),
+  MoonsightingCommittee: () => CalculationMethod.MoonsightingCommittee(),
+  Singapore: () => CalculationMethod.Singapore(),
+  Karachi: () => CalculationMethod.Karachi(),
+  Tehran: () => CalculationMethod.Tehran(),
+};
+
 // Calculate prayer times
-export function calculatePrayerTimes(latitude: number, longitude: number, date: Date = new Date()): PrayerTime[] {
+export function calculatePrayerTimes(latitude: number, longitude: number, date: Date = new Date(), method: CalcMethodKey = 'Egyptian'): PrayerTime[] {
   const coordinates = new Coordinates(latitude, longitude);
-  const params = CalculationMethod.Egyptian();
+  const params = (calcMethodMap[method] ?? calcMethodMap.Egyptian)();
   const prayerTimes = new PrayerTimes(coordinates, date, params);
   const maghribTime = prayerTimes.maghrib.getTime();
 

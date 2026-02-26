@@ -30,6 +30,9 @@ function SurahCard({ surah, index, isFavorite, onToggleFavorite, onClick, animat
       transition={{ duration: 0.2, delay: animateDelay }}
       className="surah-card group relative bg-card hover:bg-primary/5 rounded-xl p-4 border border-border/50 cursor-pointer"
       onClick={onClick}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick(); } }}
+      tabIndex={0}
+      role="button"
     >
       {/* Surah Number */}
       <div className="group-hover:opacity-100 transition-opacity absolute -top-3 -left-3 w-10 h-10 bg-primary rounded-lg flex items-center justify-center shadow-md">
@@ -155,7 +158,7 @@ export function SurahList() {
         {activeTab === 'favorites' && favorites.length === 0 && (
           <div className="text-center py-12 text-muted-foreground">
             <Star className="w-12 h-12 mx-auto mb-4 opacity-50" />
-            <p>No favorite surahs yet. Click the star icon on any surah to add it to favorites.</p>
+            <p>{t('noFavoriteSurahs')}</p>
           </div>
         )}
 

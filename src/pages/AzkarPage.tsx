@@ -208,14 +208,14 @@ export default function AzkarPage() {
                         {/* Controls */}
                         <div className="flex justify-center gap-4">
                           <Button variant="outline" onClick={resetTasbih}>
-                            <RotateCcw className="w-4 h-4 mr-2" />
+                            <RotateCcw className="w-4 h-4 me-2" />
                             {t('reset')}
                           </Button>
                           <Button
                             variant={vibrationEnabled ? 'default' : 'outline'}
                             onClick={() => setVibrationEnabled(!vibrationEnabled)}
                           >
-                            <Vibrate className="w-4 h-4 mr-2" />
+                            <Vibrate className="w-4 h-4 me-2" />
                             {t('vibrate')}
                           </Button>
                         </div>
@@ -288,7 +288,7 @@ export default function AzkarPage() {
                             </Badge>
                             {isComplete && (
                               <Badge className="bg-green-500">
-                                <Check className="w-3 h-3 mr-1" />
+                                <Check className="w-3 h-3 me-1" />
                                 {t('complete')}
                               </Badge>
                             )}
@@ -348,7 +348,7 @@ export default function AzkarPage() {
                               onClick={goPrev}
                               disabled={currentIndex === 0}
                             >
-                              <ChevronLeft className="w-4 h-4 mr-1" />
+                              <ChevronLeft className="w-4 h-4 me-1" />
                               {t('previous')}
                             </Button>
                             
@@ -367,7 +367,7 @@ export default function AzkarPage() {
                               disabled={currentIndex === azkar.length - 1}
                             >
                               {t('next')}
-                              <ChevronRight className="w-4 h-4 ml-1" />
+                              <ChevronRight className="w-4 h-4 ms-1" />
                             </Button>
                           </div>
                         </CardContent>

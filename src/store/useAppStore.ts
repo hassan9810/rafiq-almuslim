@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import type { CalcMethodKey } from '@/lib/prayerTimes';
 
 interface Surah {
   number: number;
@@ -57,6 +58,7 @@ interface AppState {
   
   // Location
   location: { latitude: number; longitude: number; city: string } | null;
+  calculationMethod: CalcMethodKey;
 
   // Layout (e.g. hide header in fullscreen mushaf)
   hideAppHeader: boolean;
@@ -74,6 +76,7 @@ interface AppState {
   addRecentRead: (surah: number, ayah: number) => void;
   setPlayer: (player: Partial<PlayerState>) => void;
   setLocation: (location: { latitude: number; longitude: number; city: string }) => void;
+  setCalculationMethod: (method: CalcMethodKey) => void;
   setHideAppHeader: (hide: boolean) => void;
 }
 
@@ -102,6 +105,7 @@ export const useAppStore = create<AppState>()(
         repeatMode: 'none',
       },
       location: null,
+      calculationMethod: 'Egyptian',
       hideAppHeader: false,
 
       // Actions
@@ -158,6 +162,7 @@ export const useAppStore = create<AppState>()(
       }),
       
       setLocation: (location) => set({ location }),
+      setCalculationMethod: (method) => set({ calculationMethod: method }),
       setHideAppHeader: (hide) => set({ hideAppHeader: hide }),
     }),
     {
@@ -172,6 +177,7 @@ export const useAppStore = create<AppState>()(
         bookmarks: state.bookmarks,
         recentReads: state.recentReads,
         location: state.location,
+        calculationMethod: state.calculationMethod,
       }),
     }
   )

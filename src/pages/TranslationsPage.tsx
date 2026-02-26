@@ -131,19 +131,19 @@ export default function TranslationsPage() {
           <div className="flex flex-col md:flex-row gap-4 mb-8">
             {/* Search */}
             <div className="relative flex-1">
-              <Search className={`absolute ${isArabic ? 'right-3' : 'left-3'} top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground`} />
+              <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder={t('searchTranslationsPlaceholder')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className={isArabic ? 'pr-10' : 'pl-10'}
+                className="ps-10"
               />
             </div>
 
             {/* Language Filter */}
             <Select dir={direction} value={selectedLanguage} onValueChange={setSelectedLanguage}>
               <SelectTrigger className="w-full md:w-[200px]">
-                <Globe className="w-4 h-4 mr-2" />
+                <Globe className="w-4 h-4 me-2" />
                 <SelectValue placeholder={t('selectLanguage')} />
               </SelectTrigger>
               <SelectContent className="bg-background border shadow-lg z-50">

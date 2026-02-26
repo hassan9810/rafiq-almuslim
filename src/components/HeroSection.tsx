@@ -130,13 +130,13 @@ export function HeroSection() {
               className="relative max-w-xl"
             >
               <div className="relative">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                <Search className="absolute start-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <Input
                   type="text"
                   placeholder={t('searchPlaceholder')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full h-14 pl-12 pr-4 rounded-xl bg-background/95 backdrop-blur-md border-0 text-foreground placeholder:text-muted-foreground shadow-lg focus-visible:ring-2 focus-visible:ring-accent"
+                  className="w-full h-14 ps-12 pe-4 rounded-xl bg-background/95 backdrop-blur-md border-0 text-foreground placeholder:text-muted-foreground shadow-lg focus-visible:ring-2 focus-visible:ring-accent"
                 />
               </div>
             </motion.form>

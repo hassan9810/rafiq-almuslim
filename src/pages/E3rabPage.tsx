@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BookText, Search, ChevronRight, ChevronLeft, Loader2, BookOpen } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import DOMPurify from 'dompurify';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAppStore } from '@/store/useAppStore';
 import { Button } from '@/components/ui/button';
@@ -134,12 +135,12 @@ export default function E3rabPage() {
 
                 {/* Search */}
                 <div className="relative flex-1">
-                  <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Search className="absolute end-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <Input
                     placeholder={t('searchE3rabPlaceholder')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pr-10 font-arabic"
+                    className="pe-10 font-arabic"
                   />
                 </div>
               </div>
@@ -187,7 +188,7 @@ export default function E3rabPage() {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -20 }}
-                      transition={{ delay: index * 0.02 }}
+                      transition={{ delay: Math.min(index * 0.02, 0.3) }}
                     >
                       <Card 
                         className={`cursor-pointer transition-all hover:shadow-md ${
@@ -213,7 +214,7 @@ export default function E3rabPage() {
                                   expandedAyah === item.aya ? '' : 'line-clamp-3'
                                 }`}
                                 dir={direction}
-                                dangerouslySetInnerHTML={{ __html: item.text }}
+                                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(item.text) }}
                               />
                               
                               {item.text.length > 200 && (

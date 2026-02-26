@@ -454,7 +454,7 @@ export default function MushafPage() {
             <Button
               variant="ghost"
               size="icon"
-              className="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-background/80 hover:bg-background"
+              className="absolute start-2 top-1/2 -translate-y-1/2 z-10 bg-background/80 hover:bg-background"
               onClick={language === 'ar' ? handleNextPage : handlePrevPage}
               disabled={language === 'ar' ? currentPage >= selectedEdition.endPage : currentPage <= selectedEdition.startPage}
             >
@@ -464,7 +464,7 @@ export default function MushafPage() {
             <Button
               variant="ghost"
               size="icon"
-              className="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-background/80 hover:bg-background"
+              className="absolute end-2 top-1/2 -translate-y-1/2 z-10 bg-background/80 hover:bg-background"
               onClick={language === 'ar' ? handlePrevPage : handleNextPage}
               disabled={language === 'ar' ? currentPage <= selectedEdition.startPage : currentPage >= selectedEdition.endPage}
             >

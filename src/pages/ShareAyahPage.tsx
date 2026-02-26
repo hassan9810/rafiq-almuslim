@@ -31,7 +31,7 @@ const FONTS = [
 ];
 
 export default function ShareAyahPage() {
-  const { language } = useTranslation();
+  const { t, language } = useTranslation();
   const { direction, surahs, setSurahs } = useAppStore();
   const isAr = language === 'ar';
 
@@ -236,7 +236,7 @@ export default function ShareAyahPage() {
             <Link to="/quran">
               <Button variant="ghost" size="sm" className="gap-2">
                 <ArrowLeft className="w-4 h-4" />
-                {isAr ? 'رجوع' : 'Back'}
+                {t('back')}
               </Button>
             </Link>
           </div>
@@ -247,17 +247,17 @@ export default function ShareAyahPage() {
               <Share2 className="w-7 h-7 text-primary" />
             </div>
             <h1 className="font-arabic text-2xl md:text-3xl font-bold text-foreground mb-1">
-              {isAr ? 'مشاركة آية' : 'Share Ayah'}
+              {t('shareAyahTitle')}
             </h1>
             <p className="text-muted-foreground text-sm">
-              {isAr ? 'شارك آية أو أكثر كصورة جميلة على السوشيال ميديا' : 'Share one or more verses as a beautiful image'}
+              {t('shareAyahSubtitle')}
             </p>
           </div>
 
           {/* Surah selector */}
           <div className="flex gap-2 mb-3">
             <Select dir={direction} value={surahNum.toString()} onValueChange={v => setSurahNum(parseInt(v))}>
-              <SelectTrigger className="flex-1"><SelectValue placeholder={isAr ? 'السورة' : 'Surah'} /></SelectTrigger>
+              <SelectTrigger className="flex-1"><SelectValue placeholder={t('surah')} /></SelectTrigger>
               <SelectContent className="max-h-60 overflow-y-auto bg-popover">
                 {(surahs.length > 0 ? surahs : Array.from({ length: 114 }, (_, i) => ({
                   number: i + 1, name: `سورة ${i + 1}`, englishName: `Surah ${i + 1}`
@@ -268,7 +268,7 @@ export default function ShareAyahPage() {
                 ))}
               </SelectContent>
             </Select>
-            <Button variant="outline" size="icon" onClick={randomAyah} title={isAr ? 'آية عشوائية' : 'Random'}>
+            <Button variant="outline" size="icon" onClick={randomAyah} title={t('randomAyah')}>
               <RefreshCw className="w-4 h-4" />
             </Button>
           </div>
@@ -276,7 +276,7 @@ export default function ShareAyahPage() {
           {/* Ayah range selector */}
           <div className="grid grid-cols-2 gap-3 mb-4">
             <div>
-              <label className="text-xs text-muted-foreground mb-1 block">{isAr ? 'من آية' : 'From Ayah'}</label>
+              <label className="text-xs text-muted-foreground mb-1 block">{t('fromAyah')}</label>
               <Select dir={direction} value={ayahFrom.toString()} onValueChange={v => setAyahFrom(parseInt(v))}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent className="max-h-60 overflow-y-auto bg-popover">
@@ -287,7 +287,7 @@ export default function ShareAyahPage() {
               </Select>
             </div>
             <div>
-              <label className="text-xs text-muted-foreground mb-1 block">{isAr ? 'إلى آية' : 'To Ayah'}</label>
+              <label className="text-xs text-muted-foreground mb-1 block">{t('toAyah')}</label>
               <Select dir={direction} value={ayahTo.toString()} onValueChange={v => setAyahTo(parseInt(v))}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent className="max-h-60 overflow-y-auto bg-popover">
@@ -303,7 +303,7 @@ export default function ShareAyahPage() {
           {ayahTo > ayahFrom && (
             <div className="mb-3 text-center">
               <Badge variant="secondary">
-                {isAr ? `${ayahTo - ayahFrom + 1} آيات محددة` : `${ayahTo - ayahFrom + 1} ayahs selected`}
+                {t('ayahsSelected', { count: ayahTo - ayahFrom + 1 })}
               </Badge>
             </div>
           )}
@@ -327,7 +327,7 @@ export default function ShareAyahPage() {
           <div className="bg-card rounded-2xl border border-border/50 p-4 mb-4">
             <div className="flex items-center gap-2 mb-3">
               <Palette className="w-4 h-4 text-primary" />
-              <span className="text-sm font-semibold text-foreground">{isAr ? 'المظهر' : 'Theme'}</span>
+              <span className="text-sm font-semibold text-foreground">{t('themeLabel')}</span>
             </div>
             <div className="flex gap-2 flex-wrap">
               {THEMES.map(theme => (
@@ -343,7 +343,7 @@ export default function ShareAyahPage() {
 
             <div className="flex items-center gap-2 mt-4 mb-2">
               <Type className="w-4 h-4 text-primary" />
-              <span className="text-sm font-semibold text-foreground">{isAr ? 'الخط' : 'Font'}</span>
+              <span className="text-sm font-semibold text-foreground">{t('fontLabel')}</span>
             </div>
             <div className="flex gap-2">
               {FONTS.map(f => (
@@ -354,7 +354,7 @@ export default function ShareAyahPage() {
             </div>
 
             <div className="flex items-center gap-3 mt-4">
-              <span className="text-xs text-muted-foreground whitespace-nowrap">{isAr ? 'حجم الخط:' : 'Font size:'}</span>
+              <span className="text-xs text-muted-foreground whitespace-nowrap">{t('fontSizeLabel')}</span>
               <Slider value={[fontSize]} min={18} max={72} step={2} onValueChange={([v]) => setFontSize(v)} className="flex-1" />
               <span className="text-xs text-muted-foreground w-8">{fontSize}</span>
             </div>
@@ -364,11 +364,11 @@ export default function ShareAyahPage() {
           <div className="flex gap-3">
             <Button className="flex-1 gap-2" onClick={shareImage} disabled={generating || selectedAyahs.length === 0}>
               {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Share2 className="w-4 h-4" />}
-              {isAr ? 'مشاركة' : 'Share'}
+              {t('share')}
             </Button>
             <Button variant="outline" className="flex-1 gap-2" onClick={downloadImage} disabled={selectedAyahs.length === 0}>
               <Download className="w-4 h-4" />
-              {isAr ? 'تحميل' : 'Download'}
+              {t('download')}
             </Button>
           </div>
         </div>

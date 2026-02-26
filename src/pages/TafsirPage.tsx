@@ -98,17 +98,17 @@ export default function TafsirPage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                     <Input
                       placeholder={t('searchShort')}
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-9"
+                      className="ps-9"
                     />
                   </div>
 
                   <ScrollArea className="h-[400px]">
-                    <div className="space-y-4 pr-4">
+                    <div className="space-y-4 pe-4">
                       {Object.entries(groupedEditions).map(([lang, editions]) => (
                         <div key={lang}>
                           <h4 className="text-sm font-semibold text-muted-foreground mb-2 capitalize text-center">
@@ -210,7 +210,7 @@ export default function TafsirPage() {
                     </div>
                   ) : (
                     <ScrollArea className="h-[600px]">
-                      <div className="space-y-6 pr-4">
+                      <div className="space-y-6 pe-4">
                         {surahData?.ayahs.map((ayah, index) => {
                           const tafsirAyah = tafsirData?.find(t => t.ayah === ayah.numberInSurah) || tafsirData?.[index];
                           return (
@@ -227,7 +227,7 @@ export default function TafsirPage() {
                               
                               {/* Tafsir */}
                               {tafsirAyah && (
-                                <div className="bg-muted/50 rounded-lg p-4 ml-14">
+                                <div className="bg-muted/50 rounded-lg p-4 ms-14">
                                   <p className={`leading-relaxed ${currentTafsirEdition?.language === 'arabic' ? 'font-arabic text-right text-lg' : ''}`}
                                      dir={direction}>
                                     {tafsirAyah.text}

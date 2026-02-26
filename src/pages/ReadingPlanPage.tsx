@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { BookOpen, Calendar, Check, RotateCcw, Trophy, ArrowLeft } from 'lucide-react';
@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/select';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAppStore } from '@/store/useAppStore';
+import { useReadingPlanStore } from '@/store/useReadingPlanStore';
 
 // Quran has 604 pages, 30 juz
 const TOTAL_PAGES = 604;
@@ -26,57 +27,21 @@ const PLANS: ReadingPlan[] = [
   { days: 60, pagesPerDay: Math.ceil(TOTAL_PAGES / 60), label: { ar: 'ختمة في شهرين', en: 'Khatmah in 60 Days' } },
 ];
 
-interface PlanState {
-  planDays: number;
-  startDate: string; // ISO date
-  completedDays: number[];  // day indices 0-based
-}
-
-const STORAGE_KEY = 'rafiq-reading-plan';
-
-function loadPlan(): PlanState | null {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : null;
-  } catch { return null; }
-}
-
-function savePlan(state: PlanState) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-}
-
 export default function ReadingPlanPage() {
   const { t, language } = useTranslation();
   const isAr = language === 'ar';
 
-  const [planState, setPlanState] = useState<PlanState | null>(loadPlan);
+  const { plan: planState, startPlan: startPlanStore, resetPlan: resetPlanStore, toggleDay } = useReadingPlanStore();
   const [selectedPlanDays, setSelectedPlanDays] = useState(30);
 
   const activePlan = PLANS.find(p => p.days === planState?.planDays);
 
   const startPlan = () => {
-    const state: PlanState = {
-      planDays: selectedPlanDays,
-      startDate: new Date().toISOString().split('T')[0],
-      completedDays: [],
-    };
-    setPlanState(state);
-    savePlan(state);
+    startPlanStore(selectedPlanDays);
   };
 
   const resetPlan = () => {
-    localStorage.removeItem(STORAGE_KEY);
-    setPlanState(null);
-  };
-
-  const toggleDay = (dayIndex: number) => {
-    if (!planState) return;
-    const completed = planState.completedDays.includes(dayIndex)
-      ? planState.completedDays.filter(d => d !== dayIndex)
-      : [...planState.completedDays, dayIndex];
-    const updated = { ...planState, completedDays: completed };
-    setPlanState(updated);
-    savePlan(updated);
+    resetPlanStore();
   };
 
   const todayIndex = useMemo(() => {
@@ -101,7 +66,7 @@ export default function ReadingPlanPage() {
             <Link to="/">
               <Button variant="ghost" size="sm" className="gap-2">
                 <ArrowLeft className="w-4 h-4" />
-                {isAr ? 'رجوع' : 'Back'}
+                {t('back')}
               </Button>
             </Link>
           </div>
@@ -112,10 +77,10 @@ export default function ReadingPlanPage() {
               <Calendar className="w-8 h-8 text-primary" />
             </div>
             <h1 className="font-arabic text-3xl md:text-4xl font-bold text-foreground mb-2">
-              {isAr ? 'خطة القراءة اليومية' : 'Daily Reading Plan'}
+              {t('dailyReadingPlan')}
             </h1>
             <p className="text-muted-foreground text-sm max-w-md mx-auto">
-              {isAr ? 'حدد خطة لختم القرآن الكريم وتابع تقدمك يومياً' : 'Set a plan to complete the Quran and track your daily progress'}
+              {t('readingPlanSubtitle')}
             </p>
           </div>
 
@@ -124,7 +89,7 @@ export default function ReadingPlanPage() {
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
               <div className="bg-card rounded-2xl border border-border/50 p-6">
                 <h2 className="text-lg font-semibold text-foreground mb-4">
-                  {isAr ? 'اختر خطتك' : 'Choose Your Plan'}
+                  {t('chooseYourPlan')}
                 </h2>
                 <div className="grid grid-cols-2 gap-3">
                   {PLANS.map(plan => (
@@ -138,16 +103,16 @@ export default function ReadingPlanPage() {
                       }`}
                     >
                       <p className="font-bold text-lg text-foreground">{plan.days}</p>
-                      <p className="text-xs text-muted-foreground">{isAr ? 'يوم' : 'days'}</p>
+                      <p className="text-xs text-muted-foreground">{t('days')}</p>
                       <p className="text-sm font-medium text-primary mt-1">
-                        {plan.pagesPerDay} {isAr ? 'صفحة/يوم' : 'pages/day'}
+                        {t('pagesPerDay', { count: plan.pagesPerDay })}
                       </p>
                     </button>
                   ))}
                 </div>
                 <Button className="w-full mt-6" size="lg" onClick={startPlan}>
-                  <Calendar className="w-5 h-5 mr-2" />
-                  {isAr ? 'ابدأ الخطة' : 'Start Plan'}
+                  <Calendar className="w-5 h-5 me-2" />
+                  {t('startPlan')}
                 </Button>
               </div>
             </motion.div>
@@ -160,7 +125,7 @@ export default function ReadingPlanPage() {
                   <>
                     <Trophy className="w-12 h-12 text-primary-foreground mx-auto mb-2" />
                     <h2 className="text-2xl font-bold text-primary-foreground">
-                      {isAr ? 'مبارك! أتممت الختمة 🎉' : 'Congratulations! Khatmah Complete 🎉'}
+                      {t('congratsKhatmah')}
                     </h2>
                   </>
                 ) : (
@@ -170,7 +135,7 @@ export default function ReadingPlanPage() {
                     </p>
                     <p className="text-5xl font-bold text-primary-foreground mb-1">{progressPct}%</p>
                     <p className="text-primary-foreground/80 text-sm">
-                      {planState.completedDays.length} / {planState.planDays} {isAr ? 'يوم' : 'days'}
+                      {planState.completedDays.length} / {planState.planDays} {t('days')}
                     </p>
                     <div className="mt-3 h-3 bg-primary-foreground/20 rounded-full overflow-hidden max-w-xs mx-auto">
                       <div className="h-full bg-primary-foreground rounded-full transition-all" style={{ width: `${progressPct}%` }} />
@@ -183,18 +148,16 @@ export default function ReadingPlanPage() {
               {!isComplete && activePlan && (
                 <div className="bg-card rounded-2xl border border-border/50 p-5">
                   <h3 className="font-semibold text-foreground mb-2">
-                    {isAr ? `📖 ورد اليوم (اليوم ${todayIndex + 1})` : `📖 Today's Reading (Day ${todayIndex + 1})`}
+                    {`📖 ${t('todaysReading', { day: todayIndex + 1 })}`}
                   </h3>
                   <p className="text-muted-foreground text-sm mb-3">
-                    {isAr
-                      ? `اقرأ من صفحة ${todayIndex * activePlan.pagesPerDay + 1} إلى صفحة ${Math.min((todayIndex + 1) * activePlan.pagesPerDay, TOTAL_PAGES)}`
-                      : `Read pages ${todayIndex * activePlan.pagesPerDay + 1} to ${Math.min((todayIndex + 1) * activePlan.pagesPerDay, TOTAL_PAGES)}`}
+                    {t('readPages', { from: todayIndex * activePlan.pagesPerDay + 1, to: Math.min((todayIndex + 1) * activePlan.pagesPerDay, TOTAL_PAGES) })}
                   </p>
                   <div className="flex gap-2">
                     <Link to={`/mushaf`} className="flex-1">
                       <Button variant="outline" className="w-full gap-2">
                         <BookOpen className="w-4 h-4" />
-                        {isAr ? 'افتح المصحف' : 'Open Mushaf'}
+                        {t('openMushaf')}
                       </Button>
                     </Link>
                     <Button
@@ -204,8 +167,8 @@ export default function ReadingPlanPage() {
                     >
                       <Check className="w-4 h-4" />
                       {planState.completedDays.includes(todayIndex)
-                        ? (isAr ? 'تم ✓' : 'Done ✓')
-                        : (isAr ? 'إتمام' : 'Complete')}
+                        ? t('done')
+                        : t('completeDayAction')}
                     </Button>
                   </div>
                 </div>
@@ -214,7 +177,7 @@ export default function ReadingPlanPage() {
               {/* Days Grid */}
               <div className="bg-card rounded-2xl border border-border/50 p-5">
                 <h3 className="font-semibold text-foreground mb-3">
-                  {isAr ? 'تقدم الأيام' : 'Daily Progress'}
+                  {t('dailyProgress')}
                 </h3>
                 <div className="grid grid-cols-7 gap-2">
                   {Array.from({ length: planState.planDays }, (_, i) => {
@@ -243,7 +206,7 @@ export default function ReadingPlanPage() {
               <div className="text-center">
                 <Button variant="ghost" size="sm" onClick={resetPlan} className="gap-2 text-muted-foreground">
                   <RotateCcw className="w-4 h-4" />
-                  {isAr ? 'إعادة تعيين الخطة' : 'Reset Plan'}
+                  {t('resetPlan')}
                 </Button>
               </div>
             </motion.div>

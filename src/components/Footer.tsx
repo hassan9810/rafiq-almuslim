@@ -43,7 +43,7 @@ export function Footer() {
               {t('features')}
             </h3>
             <ul className="space-y-2">
-              <li><Link to="/hisn-muslim" className="text-sm text-muted-foreground hover:text-primary transition-colors">{language === 'ar' ? 'حصن المسلم' : 'Hisn Muslim'}</Link></li>
+              <li><Link to="/hisn-muslim" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t('hisnMuslim')}</Link></li>
               <li><Link to="/radio" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t('radio')}</Link></li>
               <li><Link to="/qibla" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t('qibla')}</Link></li>
               <li><Link to="/azkar" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t('azkar')}</Link></li>

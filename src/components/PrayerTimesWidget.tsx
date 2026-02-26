@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 
 export function PrayerTimesWidget() {
   const { t, language } = useTranslation();
-  const { location, setLocation, direction } = useAppStore();
+  const { location, setLocation, direction, calculationMethod } = useAppStore();
   const [prayerTimes, setPrayerTimes] = useState<PrayerTime[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -16,10 +16,10 @@ export function PrayerTimesWidget() {
 
   useEffect(() => {
     if (location) {
-      const times = calculatePrayerTimes(location.latitude, location.longitude);
+      const times = calculatePrayerTimes(location.latitude, location.longitude, new Date(), calculationMethod);
       setPrayerTimes(times);
     }
-  }, [location]);
+  }, [location, calculationMethod]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -38,7 +38,7 @@ export function PrayerTimesWidget() {
       const loc = await getCurrentLocation();
       setLocation({ latitude: loc.latitude, longitude: loc.longitude, city: loc.city });
     } catch (err) {
-      setError('Could not detect location');
+      setError(t('locationError'));
     } finally {
       setLoading(false);
     }

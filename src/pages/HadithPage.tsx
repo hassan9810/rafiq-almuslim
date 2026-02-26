@@ -74,7 +74,7 @@ export default function HadithPage() {
                 {t('browse')}
               </TabsTrigger>
               <TabsTrigger value="search">
-                {language === 'ar' ? 'بحث' : 'Search'}
+                {t('search')}
               </TabsTrigger>
             </TabsList>
 
@@ -93,6 +93,10 @@ export default function HadithPage() {
                         selectedCollection.id === collection.id ? 'ring-2 ring-primary' : ''
                       }`}
                       onClick={() => setSelectedCollection(collection)}
+                      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelectedCollection(collection); } }}
+                      tabIndex={0}
+                      role="button"
+                      aria-pressed={selectedCollection.id === collection.id}
                     >
                       <CardContent className="p-4">
                         <div className="flex items-start justify-between">
@@ -127,9 +131,7 @@ export default function HadithPage() {
                     {selectedCollection.name}
                   </CardTitle>
                   <CardDescription>
-                    {language === 'ar' 
-                      ? 'أدخل رقم الحديث للقراءة'
-                      : 'Enter hadith number to read'}
+                    {t('enterHadithNumberDesc')}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -144,7 +146,7 @@ export default function HadithPage() {
                       max={(selectedCollection as any).maxApiIndex || selectedCollection.hadiths}
                     />
                     <Button onClick={loadHadith} disabled={loading || !hadithNumber}>
-                      {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : (language === 'ar' ? 'اقرأ' : 'Read')}
+                      {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : t('readButton')}
                     </Button>
                     <Button variant="outline" onClick={loadRandomHadith} disabled={loading}>
                       {t('random')}
@@ -161,7 +163,7 @@ export default function HadithPage() {
                         <CardContent className="p-6">
                           <div className="flex items-start justify-between mb-4">
                             <Badge variant="outline">
-                              {language === 'ar' ? 'حديث رقم' : 'Hadith #'}{currentHadith.hadithnumber}
+                              {t('hadithNumberLabel')} {currentHadith.hadithnumber}
                             </Badge>
                             <Button
                               variant="ghost"
@@ -212,7 +214,7 @@ export default function HadithPage() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Search className="w-5 h-5" />
-                    {language === 'ar' ? 'البحث في الأحاديث' : 'Search Hadiths'}
+                    {t('searchHadiths')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -222,9 +224,7 @@ export default function HadithPage() {
                       {t('searchHadithHint')}
                     </p>
                     <p className="text-sm">
-                      {language === 'ar' 
-                        ? 'اختر مجموعة الأحاديث وأدخل رقم الحديث للقراءة' 
-                        : 'Select a hadith collection and enter the hadith number to read'}
+                      {t('enterHadithNumberDesc')}
                     </p>
                   </div>
                 </CardContent>

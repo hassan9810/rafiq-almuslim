@@ -164,7 +164,7 @@ export default function TranslationReaderPage() {
             {/* Surah Selector */}
             <Select dir={direction} value={surahNum.toString()} onValueChange={(v) => goToSurah(parseInt(v))}>
               <SelectTrigger className="flex-1">
-                <BookOpen className="w-4 h-4 mr-2" />
+                <BookOpen className="w-4 h-4 me-2" />
                 <SelectValue placeholder={isArabic ? 'اختر السورة' : 'Select Surah'} />
               </SelectTrigger>
               <SelectContent className="bg-background border shadow-lg z-50 max-h-[300px]">
@@ -179,7 +179,7 @@ export default function TranslationReaderPage() {
             {/* Translation Selector */}
             <Select dir={direction} value={translationKey} onValueChange={changeTranslation}>
               <SelectTrigger className="flex-1">
-                <Languages className="w-4 h-4 mr-2" />
+                <Languages className="w-4 h-4 me-2" />
                 <SelectValue placeholder={t('selectTranslation')} />
               </SelectTrigger>
               <SelectContent className="bg-background border shadow-lg z-50 max-h-[300px]">
@@ -233,7 +233,7 @@ export default function TranslationReaderPage() {
                   key={ayah.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.02 }}
+                  transition={{ delay: Math.min(index * 0.02, 0.3) }}
                 >
                   <Card className="hover:shadow-md transition-shadow">
                     <CardContent className="p-4 md:p-6">
@@ -296,7 +296,7 @@ export default function TranslationReaderPage() {
               disabled={surahNum <= 1}
               className="flex-1"
             >
-              <ChevronRight className="w-4 h-4 ml-2" />
+              <ChevronRight className="w-4 h-4 ms-2" />
               {t('previousSurah')}
             </Button>
             <Button
@@ -306,7 +306,7 @@ export default function TranslationReaderPage() {
               className="flex-1"
             >
               {t('nextSurah')}
-              <ChevronLeft className="w-4 h-4 mr-2" />
+              <ChevronLeft className="w-4 h-4 me-2" />
             </Button>
           </div>
         </div>

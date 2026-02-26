@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
   BookOpen,
   Search,
@@ -30,6 +30,11 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import {
   HisnChapter,
   HisnDhikr,
@@ -271,33 +276,24 @@ export default function HisnMuslimPage() {
 
           {/* Search */}
           <div className="relative max-w-md mx-auto mb-8">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder={t('searchAdhkarPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pr-10 text-right"
+              className="pe-10 text-right"
               dir={direction}
             />
           </div>
 
           {/* Selected Chapter Modal */}
-          <AnimatePresence>
-            {selectedChapter && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-0 md:p-4"
-                onClick={closeChapter}
-              >
-                <motion.div
-                  initial={{ scale: 0.9, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  exit={{ scale: 0.9, opacity: 0 }}
-                  className="bg-background rounded-none md:rounded-2xl w-full h-full md:w-auto md:max-w-4xl md:max-h-[85vh] md:h-auto overflow-hidden flex flex-col"
-                  onClick={(e) => e.stopPropagation()}
-                >
+          <Dialog open={!!selectedChapter} onOpenChange={(open) => { if (!open) closeChapter(); }}>
+            <DialogContent
+              hideClose
+              className="p-0 gap-0 rounded-none md:rounded-2xl w-full h-full md:w-auto md:max-w-4xl md:max-h-[85vh] md:h-auto overflow-hidden flex flex-col max-w-none"
+            >
+              {selectedChapter && (
+                <>
                   {/* Header */}
                   <div className={`bg-primary text-primary-foreground p-4 flex items-center justify-between ${!hasMultipleAdhkar ? 'w-full' : ''}`}>
                     <Button
@@ -305,18 +301,20 @@ export default function HisnMuslimPage() {
                       size="icon"
                       onClick={closeChapter}
                       className="text-primary-foreground hover:bg-primary-foreground/20"
+                      aria-label={t('close')}
                     >
                       <X className="h-5 w-5" />
                     </Button>
-                    <h2 className="font-arabic text-lg font-bold flex-1 text-center">
+                    <DialogTitle className="font-arabic text-lg font-bold flex-1 text-center text-primary-foreground tracking-normal">
                       {selectedChapter.title}
-                    </h2>
+                    </DialogTitle>
                     <div className="flex gap-2">
                       <Button
                         variant="ghost"
                         size="icon"
                         onClick={toggleMute}
                         className="text-primary-foreground hover:bg-primary-foreground/20"
+                        aria-label={isMuted ? t('unmute') : t('mute')}
                       >
                         {isMuted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
                       </Button>
@@ -325,6 +323,7 @@ export default function HisnMuslimPage() {
                         size="icon"
                         onClick={playCurrentDhikrAudio}
                         className="text-primary-foreground hover:bg-primary-foreground/20"
+                        aria-label={isPlaying ? t('pause') : t('play')}
                       >
                         {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
                       </Button>
@@ -424,7 +423,7 @@ export default function HisnMuslimPage() {
 
                                 {/* Scrollable text — wrap + scroll when long; centered; single azkar: tighter max height */}
                                 <ScrollArea className={`min-h-0 -mx-1 px-1 shrink-0 ${hasMultipleAdhkar ? 'max-h-[min(40vh,320px)]' : 'max-h-[min(28vh,240px)]'}`}>
-                                  <div className="space-y-4 pr-2 flex flex-col items-center text-center max-w-full">
+                                  <div className="space-y-4 pe-2 flex flex-col items-center text-center max-w-full">
                                     <p
                                       className={`font-arabic text-foreground w-full ${(currentDhikr?.ARABIC_TEXT?.length ?? 0) > 400 ? 'text-lg md:text-xl' : (currentDhikr?.ARABIC_TEXT?.length ?? 0) > 200 ? 'text-xl md:text-2xl' : 'text-2xl md:text-3xl'}`}
                                       dir={direction}
@@ -479,7 +478,7 @@ export default function HisnMuslimPage() {
                                 onClick={prevDhikr}
                                 disabled={currentDhikrIndex === 0}
                               >
-                                <ChevronRight className="h-4 w-4 ml-2" />
+                                <ChevronRight className="h-4 w-4 ms-2" />
                                 {t('previous')}
                               </Button>
                               <Button
@@ -488,7 +487,7 @@ export default function HisnMuslimPage() {
                                 disabled={currentDhikrIndex === selectedChapter.adhkar.length - 1}
                               >
                                 {t('next')}
-                                <ChevronLeft className="h-4 w-4 mr-2" />
+                                <ChevronLeft className="h-4 w-4 me-2" />
                               </Button>
                             </div>
                           )}
@@ -510,10 +509,10 @@ export default function HisnMuslimPage() {
                       </div>
                     )}
                   </div>
-                </motion.div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+                </>
+              )}
+            </DialogContent>
+          </Dialog>
 
           {/* Loading State */}
           {loading ? (
@@ -530,6 +529,9 @@ export default function HisnMuslimPage() {
                   key={chapter.id}
                   className="cursor-pointer hover:shadow-lg transition-all hover:border-primary/50"
                   onClick={() => openChapter(chapter)}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openChapter(chapter); } }}
+                  tabIndex={0}
+                  role="button"
                 >
                   <CardContent className="p-4">
                     <div className="flex items-center gap-3">
@@ -575,6 +577,9 @@ export default function HisnMuslimPage() {
                           key={chapter.id}
                           className="cursor-pointer hover:shadow-lg transition-all hover:border-primary/50"
                           onClick={() => openChapter(chapter)}
+                          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openChapter(chapter); } }}
+                          tabIndex={0}
+                          role="button"
                         >
                           <CardContent className="p-4">
                             <div className="flex items-center justify-between gap-2">
