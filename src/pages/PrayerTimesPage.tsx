@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { MapPin, Clock, Loader2, RefreshCw, Search, X, Bell, BellOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -28,14 +28,14 @@ import {
 } from '@/lib/prayerNotifications';
 
 const prayerIcons = {
-  Fajr: '🌙',
-  Sunrise: '🌅',
-  Dhuhr: '☀️',
-  Asr: '🌤️',
-  Maghrib: '🌇',
-  Isha: '🌃',
-  Midnight: '🌌',
-  LastThird: '✨',
+  Fajr: 'ðŸŒ™',
+  Sunrise: 'ðŸŒ…',
+  Dhuhr: 'â˜€ï¸',
+  Asr: 'ðŸŒ¤ï¸',
+  Maghrib: 'ðŸŒ‡',
+  Isha: 'ðŸŒƒ',
+  Midnight: 'ðŸŒŒ',
+  LastThird: 'âœ¨',
 };
 
 
@@ -220,8 +220,6 @@ export default function PrayerTimesPage() {
                 )}
               </div>
             )}
-          </div>
-          )}
 
           {!location ? (
             <motion.div
