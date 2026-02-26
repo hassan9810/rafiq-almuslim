@@ -315,7 +315,7 @@ export async function fetchAyahTimings(reciterId: number, surahNumber: number): 
 // Fetch page ayahs with Arabic text (simple edition - same as surah reader)
 export async function fetchPageAyahs(pageNumber: number): Promise<PageAyahs | null> {
   try {
-    const response = await fetch(`${QURAN_API}/page/${pageNumber}`);
+    const response = await fetch(`${QURAN_API}/page/${pageNumber}/quran-simple`);
     const data = await response.json();
     
     if (data.data && data.data.ayahs) {
@@ -342,7 +342,7 @@ export async function fetchPageWithTranslation(
 ): Promise<PageAyahs | null> {
   try {
     const [arabicRes, translationRes] = await Promise.all([
-      fetch(`${QURAN_API}/page/${pageNumber}`),
+      fetch(`${QURAN_API}/page/${pageNumber}/quran-simple`),
       fetch(`${QURAN_API}/page/${pageNumber}/${translationEdition}`)
     ]);
     
