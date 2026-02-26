@@ -387,7 +387,7 @@ export default function TextMushafPage() {
                     </div>
                     {/* Bismillah - except for Surah 9 (At-Tawbah) */}
                     {parseInt(surahNum) !== 9 && parseInt(surahNum) !== 1 && (
-                      <div className="bismillah-golden text-2xl md:text-3xl mb-4 uthmani-text">
+                      <div className="bismillah-golden text-2xl md:text-3xl mb-4 font-arabic">
                         بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
                       </div>
                     )}
@@ -396,7 +396,7 @@ export default function TextMushafPage() {
 
                 {/* Ayahs */}
                 <div 
-                  className="uthmani-text text-right"
+                  className="font-arabic text-right"
                   style={{
                     fontSize: 'var(--quran-font-size, 1.75rem)',
                     lineHeight: 'var(--quran-line-height, 2.5)',
