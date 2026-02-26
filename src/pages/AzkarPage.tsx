@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sun, Moon, Bed, Plane, RotateCcw, Check, ChevronLeft, ChevronRight, Vibrate, Mic2 } from 'lucide-react';
+import { Sun, Moon, Bed, Plane, RotateCcw, Check, ChevronLeft, ChevronRight, Vibrate, Mic2, BarChart3, ArrowRight } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAppStore } from '@/store/useAppStore';
 import { useAzkarStore, type AzkarCategory as StoreAzkarCategory } from '@/store/useAzkarStore';
@@ -218,6 +219,28 @@ export default function AzkarPage() {
                             {t('vibrate')}
                           </Button>
                         </div>
+
+                        {/* Link to Advanced Tasbeeh */}
+                        <Link to="/tasbeeh">
+                          <div className="mt-4 p-4 rounded-xl border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors cursor-pointer">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                                  <BarChart3 className="w-5 h-5 text-primary" />
+                                </div>
+                                <div className="text-start">
+                                  <p className="text-sm font-semibold text-foreground">
+                                    {language === 'ar' ? 'المسبحة المتقدمة' : 'Advanced Tasbeeh'}
+                                  </p>
+                                  <p className="text-xs text-muted-foreground">
+                                    {language === 'ar' ? 'إحصائيات يومية • أهداف • تتبع تقدمك' : 'Daily stats • Goals • Track your progress'}
+                                  </p>
+                                </div>
+                              </div>
+                              <ArrowRight className="w-5 h-5 text-muted-foreground" />
+                            </div>
+                          </div>
+                        </Link>
 
                         {/* Quick Azkar */}
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-8">
