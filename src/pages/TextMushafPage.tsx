@@ -731,13 +731,13 @@ export default function TextMushafPage() {
         )}
 
         {/* Main Content */}
-        <div className={`flex-1 ${isFullscreen ? 'p-4' : 'container max-w-7xl py-6'}`}>
+        <div className={`flex-1 ${isFullscreen ? 'p-4 pt-24' : 'container max-w-7xl py-6'}`}>
           {/* Navigation Arrows */}
           {/* Right arrow - in Arabic goes to previous page (lower number) */}
           <Button
             variant="ghost"
             size="icon"
-            className={`fixed right-2 top-1/2 -translate-y-1/2 z-30 shadow-lg h-12 w-12 rounded-full ${
+            className={`fixed right-2 z-30 shadow-lg h-12 w-12 rounded-full ${isFullscreen ? 'top-[60%]' : 'top-1/2'} -translate-y-1/2 ${
               settings.nightMode 
                 ? '!bg-neutral-800 hover:!bg-neutral-700 !text-neutral-100' 
                 : 'bg-card/80 hover:bg-card'
@@ -752,7 +752,7 @@ export default function TextMushafPage() {
           <Button
             variant="ghost"
             size="icon"
-            className={`fixed left-2 top-1/2 -translate-y-1/2 z-30 shadow-lg h-12 w-12 rounded-full ${
+            className={`fixed left-2 z-30 shadow-lg h-12 w-12 rounded-full ${isFullscreen ? 'top-[60%]' : 'top-1/2'} -translate-y-1/2 ${
               settings.nightMode 
                 ? '!bg-neutral-800 hover:!bg-neutral-700 !text-neutral-100' 
                 : 'bg-card/80 hover:bg-card'
