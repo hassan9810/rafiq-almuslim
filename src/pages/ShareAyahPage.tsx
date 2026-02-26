@@ -16,12 +16,12 @@ import { useAppStore } from '@/store/useAppStore';
 import { fetchSurahs, fetchSurah, type Surah, type SurahData } from '@/lib/quranApi';
 
 const THEMES = [
-  { id: 'emerald', label: 'أخضر', labelEn: 'Emerald', bg: 'linear-gradient(135deg, #064e3b 0%, #065f46 50%, #047857 100%)', text: '#ecfdf5', accent: '#d4a574' },
-  { id: 'gold', label: 'ذهبي', labelEn: 'Gold', bg: 'linear-gradient(135deg, #451a03 0%, #78350f 50%, #92400e 100%)', text: '#fefce8', accent: '#f59e0b' },
-  { id: 'midnight', label: 'ليلي', labelEn: 'Midnight', bg: 'linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%)', text: '#f1f5f9', accent: '#94a3b8' },
-  { id: 'rose', label: 'وردي', labelEn: 'Rose', bg: 'linear-gradient(135deg, #4c0519 0%, #881337 50%, #9f1239 100%)', text: '#fff1f2', accent: '#fda4af' },
-  { id: 'ocean', label: 'بحري', labelEn: 'Ocean', bg: 'linear-gradient(135deg, #0c4a6e 0%, #075985 50%, #0369a1 100%)', text: '#f0f9ff', accent: '#7dd3fc' },
-  { id: 'parchment', label: 'رقي', labelEn: 'Parchment', bg: 'linear-gradient(135deg, #f5f0e8 0%, #ede5d8 50%, #e8dcc8 100%)', text: '#1c1917', accent: '#92400e' },
+  { id: 'emerald', label: 'أخضر', labelEn: 'Emerald', bg: 'linear-gradient(135deg, #064e3b 0%, #065f46 50%, #047857 100%)', text: '#ecfdf5', accent: '#d4a574', colors: ['#064e3b', '#065f46', '#047857'] },
+  { id: 'gold', label: 'ذهبي', labelEn: 'Gold', bg: 'linear-gradient(135deg, #451a03 0%, #78350f 50%, #92400e 100%)', text: '#fefce8', accent: '#f59e0b', colors: ['#451a03', '#78350f', '#92400e'] },
+  { id: 'midnight', label: 'ليلي', labelEn: 'Midnight', bg: 'linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%)', text: '#f1f5f9', accent: '#94a3b8', colors: ['#0f172a', '#1e293b', '#334155'] },
+  { id: 'rose', label: 'وردي', labelEn: 'Rose', bg: 'linear-gradient(135deg, #4c0519 0%, #881337 50%, #9f1239 100%)', text: '#fff1f2', accent: '#fda4af', colors: ['#4c0519', '#881337', '#9f1239'] },
+  { id: 'ocean', label: 'بحري', labelEn: 'Ocean', bg: 'linear-gradient(135deg, #0c4a6e 0%, #075985 50%, #0369a1 100%)', text: '#f0f9ff', accent: '#7dd3fc', colors: ['#0c4a6e', '#075985', '#0369a1'] },
+  { id: 'parchment', label: 'رقي', labelEn: 'Parchment', bg: 'linear-gradient(135deg, #f5f0e8 0%, #ede5d8 50%, #e8dcc8 100%)', text: '#1c1917', accent: '#92400e', colors: ['#f5f0e8', '#ede5d8', '#e8dcc8'] },
 ];
 
 const FONTS = [
@@ -37,7 +37,8 @@ export default function ShareAyahPage() {
 
   const [surahNum, setSurahNum] = useState(1);
   const [surahData, setSurahData] = useState<SurahData | null>(null);
-  const [ayahNum, setAyahNum] = useState(1);
+  const [ayahFrom, setAyahFrom] = useState(1);
+  const [ayahTo, setAyahTo] = useState(1);
   const [loading, setLoading] = useState(false);
   const [themeId, setThemeId] = useState('emerald');
   const [fontId, setFontId] = useState('amiri');
@@ -48,34 +49,43 @@ export default function ShareAyahPage() {
   const currentTheme = THEMES.find(t => t.id === themeId) || THEMES[0];
   const currentFont = FONTS.find(f => f.id === fontId) || FONTS[0];
 
-  // Load surahs
   useEffect(() => {
     if (surahs.length === 0) fetchSurahs().then(data => setSurahs(data));
   }, [surahs.length, setSurahs]);
 
-  // Load surah data
   useEffect(() => {
     setLoading(true);
     fetchSurah(surahNum).then(data => {
       setSurahData(data);
-      setAyahNum(1);
+      setAyahFrom(1);
+      setAyahTo(1);
       setLoading(false);
     });
   }, [surahNum]);
 
-  const currentAyah = surahData?.ayahs.find(a => a.numberInSurah === ayahNum);
-  const currentSurah = surahs.find(s => s.number === surahNum);
   const totalAyahs = surahData?.numberOfAyahs || 1;
+  const currentSurah = surahs.find(s => s.number === surahNum);
+
+  // Get selected ayahs text
+  const selectedAyahs = surahData?.ayahs.filter(
+    a => a.numberInSurah >= ayahFrom && a.numberInSurah <= ayahTo
+  ) || [];
+
+  const combinedText = selectedAyahs.map(a => `${a.text} ﴿${a.numberInSurah}﴾`).join(' ');
 
   const randomAyah = () => {
     const randomSurah = Math.floor(Math.random() * 114) + 1;
     setSurahNum(randomSurah);
   };
 
-  // Generate image on canvas
+  // Ensure ayahTo >= ayahFrom
+  useEffect(() => {
+    if (ayahTo < ayahFrom) setAyahTo(ayahFrom);
+  }, [ayahFrom, ayahTo]);
+
   const generateImage = useCallback(() => {
     const canvas = canvasRef.current;
-    if (!canvas || !currentAyah) return;
+    if (!canvas || selectedAyahs.length === 0) return;
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
@@ -87,31 +97,10 @@ export default function ShareAyahPage() {
 
     // Background gradient
     const grad = ctx.createLinearGradient(0, 0, W, H);
-    if (currentTheme.id === 'parchment') {
-      grad.addColorStop(0, '#f5f0e8');
-      grad.addColorStop(0.5, '#ede5d8');
-      grad.addColorStop(1, '#e8dcc8');
-    } else if (currentTheme.id === 'emerald') {
-      grad.addColorStop(0, '#064e3b');
-      grad.addColorStop(0.5, '#065f46');
-      grad.addColorStop(1, '#047857');
-    } else if (currentTheme.id === 'gold') {
-      grad.addColorStop(0, '#451a03');
-      grad.addColorStop(0.5, '#78350f');
-      grad.addColorStop(1, '#92400e');
-    } else if (currentTheme.id === 'midnight') {
-      grad.addColorStop(0, '#0f172a');
-      grad.addColorStop(0.5, '#1e293b');
-      grad.addColorStop(1, '#334155');
-    } else if (currentTheme.id === 'rose') {
-      grad.addColorStop(0, '#4c0519');
-      grad.addColorStop(0.5, '#881337');
-      grad.addColorStop(1, '#9f1239');
-    } else {
-      grad.addColorStop(0, '#0c4a6e');
-      grad.addColorStop(0.5, '#075985');
-      grad.addColorStop(1, '#0369a1');
-    }
+    const colors = currentTheme.colors;
+    grad.addColorStop(0, colors[0]);
+    grad.addColorStop(0.5, colors[1]);
+    grad.addColorStop(1, colors[2]);
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, W, H);
 
@@ -123,26 +112,27 @@ export default function ShareAyahPage() {
 
     // Corner decorations
     const cornerSize = 30;
-    [
-      [60, 60], [W - 60, 60], [60, H - 60], [W - 60, H - 60]
-    ].forEach(([x, y]) => {
+    [[60, 60], [W - 60, 60], [60, H - 60], [W - 60, H - 60]].forEach(([x, y]) => {
       ctx.beginPath();
       ctx.arc(x, y, cornerSize / 2, 0, Math.PI * 2);
       ctx.fillStyle = currentTheme.accent;
       ctx.fill();
     });
 
-    // Bismillah at top
+    // Bismillah
     ctx.fillStyle = currentTheme.accent;
     ctx.font = `24px ${currentFont.family}`;
     ctx.textAlign = 'center';
     ctx.direction = 'rtl';
     ctx.fillText('﷽', W / 2, 130);
 
-    // Ayah text - word wrap
-    const text = currentAyah.text;
+    // Combined ayah text - word wrap
+    const text = combinedText;
+    // Auto-adjust font size for multiple ayahs
+    const adjustedSize = selectedAyahs.length > 3 ? Math.min(fontSize, 22) : selectedAyahs.length > 1 ? Math.min(fontSize, 26) : fontSize;
+    
     ctx.fillStyle = currentTheme.text;
-    ctx.font = `${fontSize}px ${currentFont.family}`;
+    ctx.font = `${adjustedSize}px ${currentFont.family}`;
     ctx.textAlign = 'center';
     ctx.direction = 'rtl';
 
@@ -163,42 +153,41 @@ export default function ShareAyahPage() {
     }
     if (currentLine) lines.push(currentLine);
 
-    const lineHeight = fontSize * 1.8;
+    const lineHeight = adjustedSize * 1.8;
     const totalTextHeight = lines.length * lineHeight;
-    const startY = (H / 2) - (totalTextHeight / 2) + fontSize;
+    const startY = (H / 2) - (totalTextHeight / 2) + adjustedSize;
 
     lines.forEach((line, i) => {
       ctx.fillText(line, W / 2, startY + i * lineHeight);
     });
 
-    // Ayah number decoration
-    const ayahBadge = `﴿${ayahNum}﴾`;
+    // Ayah range badge
+    const rangeLabel = ayahFrom === ayahTo ? `﴿${ayahFrom}﴾` : `﴿${ayahFrom} - ${ayahTo}﴾`;
     ctx.fillStyle = currentTheme.accent;
     ctx.font = `22px ${currentFont.family}`;
-    ctx.fillText(ayahBadge, W / 2, startY + lines.length * lineHeight + 20);
+    ctx.fillText(rangeLabel, W / 2, startY + lines.length * lineHeight + 20);
 
-    // Surah name at bottom
+    // Surah name
     const surahName = currentSurah ? (isAr ? currentSurah.name : currentSurah.englishName) : '';
     ctx.fillStyle = currentTheme.accent;
     ctx.font = `20px ${currentFont.family}`;
     ctx.fillText(`— ${surahName} —`, W / 2, H - 100);
 
-    // App watermark
+    // Watermark
     ctx.fillStyle = currentTheme.text + '80';
     ctx.font = `14px 'Noto Sans', sans-serif`;
     ctx.fillText('rafiqalmuslim.lovable.app', W / 2, H - 65);
-  }, [currentAyah, currentTheme, currentFont, fontSize, ayahNum, currentSurah, isAr]);
+  }, [selectedAyahs, combinedText, currentTheme, currentFont, fontSize, ayahFrom, ayahTo, currentSurah, isAr]);
 
-  // Regenerate image when settings change
   useEffect(() => {
-    if (currentAyah) generateImage();
-  }, [currentAyah, generateImage]);
+    if (selectedAyahs.length > 0) generateImage();
+  }, [selectedAyahs.length, generateImage]);
 
   const downloadImage = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const link = document.createElement('a');
-    link.download = `ayah-${surahNum}-${ayahNum}.png`;
+    link.download = `ayah-${surahNum}-${ayahFrom}${ayahTo !== ayahFrom ? `-${ayahTo}` : ''}.png`;
     link.href = canvas.toDataURL('image/png');
     link.click();
   };
@@ -210,11 +199,8 @@ export default function ShareAyahPage() {
     try {
       const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/png'));
       if (blob && navigator.share) {
-        const file = new File([blob], `ayah-${surahNum}-${ayahNum}.png`, { type: 'image/png' });
-        await navigator.share({
-          title: isAr ? 'مشاركة آية' : 'Share Ayah',
-          files: [file],
-        });
+        const file = new File([blob], `ayah-${surahNum}-${ayahFrom}.png`, { type: 'image/png' });
+        await navigator.share({ title: isAr ? 'مشاركة آية' : 'Share Ayah', files: [file] });
       } else {
         downloadImage();
       }
@@ -247,14 +233,14 @@ export default function ShareAyahPage() {
               {isAr ? 'مشاركة آية' : 'Share Ayah'}
             </h1>
             <p className="text-muted-foreground text-sm">
-              {isAr ? 'شارك آية كصورة جميلة على السوشيال ميديا' : 'Share a verse as a beautiful image on social media'}
+              {isAr ? 'شارك آية أو أكثر كصورة جميلة على السوشيال ميديا' : 'Share one or more verses as a beautiful image'}
             </p>
           </div>
 
-          {/* Selectors */}
-          <div className="grid grid-cols-2 gap-3 mb-4">
+          {/* Surah selector */}
+          <div className="flex gap-2 mb-3">
             <Select dir={direction} value={surahNum.toString()} onValueChange={v => setSurahNum(parseInt(v))}>
-              <SelectTrigger><SelectValue placeholder={isAr ? 'السورة' : 'Surah'} /></SelectTrigger>
+              <SelectTrigger className="flex-1"><SelectValue placeholder={isAr ? 'السورة' : 'Surah'} /></SelectTrigger>
               <SelectContent className="max-h-60 overflow-y-auto bg-popover">
                 {(surahs.length > 0 ? surahs : Array.from({ length: 114 }, (_, i) => ({
                   number: i + 1, name: `سورة ${i + 1}`, englishName: `Surah ${i + 1}`
@@ -265,23 +251,45 @@ export default function ShareAyahPage() {
                 ))}
               </SelectContent>
             </Select>
+            <Button variant="outline" size="icon" onClick={randomAyah} title={isAr ? 'آية عشوائية' : 'Random'}>
+              <RefreshCw className="w-4 h-4" />
+            </Button>
+          </div>
 
-            <div className="flex gap-2">
-              <Select dir={direction} value={ayahNum.toString()} onValueChange={v => setAyahNum(parseInt(v))}>
-                <SelectTrigger className="flex-1"><SelectValue /></SelectTrigger>
+          {/* Ayah range selector */}
+          <div className="grid grid-cols-2 gap-3 mb-4">
+            <div>
+              <label className="text-xs text-muted-foreground mb-1 block">{isAr ? 'من آية' : 'From Ayah'}</label>
+              <Select dir={direction} value={ayahFrom.toString()} onValueChange={v => setAyahFrom(parseInt(v))}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent className="max-h-60 overflow-y-auto bg-popover">
                   {Array.from({ length: totalAyahs }, (_, i) => i + 1).map(n => (
-                    <SelectItem key={n} value={n.toString()}>
-                      {isAr ? `آية ${n}` : `Ayah ${n}`}
-                    </SelectItem>
+                    <SelectItem key={n} value={n.toString()}>{n}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-              <Button variant="outline" size="icon" onClick={randomAyah} title={isAr ? 'آية عشوائية' : 'Random'}>
-                <RefreshCw className="w-4 h-4" />
-              </Button>
+            </div>
+            <div>
+              <label className="text-xs text-muted-foreground mb-1 block">{isAr ? 'إلى آية' : 'To Ayah'}</label>
+              <Select dir={direction} value={ayahTo.toString()} onValueChange={v => setAyahTo(parseInt(v))}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent className="max-h-60 overflow-y-auto bg-popover">
+                  {Array.from({ length: totalAyahs - ayahFrom + 1 }, (_, i) => ayahFrom + i).map(n => (
+                    <SelectItem key={n} value={n.toString()}>{n}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
+
+          {/* Selected count badge */}
+          {ayahTo > ayahFrom && (
+            <div className="mb-3 text-center">
+              <Badge variant="secondary">
+                {isAr ? `${ayahTo - ayahFrom + 1} آيات محددة` : `${ayahTo - ayahFrom + 1} ayahs selected`}
+              </Badge>
+            </div>
+          )}
 
           {/* Preview */}
           <div className="bg-card rounded-2xl border border-border/50 p-3 mb-4">
@@ -302,9 +310,7 @@ export default function ShareAyahPage() {
           <div className="bg-card rounded-2xl border border-border/50 p-4 mb-4">
             <div className="flex items-center gap-2 mb-3">
               <Palette className="w-4 h-4 text-primary" />
-              <span className="text-sm font-semibold text-foreground">
-                {isAr ? 'المظهر' : 'Theme'}
-              </span>
+              <span className="text-sm font-semibold text-foreground">{isAr ? 'المظهر' : 'Theme'}</span>
             </div>
             <div className="flex gap-2 flex-wrap">
               {THEMES.map(theme => (
@@ -320,46 +326,30 @@ export default function ShareAyahPage() {
 
             <div className="flex items-center gap-2 mt-4 mb-2">
               <Type className="w-4 h-4 text-primary" />
-              <span className="text-sm font-semibold text-foreground">
-                {isAr ? 'الخط' : 'Font'}
-              </span>
+              <span className="text-sm font-semibold text-foreground">{isAr ? 'الخط' : 'Font'}</span>
             </div>
             <div className="flex gap-2">
               {FONTS.map(f => (
-                <Button
-                  key={f.id}
-                  variant={fontId === f.id ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setFontId(f.id)}
-                >
+                <Button key={f.id} variant={fontId === f.id ? 'default' : 'outline'} size="sm" onClick={() => setFontId(f.id)}>
                   {f.label}
                 </Button>
               ))}
             </div>
 
             <div className="flex items-center gap-3 mt-4">
-              <span className="text-xs text-muted-foreground whitespace-nowrap">
-                {isAr ? 'حجم الخط:' : 'Font size:'}
-              </span>
-              <Slider
-                value={[fontSize]}
-                min={18}
-                max={42}
-                step={2}
-                onValueChange={([v]) => setFontSize(v)}
-                className="flex-1"
-              />
+              <span className="text-xs text-muted-foreground whitespace-nowrap">{isAr ? 'حجم الخط:' : 'Font size:'}</span>
+              <Slider value={[fontSize]} min={18} max={42} step={2} onValueChange={([v]) => setFontSize(v)} className="flex-1" />
               <span className="text-xs text-muted-foreground w-8">{fontSize}</span>
             </div>
           </div>
 
           {/* Action Buttons */}
           <div className="flex gap-3">
-            <Button className="flex-1 gap-2" onClick={shareImage} disabled={generating || !currentAyah}>
+            <Button className="flex-1 gap-2" onClick={shareImage} disabled={generating || selectedAyahs.length === 0}>
               {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Share2 className="w-4 h-4" />}
               {isAr ? 'مشاركة' : 'Share'}
             </Button>
-            <Button variant="outline" className="flex-1 gap-2" onClick={downloadImage} disabled={!currentAyah}>
+            <Button variant="outline" className="flex-1 gap-2" onClick={downloadImage} disabled={selectedAyahs.length === 0}>
               <Download className="w-4 h-4" />
               {isAr ? 'تحميل' : 'Download'}
             </Button>
