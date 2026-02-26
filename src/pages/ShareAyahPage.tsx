@@ -157,13 +157,13 @@ export default function ShareAyahPage() {
     // Find the best font size: start from user's choice, shrink only if text overflows
     let finalSize = scaledFontSize;
     let lines = computeLines(finalSize);
-    let lineHeight = finalSize * 1.7;
+    let lineHeight = finalSize * 2.1;
     let totalTextHeight = lines.length * lineHeight;
 
     while (totalTextHeight > availableHeight && finalSize > 16 * scale) {
       finalSize -= 2;
       lines = computeLines(finalSize);
-      lineHeight = finalSize * 1.7;
+      lineHeight = finalSize * 2.1;
       totalTextHeight = lines.length * lineHeight;
     }
 
