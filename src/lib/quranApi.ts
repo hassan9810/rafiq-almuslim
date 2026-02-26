@@ -63,7 +63,7 @@ export async function fetchSurahs(): Promise<Surah[]> {
 // Fetch a specific surah with Arabic text
 export async function fetchSurah(surahNumber: number): Promise<SurahData | null> {
   try {
-    const response = await fetch(`${QURAN_API}/surah/${surahNumber}`);
+    const response = await fetch(`${QURAN_API}/surah/${surahNumber}/quran-simple`);
     const data = await response.json();
     return data.data;
   } catch (error) {
@@ -79,7 +79,7 @@ export async function fetchSurahWithTranslation(
 ): Promise<{ arabic: SurahData; translation: SurahData } | null> {
   try {
     const [arabicRes, translationRes] = await Promise.all([
-      fetch(`${QURAN_API}/surah/${surahNumber}`),
+      fetch(`${QURAN_API}/surah/${surahNumber}/quran-simple`),
       fetch(`${QURAN_API}/surah/${surahNumber}/${edition}`)
     ]);
     
