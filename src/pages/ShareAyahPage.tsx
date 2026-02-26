@@ -128,8 +128,8 @@ export default function ShareAyahPage() {
 
     // Combined ayah text - word wrap
     const text = combinedText;
-    // Auto-adjust font size for multiple ayahs
-    const adjustedSize = selectedAyahs.length > 3 ? Math.min(fontSize, 22) : selectedAyahs.length > 1 ? Math.min(fontSize, 26) : fontSize;
+    // Auto-adjust font size for multiple ayahs - reduce proportionally
+    const adjustedSize = selectedAyahs.length > 5 ? Math.round(fontSize * 0.6) : selectedAyahs.length > 3 ? Math.round(fontSize * 0.75) : selectedAyahs.length > 1 ? Math.round(fontSize * 0.85) : fontSize;
     
     ctx.fillStyle = currentTheme.text;
     ctx.font = `${adjustedSize}px ${currentFont.family}`;
