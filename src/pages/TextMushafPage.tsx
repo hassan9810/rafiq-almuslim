@@ -105,7 +105,24 @@ export default function TextMushafPage() {
   const [showSettings, setShowSettings] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [showBookmarksList, setShowBookmarksList] = useState(false);
-  const [showControls, setShowControls] = useState(true);
+  const [showControls, setShowControls] = useState(false);
+  const hideControlsTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Auto-hide controls in fullscreen
+  const showControlsTemporarily = useCallback(() => {
+    if (!isFullscreen) return;
+    setShowControls(true);
+    if (hideControlsTimer.current) clearTimeout(hideControlsTimer.current);
+    hideControlsTimer.current = setTimeout(() => setShowControls(false), 3000);
+  }, [isFullscreen]);
+
+  // Reset controls visibility when exiting fullscreen
+  useEffect(() => {
+    if (!isFullscreen) {
+      setShowControls(false);
+      if (hideControlsTimer.current) clearTimeout(hideControlsTimer.current);
+    }
+  }, [isFullscreen]);
   
   // Settings
   const [settings, setSettings] = useState<TextMushafSettings>(() => {
@@ -477,9 +494,9 @@ export default function TextMushafPage() {
         )}
 
         {/* Toolbar */}
-        <div className={`container max-w-7xl ${isFullscreen ? 'absolute top-4 left-1/2 -translate-x-1/2 z-50' : ''}`}>
+        <div className={`container max-w-7xl ${isFullscreen ? 'absolute top-4 left-1/2 -translate-x-1/2 z-50 transition-opacity duration-300' : ''} ${isFullscreen && !showControls ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
           <AnimatePresence>
-            {(showControls || !isFullscreen) && (
+            {(!isFullscreen || showControls) && (
               <motion.div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -731,13 +748,19 @@ export default function TextMushafPage() {
         )}
 
         {/* Main Content */}
-        <div className={`flex-1 ${isFullscreen ? 'p-4 pt-24' : 'container max-w-7xl py-6'}`}>
+        <div 
+          className={`flex-1 ${isFullscreen ? 'p-4 pt-8' : 'container max-w-7xl py-6'}`}
+          onMouseMove={isFullscreen ? showControlsTemporarily : undefined}
+          onTouchStart={isFullscreen ? showControlsTemporarily : undefined}
+        >
           {/* Navigation Arrows */}
-          {/* Right arrow - in Arabic goes to previous page (lower number) */}
+          {/* Right arrow */}
           <Button
             variant="ghost"
             size="icon"
-            className={`fixed right-2 z-30 shadow-lg h-12 w-12 rounded-full ${isFullscreen ? 'top-[60%]' : 'top-1/2'} -translate-y-1/2 ${
+            className={`fixed right-2 z-30 shadow-lg h-12 w-12 rounded-full transition-opacity duration-300 ${isFullscreen ? 'top-[60%]' : 'top-1/2'} -translate-y-1/2 ${
+              isFullscreen && !showControls ? 'opacity-0 pointer-events-none' : 'opacity-100'
+            } ${
               settings.nightMode 
                 ? '!bg-neutral-800 hover:!bg-neutral-700 !text-neutral-100' 
                 : 'bg-card/80 hover:bg-card'
@@ -748,11 +771,13 @@ export default function TextMushafPage() {
             <ChevronRight className="w-6 h-6" />
           </Button>
 
-          {/* Left arrow - in Arabic goes to next page (higher number) */}
+          {/* Left arrow */}
           <Button
             variant="ghost"
             size="icon"
-            className={`fixed left-2 z-30 shadow-lg h-12 w-12 rounded-full ${isFullscreen ? 'top-[60%]' : 'top-1/2'} -translate-y-1/2 ${
+            className={`fixed left-2 z-30 shadow-lg h-12 w-12 rounded-full transition-opacity duration-300 ${isFullscreen ? 'top-[60%]' : 'top-1/2'} -translate-y-1/2 ${
+              isFullscreen && !showControls ? 'opacity-0 pointer-events-none' : 'opacity-100'
+            } ${
               settings.nightMode 
                 ? '!bg-neutral-800 hover:!bg-neutral-700 !text-neutral-100' 
                 : 'bg-card/80 hover:bg-card'
