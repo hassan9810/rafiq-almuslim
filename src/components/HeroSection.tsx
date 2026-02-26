@@ -67,7 +67,7 @@ export function HeroSection() {
     const gregorian =
       now.toLocaleDateString(language === 'ar' ? 'ar-EG' : 'en-US', {
         day: 'numeric', month: 'long', year: 'numeric',
-      }) + ' Ù…';
+      }) + '\u0020\u0645';
     const hijri = now.toLocaleDateString('ar-SA', {
       calendar: 'islamic-umalqura',
       weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
@@ -94,7 +94,8 @@ export function HeroSection() {
     <section className="relative min-h-[75vh] flex flex-col overflow-hidden">
 
       {/* â”€â”€ Background â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
-      <div className="absolute inset-0 hero-gradient islamic-pattern-geo" />
+      <div className="absolute inset-0 hero-gradient" />
+      <div className="absolute inset-0 islamic-pattern-geo" />
 
       {/* Floating soft orbs */}
       <motion.div
@@ -103,7 +104,7 @@ export function HeroSection() {
         transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
       />
       <motion.div
-        className="absolute bottom-12 right-8 w-[28rem] h-[28rem] rounded-full bg-primary-foreground/8 blur-3xl pointer-events-none"
+        className="absolute bottom-12 right-8 w-[28rem] h-[28rem] rounded-full bg-white/8 blur-3xl pointer-events-none"
         animate={shouldReduceMotion ? {} : { scale: [1, 1.15, 1], opacity: [0.15, 0.3, 0.15] }}
         transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
       />
@@ -113,7 +114,7 @@ export function HeroSection() {
 
       {/* Large slowly-rotating Islamic star â€” background right */}
       <motion.div
-        className="absolute right-[-6%] top-1/2 -translate-y-1/2 w-[46%] opacity-[0.09] text-primary-foreground pointer-events-none"
+        className="absolute right-[-6%] top-1/2 -translate-y-1/2 w-[46%] opacity-[0.09] text-white pointer-events-none"
         animate={shouldReduceMotion ? {} : { rotate: 360 }}
         transition={{ duration: 70, repeat: Infinity, ease: 'linear' }}
       >
@@ -146,10 +147,10 @@ export function HeroSection() {
           transition={{ delay: 0.1, type: 'spring', stiffness: 120 }}
           className="bg-primary-foreground/10 backdrop-blur-sm py-2 px-4"
         >
-          <div className="container flex items-center justify-center gap-2 text-primary-foreground/90 dark:text-foreground">
+          <div className="container flex items-center justify-center gap-2 text-white/90">
             <Calendar className="w-4 h-4" />
             <span className="font-arabic text-sm md:text-base">{hijriDate}</span>
-            <span className="text-primary-foreground/50 dark:text-foreground/50">|</span>
+            <span className="text-white/50">|</span>
             <span className="text-sm md:text-base">{gregorianDate}</span>
           </div>
         </motion.div>
@@ -183,7 +184,7 @@ export function HeroSection() {
                 initial={{ opacity: 0, y: 28 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3, type: 'spring', stiffness: 100 }}
-                className="font-arabic text-4xl md:text-5xl lg:text-6xl font-bold text-primary-foreground leading-tight"
+                className="font-arabic text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight"
                 style={{ lineHeight: '1.5' }}
               >
                 {t('welcome')}
@@ -192,7 +193,7 @@ export function HeroSection() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4, type: 'spring', stiffness: 100 }}
-                className="font-arabic text-lg md:text-xl text-primary-foreground/80 max-w-xl"
+                className="font-arabic text-lg md:text-xl text-white/85 max-w-xl"
                 style={{ lineHeight: '1.8' }}
               >
                 {t('heroSubtitle')}
@@ -277,8 +278,8 @@ export function HeroSection() {
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.8 + index * 0.08, type: 'spring', stiffness: 220 }}
                 >
-                  <p className="text-2xl md:text-3xl font-bold text-primary-foreground">{stat.value}</p>
-                  <p className="text-sm text-primary-foreground/70">{stat.label}</p>
+                  <p className="text-2xl md:text-3xl font-bold text-white">{stat.value}</p>
+                  <p className="text-sm text-white/70">{stat.label}</p>
                 </motion.div>
               ))}
             </motion.div>
