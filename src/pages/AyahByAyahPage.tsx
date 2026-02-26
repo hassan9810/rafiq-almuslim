@@ -13,10 +13,10 @@ import {
 } from '@/components/ui/select';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAppStore } from '@/store/useAppStore';
-import { fetchSurahs, type Surah } from '@/lib/quranApi';
+import { fetchSurahs, fetchSurah, type Surah, type SurahData } from '@/lib/quranApi';
 import {
   EVERY_AYAH_RECITERS, RECITER_CATEGORIES,
-  getAyahAudioUrl, getAyahImageUrl, getAyahCount,
+  getAyahAudioUrl, getAyahCount,
   type EveryAyahReciter,
 } from '@/data/everyAyahReciters';
 
@@ -37,7 +37,8 @@ export default function AyahByAyahPage() {
   const [repeatAyah, setRepeatAyah] = useState(false);
   const [volume, setVolume] = useState(1);
   const [isMuted, setIsMuted] = useState(false);
-  const [imgLoading, setImgLoading] = useState(true);
+  const [surahData, setSurahData] = useState<SurahData | null>(null);
+  const [loadingSurah, setLoadingSurah] = useState(false);
 
   const audioRef = useRef<HTMLAudioElement>(null);
   const totalAyahs = getAyahCount(surah);
@@ -48,6 +49,15 @@ export default function AyahByAyahPage() {
       fetchSurahs().then(data => setSurahs(data));
     }
   }, [surahs.length, setSurahs]);
+
+  // Load surah text data
+  useEffect(() => {
+    setLoadingSurah(true);
+    fetchSurah(surah).then(data => {
+      setSurahData(data);
+      setLoadingSurah(false);
+    });
+  }, [surah]);
 
   const currentSurah = surahs.find(s => s.number === surah);
 
@@ -118,7 +128,6 @@ export default function AyahByAyahPage() {
   const goToAyah = (n: number) => {
     if (n >= 1 && n <= totalAyahs) {
       setAyah(n);
-      setImgLoading(true);
     }
   };
 
@@ -206,20 +215,26 @@ export default function AyahByAyahPage() {
             </Select>
           </div>
 
-          {/* Ayah Image */}
-          <div className="relative bg-card rounded-2xl border border-border/50 overflow-hidden mb-6 min-h-[120px] max-h-[300px] flex items-center justify-center">
-            {imgLoading && (
-              <div className="absolute inset-0 flex items-center justify-center bg-card z-10">
+          {/* Ayah Text Display */}
+          <div className="bg-card rounded-2xl border border-border/50 p-6 mb-6 min-h-[120px] flex items-center justify-center">
+            {loadingSurah ? (
+              <div className="flex items-center justify-center py-8">
                 <Loader2 className="w-8 h-8 animate-spin text-primary" />
               </div>
-            )}
-            <img
-              src={getAyahImageUrl(surah, ayah)}
-              alt={`${isAr ? 'آية' : 'Ayah'} ${ayah}`}
-              className="max-w-full max-h-[280px] h-auto object-contain"
-              onLoad={() => setImgLoading(false)}
-              onError={() => setImgLoading(false)}
-            />
+            ) : surahData ? (
+              <AnimatePresence mode="wait">
+                <motion.p
+                  key={ayah}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="font-arabic text-2xl md:text-3xl leading-loose text-foreground text-center"
+                  dir="rtl"
+                >
+                  {surahData.ayahs.find(a => a.numberInSurah === ayah)?.text || ''}
+                </motion.p>
+              </AnimatePresence>
+            ) : null}
           </div>
 
           {/* Ayah Number & Navigation */}
@@ -323,7 +338,7 @@ export default function AyahByAyahPage() {
                   const v = parseInt(e.target.value);
                   if (!isNaN(v) && v >= 1 && v <= totalAyahs) {
                     setAyah(v);
-                    setImgLoading(true);
+                    setAyah(v);
                   }
                 }}
                 className="w-20 h-9 rounded-lg border border-input bg-background px-3 text-center text-sm focus:outline-none focus:ring-2 focus:ring-ring"
@@ -335,7 +350,7 @@ export default function AyahByAyahPage() {
               min={1}
               max={totalAyahs}
               step={1}
-              onValueChange={([v]) => { setAyah(v); setImgLoading(true); }}
+              onValueChange={([v]) => { setAyah(v); }}
               className="w-full"
             />
           </div>
