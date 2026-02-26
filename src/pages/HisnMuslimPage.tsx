@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAppStore } from '@/store/useAppStore';
+import { PageHeader } from '@/components/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
@@ -258,21 +259,11 @@ export default function HisnMuslimPage() {
       <main>
         <div className="container max-w-6xl">
           {/* Page Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-8"
-          >
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-4">
-              <Shield className="w-8 h-8 text-primary" />
-            </div>
-            <h1 className="font-arabic text-3xl md:text-4xl font-bold mb-2">
-              {t('hisnMuslim')}
-            </h1>
-            <p className="font-arabic text-muted-foreground max-w-2xl mx-auto">
-              {t('hisnSubtitle')}
-            </p>
-          </motion.div>
+          <PageHeader
+            icon={Shield}
+            title={t('hisnMuslim')}
+            subtitle={t('hisnSubtitle')}
+          />
 
           {/* Search */}
           <div className="relative max-w-md mx-auto mb-8">
@@ -295,7 +286,9 @@ export default function HisnMuslimPage() {
               {selectedChapter && (
                 <>
                   {/* Header */}
-                  <div className={`bg-primary text-primary-foreground p-4 flex items-center justify-between ${!hasMultipleAdhkar ? 'w-full' : ''}`}>
+                  <div className={`bg-gradient-to-r from-primary to-primary/80 text-primary-foreground p-4 flex items-center justify-between relative ${!hasMultipleAdhkar ? 'w-full' : ''}`}>
+                    {/* Pattern overlay — separate div so it doesn't override the gradient */}
+                    <div className="absolute inset-0 islamic-pattern-light pointer-events-none" />
                     <Button
                       variant="ghost"
                       size="icon"
@@ -399,7 +392,7 @@ export default function HisnMuslimPage() {
 
                         {/* Main azkar content — centered when single azkar; card fits content height when single */}
                         <div className={`flex flex-col min-h-0 ${hasMultipleAdhkar ? 'flex-1 min-w-0' : 'max-w-2xl w-full mx-auto'}`}>
-                          <Card className={`border-2 border-primary/20 bg-primary/5 flex flex-col overflow-hidden ${hasMultipleAdhkar ? 'flex-1 min-h-0' : 'flex-initial'}`}>
+                          <Card className={`border-2 border-accent/20 bg-gradient-to-b from-[hsl(45_40%_98%)] to-[hsl(45_30%_96%)] dark:from-[hsl(30_15%_12%)] dark:to-[hsl(30_12%_10%)] dark:border-accent/15 flex flex-col overflow-hidden ${hasMultipleAdhkar ? 'flex-1 min-h-0' : 'flex-initial'}`}>
                             <CardContent className={`p-4 md:p-6 flex flex-col text-center ${hasMultipleAdhkar ? 'flex-1 min-h-0' : 'py-6'}`}>
                               {/* الذكر، التكرار وعددها من القائمة — وسطنهم رأسياً؛ single: من الأعلى مع تباعد مريح */}
                               <div className={`flex flex-col min-h-0 gap-4 ${hasMultipleAdhkar ? 'flex-1 justify-center' : 'justify-start'}`}>
@@ -527,7 +520,7 @@ export default function HisnMuslimPage() {
               {filteredChapters.map((chapter) => (
                 <Card
                   key={chapter.id}
-                  className="cursor-pointer hover:shadow-lg transition-all hover:border-primary/50"
+                  className="cursor-pointer card-islamic gold-hover transition-all hover:border-primary/50"
                   onClick={() => openChapter(chapter)}
                   onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openChapter(chapter); } }}
                   tabIndex={0}
@@ -575,7 +568,7 @@ export default function HisnMuslimPage() {
                       {categoryChapters.map((chapter) => (
                         <Card
                           key={chapter.id}
-                          className="cursor-pointer hover:shadow-lg transition-all hover:border-primary/50"
+                          className="cursor-pointer card-islamic gold-hover transition-all hover:border-primary/50"
                           onClick={() => openChapter(chapter)}
                           onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openChapter(chapter); } }}
                           tabIndex={0}

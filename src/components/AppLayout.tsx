@@ -3,6 +3,7 @@ import { Outlet } from 'react-router-dom';
 import { useAppStore } from '@/store/useAppStore';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
+import { ScrollToTop } from '@/components/ScrollToTop';
 
 /**
  * Shared layout: one Header and one Footer for the whole app.
@@ -23,6 +24,7 @@ export function AppLayout() {
         <Outlet />
       </main>
       {!hideAppHeader && <Footer />}
+      <ScrollToTop />
     </div>
   );
 }

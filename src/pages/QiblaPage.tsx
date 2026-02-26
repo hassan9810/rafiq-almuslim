@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAppStore } from '@/store/useAppStore';
 import { getCurrentLocation, getQiblaDirection } from '@/lib/prayerTimes';
+import PageHeader from '@/components/PageHeader';
 
 export default function QiblaPage() {
   const { t, language } = useTranslation();
@@ -70,22 +71,7 @@ export default function QiblaPage() {
     <div>
       <main>
         <div className="container max-w-lg">
-          {/* Page Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-8"
-          >
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-4">
-              <Compass className="w-8 h-8 text-primary" />
-            </div>
-            <h1 className="font-arabic text-3xl md:text-4xl font-bold text-foreground mb-2">
-              {t('qibla')}
-            </h1>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              {t('qiblaSubtitle')}
-            </p>
-          </motion.div>
+          <PageHeader icon={Compass} title={t('qibla')} subtitle={t('qiblaSubtitle')} />
 
           {!location ? (
             <motion.div

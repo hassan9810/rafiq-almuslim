@@ -28,14 +28,14 @@ function SurahCard({ surah, index, isFavorite, onToggleFavorite, onClick, animat
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2, delay: animateDelay }}
-      className="surah-card group relative bg-card hover:bg-primary/5 rounded-xl p-4 border border-border/50 cursor-pointer"
+      className="surah-card card-islamic gold-hover group relative bg-card hover:bg-primary/5 rounded-xl p-4 border border-border/50 cursor-pointer"
       onClick={onClick}
       onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick(); } }}
       tabIndex={0}
       role="button"
     >
-      {/* Surah Number */}
-      <div className="group-hover:opacity-100 transition-opacity absolute -top-3 -left-3 w-10 h-10 bg-primary rounded-lg flex items-center justify-center shadow-md">
+      {/* Surah Number - Islamic octagon */}
+      <div className="group-hover:opacity-100 transition-all absolute -top-3 -left-3 w-10 h-10 surah-number bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-md">
         <span className="text-sm font-bold text-primary-foreground">{surah.number}</span>
       </div>
 
@@ -59,8 +59,10 @@ function SurahCard({ surah, index, isFavorite, onToggleFavorite, onClick, animat
         {/* Meta Info */}
         <div className="flex items-center justify-between gap-2 mt-3 pt-3 border-t border-border/50">
           <span className="flex items-center gap-2">
-            <Badge variant={surah.revelationType === 'Meccan' ? 'default' : 'secondary'} className="text-xs">
-              {surah.revelationType === 'Meccan' ? t('makki') : t('madani')}
+            <Badge 
+              variant={surah.revelationType === 'Meccan' ? 'default' : 'secondary'} 
+              className={`text-xs ${surah.revelationType === 'Meccan' ? 'bg-accent/15 text-accent border-accent/30 hover:bg-accent/20' : 'bg-primary/15 text-primary border-primary/30 hover:bg-primary/20'}`}
+            >              {surah.revelationType === 'Meccan' ? t('makki') : t('madani')}
             </Badge>
             <span className="text-xs text-muted-foreground">
               {surah.numberOfAyahs} {t('verses')}

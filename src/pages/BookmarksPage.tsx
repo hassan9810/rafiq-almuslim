@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAppStore } from '@/store/useAppStore';
+import { PageHeader } from '@/components/PageHeader';
 import { fetchSurahs, type Surah } from '@/lib/quranApi';
 
 export default function BookmarksPage() {
@@ -66,21 +67,11 @@ export default function BookmarksPage() {
       <main>
         <div className="container">
           {/* Page Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-8"
-          >
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-4">
-              <Bookmark className="w-8 h-8 text-primary" />
-            </div>
-            <h1 className="font-arabic text-3xl md:text-4xl font-bold mb-2">
-              {t('bookmarks')}
-            </h1>
-            <p className="font-arabic text-muted-foreground max-w-2xl mx-auto">
-              {favorites.length} {favorites.length === 1 ? t('favorite') : t('favorites')} · {bookmarks.length} {bookmarks.length === 1 ? t('bookmark') : t('bookmarks')}
-            </p>
-          </motion.div>
+          <PageHeader
+            icon={Bookmark}
+            title={t('bookmarks')}
+            subtitle={`${favorites.length} ${favorites.length === 1 ? t('favorite') : t('favorites')} · ${bookmarks.length} ${bookmarks.length === 1 ? t('bookmark') : t('bookmarks')}`}
+          />
 
           <div className="max-w-3xl mx-auto">
           {/* Favorites Section */}

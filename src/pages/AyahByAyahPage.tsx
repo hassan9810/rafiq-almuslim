@@ -8,6 +8,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Badge } from '@/components/ui/badge';
+import PageHeader from '@/components/PageHeader';
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
@@ -148,20 +149,11 @@ export default function AyahByAyahPage() {
             </Link>
           </div>
 
-          {/* Header */}
-          <div className="text-center mb-6">
-            <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-primary/10 mb-3">
-              <BookOpen className="w-7 h-7 text-primary" />
-            </div>
-            <h1 className="font-arabic text-2xl md:text-3xl font-bold text-foreground mb-1">
-              {isAr ? 'تشغيل آية بآية' : 'Ayah by Ayah Player'}
-            </h1>
-            {currentSurah && (
-              <p className="text-muted-foreground font-arabic">
-                {isAr ? currentSurah.name : currentSurah.englishName} - {totalAyahs} {t('verses')}
-              </p>
-            )}
-          </div>
+          <PageHeader
+            icon={BookOpen}
+            title={isAr ? 'تشغيل آية بآية' : 'Ayah by Ayah Player'}
+            subtitle={currentSurah ? `${isAr ? currentSurah.name : currentSurah.englishName} - ${totalAyahs} ${t('verses')}` : undefined}
+          />
 
           {/* Controls Row */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">

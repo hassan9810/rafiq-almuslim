@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/select';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAppStore } from '@/store/useAppStore';
+import { PageHeader } from '@/components/PageHeader';
 import { useReadingPlanStore } from '@/store/useReadingPlanStore';
 
 // Quran has 604 pages, 30 juz
@@ -72,17 +73,11 @@ export default function ReadingPlanPage() {
           </div>
 
           {/* Header */}
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-4">
-              <Calendar className="w-8 h-8 text-primary" />
-            </div>
-            <h1 className="font-arabic text-3xl md:text-4xl font-bold text-foreground mb-2">
-              {t('dailyReadingPlan')}
-            </h1>
-            <p className="text-muted-foreground text-sm max-w-md mx-auto">
-              {t('readingPlanSubtitle')}
-            </p>
-          </div>
+          <PageHeader
+            icon={Calendar}
+            title={t('dailyReadingPlan')}
+            subtitle={t('readingPlanSubtitle')}
+          />
 
           {!planState ? (
             /* Plan Selection */

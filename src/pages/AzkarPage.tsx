@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Sun, Moon, Bed, Plane, RotateCcw, Check, ChevronLeft, ChevronRight, Vibrate, Mic2, BarChart3, ArrowRight } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAppStore } from '@/store/useAppStore';
+import { PageHeader } from '@/components/PageHeader';
 import { useAzkarStore, type AzkarCategory as StoreAzkarCategory } from '@/store/useAzkarStore';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -136,23 +137,13 @@ export default function AzkarPage() {
       <main>
         <div className="container max-w-4xl">
           {/* Page Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-8"
-          >
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-4">
-              <Mic2 className="w-8 h-8 text-primary" />
-            </div>
-            <h1 className="font-arabic text-3xl md:text-4xl font-bold mb-2">
-              {t('azkar')}
-            </h1>
-            <p className="font-arabic text-muted-foreground max-w-2xl mx-auto">
-              {language === 'ar' 
-                ? 'أذكار الصباح والمساء والنوم والسفر'
-                : 'Morning, Evening, Sleep and Travel Remembrances'}
-            </p>
-          </motion.div>
+          <PageHeader
+            icon={Mic2}
+            title={t('azkar')}
+            subtitle={language === 'ar' 
+              ? 'أذكار الصباح والمساء والنوم والسفر'
+              : 'Morning, Evening, Sleep and Travel Remembrances'}
+          />
 
           {/* Category Tabs */}
           <Tabs value={activeCategory} onValueChange={(v) => setActiveCategory(v as Category)} className="space-y-6" dir={direction}>
@@ -190,7 +181,7 @@ export default function AzkarPage() {
                         <motion.button
                           onClick={handleTasbihClick}
                           whileTap={{ scale: 0.95 }}
-                          className="w-48 h-48 mx-auto rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-2xl cursor-pointer hover:shadow-primary/25 transition-shadow"
+                          className="w-48 h-48 mx-auto rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-2xl cursor-pointer hover:shadow-primary/25 transition-shadow touch-counter ripple pulse-glow"
                         >
                           <span className="text-6xl font-bold text-primary-foreground">
                             {tasbihCount}
@@ -280,8 +271,8 @@ export default function AzkarPage() {
 
                     {/* Current Dhikr Card */}
                     {currentDhikr && (
-                      <Card className="overflow-hidden">
-                        <CardHeader className="bg-primary/5">
+                      <Card className="overflow-hidden gold-hover">
+                        <CardHeader className="bg-primary/5 islamic-pattern-light relative">
                           <div className="flex items-center justify-between">
                             <Badge variant="outline">
                               {currentIndex + 1} / {azkar.length}
@@ -356,7 +347,7 @@ export default function AzkarPage() {
                               onClick={incrementCount}
                               disabled={isComplete}
                               size="lg"
-                              className="px-8"
+                              className="px-8 btn-islamic touch-counter"
                             >
                               {t('count')}
                             </Button>

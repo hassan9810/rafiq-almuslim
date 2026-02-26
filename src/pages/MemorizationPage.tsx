@@ -8,6 +8,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Badge } from '@/components/ui/badge';
+import PageHeader from '@/components/PageHeader';
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
@@ -181,18 +182,7 @@ export default function MemorizationPage() {
             </Link>
           </div>
 
-          {/* Header */}
-          <div className="text-center mb-6">
-            <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-primary/10 mb-3">
-              <BookOpen className="w-7 h-7 text-primary" />
-            </div>
-            <h1 className="font-arabic text-2xl md:text-3xl font-bold text-foreground mb-1">
-              {t('memorizationMode')}
-            </h1>
-            <p className="text-muted-foreground text-sm">
-              {t('memorizationSubtitle')}
-            </p>
-          </div>
+          <PageHeader icon={BookOpen} title={t('memorizationMode')} subtitle={t('memorizationSubtitle')} />
 
           {/* Surah + Reciter Selection */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">

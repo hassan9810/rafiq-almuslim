@@ -25,6 +25,7 @@ import {
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAppStore } from '@/store/useAppStore';
 import { Link } from 'react-router-dom';
+import PageHeader from '@/components/PageHeader';
 
 interface MushafEdition {
   id: string;
@@ -281,30 +282,15 @@ export default function MushafPage() {
     <div>
       <main>
         <div className="container max-w-6xl">
-          {/* Page Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-8"
-          >
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-4">
-              <BookImage className="w-8 h-8 text-primary" />
-            </div>
-            <h1 className="font-arabic text-3xl md:text-4xl font-bold text-foreground mb-2">
-              {t('holyQuranMushaf')}
-            </h1>
-            <p className="font-arabic text-muted-foreground max-w-2xl mx-auto">
-              {t('browseMushafPages')}
-            </p>
-            <div className="flex flex-wrap items-center justify-center gap-3 mt-4">
-              <Link to="/mushaf-text">
-                <Button variant="outline" className="gap-2">
-                  <BookOpen className="w-4 h-4" />
-                  {t('textMushaf')}
-                </Button>
-              </Link>
-            </div>
-          </motion.div>
+          <PageHeader icon={BookImage} title={t('holyQuranMushaf')} subtitle={t('browseMushafPages')} />
+          <div className="flex flex-wrap items-center justify-center gap-3 mb-6 -mt-4">
+            <Link to="/mushaf-text">
+              <Button variant="outline" className="gap-2 btn-islamic">
+                <BookOpen className="w-4 h-4" />
+                {t('textMushaf')}
+              </Button>
+            </Link>
+          </div>
 
           {/* Controls */}
           <div className="bg-card rounded-2xl border border-border p-4 mb-6">

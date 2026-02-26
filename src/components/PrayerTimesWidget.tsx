@@ -51,7 +51,7 @@ export function PrayerTimesWidget() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.2 }}
-      className="bg-card/80 backdrop-blur-md rounded-2xl p-4 md:p-6 border border-border/50 shadow-card"
+      className="bg-card/80 backdrop-blur-md rounded-2xl p-4 md:p-6 border border-border/50 shadow-card gold-hover"
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
@@ -93,7 +93,7 @@ export function PrayerTimesWidget() {
         <>
           {/* Next Prayer Highlight */}
           {nextPrayer && (
-            <div className="bg-primary/10 rounded-xl p-3 mb-4">
+            <div className="bg-gradient-to-r from-primary/10 to-accent/10 rounded-xl p-3 mb-4 border border-accent/15">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs text-muted-foreground">{t('nextPrayer')}</p>

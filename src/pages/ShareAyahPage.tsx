@@ -13,6 +13,7 @@ import {
 import { Slider } from '@/components/ui/slider';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAppStore } from '@/store/useAppStore';
+import PageHeader from '@/components/PageHeader';
 import { fetchSurahs, fetchSurah, type Surah, type SurahData } from '@/lib/quranApi';
 
 const THEMES = [
@@ -241,18 +242,7 @@ export default function ShareAyahPage() {
             </Link>
           </div>
 
-          {/* Header */}
-          <div className="text-center mb-6">
-            <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-primary/10 mb-3">
-              <Share2 className="w-7 h-7 text-primary" />
-            </div>
-            <h1 className="font-arabic text-2xl md:text-3xl font-bold text-foreground mb-1">
-              {t('shareAyahTitle')}
-            </h1>
-            <p className="text-muted-foreground text-sm">
-              {t('shareAyahSubtitle')}
-            </p>
-          </div>
+          <PageHeader icon={Share2} title={t('shareAyahTitle')} subtitle={t('shareAyahSubtitle')} />
 
           {/* Surah selector */}
           <div className="flex gap-2 mb-3">

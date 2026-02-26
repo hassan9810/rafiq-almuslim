@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAppStore } from '@/store/useAppStore';
+import { PageHeader } from '@/components/PageHeader';
 import { useRadioStore } from '@/store/useRadioStore';
 import { useQuery } from '@tanstack/react-query';
 import { fetchRadioStations } from '@/lib/radioApi';
@@ -120,21 +121,11 @@ export default function RadioPage() {
       <main>
         <div className="container max-w-2xl">
           {/* Page Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-6"
-          >
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-4">
-              <Radio className="w-8 h-8 text-primary" />
-            </div>
-            <h1 className="font-arabic text-3xl md:text-4xl font-bold text-foreground mb-2">
-              {t('radio')}
-            </h1>
-            <p className="font-arabic text-muted-foreground max-w-2xl mx-auto">
-              {t('radioSubtitle')}
-            </p>
-          </motion.div>
+          <PageHeader
+            icon={Radio}
+            title={t('radio')}
+            subtitle={t('radioSubtitle')}
+          />
 
           {/* Search */}
           <div className="relative mb-3">
@@ -202,8 +193,8 @@ export default function RadioPage() {
                   transition={{ delay: Math.min(index * 0.02, 0.3) }}
                   className={`flex items-center gap-3 p-3 rounded-2xl border transition-all cursor-pointer ${
                     isActive
-                      ? 'bg-primary/5 border-primary/30'
-                      : 'bg-card border-border/50 hover:border-primary/20'
+                      ? 'bg-primary/5 border-primary/30 active-gold'
+                      : 'bg-card border-border/50 hover:border-primary/20 gold-hover'
                   }`}
                   onClick={() => handlePlayStation(station)}
                   onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handlePlayStation(station); } }}
@@ -247,8 +238,8 @@ export default function RadioPage() {
                     </h3>
                     {isActive && isPlaying && (
                       <div className="flex items-center gap-1 mt-1">
-                        <span className="w-2 h-2 bg-primary rounded-full animate-pulse" />
-                        <span className="text-xs text-primary">{t('nowPlaying')}</span>
+                        <span className="w-2 h-2 bg-accent rounded-full animate-pulse" />
+                        <span className="text-xs text-accent">{t('nowPlaying')}</span>
                       </div>
                     )}
                   </div>
@@ -276,7 +267,7 @@ export default function RadioPage() {
         <motion.div
           initial={{ y: 100 }}
           animate={{ y: 0 }}
-          className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-md border-t border-border z-50"
+          className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-md border-t border-border z-50 islamic-pattern-light"
         >
           <div className="container max-w-2xl py-4">
             <div className="flex items-center gap-4">
@@ -286,8 +277,8 @@ export default function RadioPage() {
                 </p>
                 {isPlaying && (
                   <div className="flex items-center gap-1">
-                    <span className="w-2 h-2 bg-primary rounded-full animate-pulse" />
-                    <span className="text-xs text-primary">{t('live')}</span>
+                    <span className="w-2 h-2 bg-accent rounded-full animate-pulse" />
+                    <span className="text-xs text-accent">{t('live')}</span>
                   </div>
                 )}
               </div>

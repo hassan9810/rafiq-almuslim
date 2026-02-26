@@ -209,6 +209,11 @@ export function Header() {
         </div>
       </header>
 
+      {/* Gold accent line */}
+      {isScrolled && (
+        <div className="fixed top-16 inset-x-0 h-[1px] z-50 bg-gradient-to-r from-transparent via-accent/40 to-transparent" />
+      )}
+
       {/* Mobile Menu */}
       <AnimatePresence>
         {mobileMenuOpen && (
@@ -216,7 +221,7 @@ export function Header() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed inset-x-0 top-16 z-40 lg:hidden bg-background border-b border-border shadow-lg"
+            className="fixed inset-x-0 top-16 z-40 lg:hidden bg-background border-b border-border shadow-lg islamic-pattern-light"
           >
             <nav className="container py-4 space-y-1">
               {navItems.map((item) => {

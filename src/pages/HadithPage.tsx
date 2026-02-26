@@ -3,6 +3,9 @@ import { motion } from 'framer-motion';
 import { MessageSquareQuote, Search, Book, Heart, Loader2, ChevronRight, Star } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAppStore } from '@/store/useAppStore';
+import { PageHeader } from '@/components/PageHeader';
+import { VerseFrame } from '@/components/VerseFrame';
+import { IslamicDivider } from '@/components/IslamicDivider';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -52,21 +55,11 @@ export default function HadithPage() {
       <main>
         <div className="container">
           {/* Page Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-8"
-          >
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-4">
-              <MessageSquareQuote className="w-8 h-8 text-primary" />
-            </div>
-            <h1 className="font-arabic text-3xl md:text-4xl font-bold mb-2">
-              {t('hadith')}
-            </h1>
-            <p className="font-arabic text-muted-foreground max-w-2xl mx-auto">
-              {t('hadithSubtitle')}
-            </p>
-          </motion.div>
+          <PageHeader
+            icon={MessageSquareQuote}
+            title={t('hadith')}
+            subtitle={t('hadithSubtitle')}
+          />
 
           <Tabs defaultValue="browse" className="space-y-6" dir={direction}>
             <TabsList className="grid w-full max-w-md mx-auto grid-cols-2">
@@ -89,8 +82,8 @@ export default function HadithPage() {
                     transition={{ delay: index * 0.05 }}
                   >
                     <Card 
-                      className={`cursor-pointer transition-all hover:shadow-lg ${
-                        selectedCollection.id === collection.id ? 'ring-2 ring-primary' : ''
+                      className={`cursor-pointer transition-all card-islamic gold-hover ${
+                        selectedCollection.id === collection.id ? 'ring-2 ring-primary active-gold' : ''
                       }`}
                       onClick={() => setSelectedCollection(collection)}
                       onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelectedCollection(collection); } }}
@@ -159,10 +152,10 @@ export default function HadithPage() {
                       animate={{ opacity: 1, y: 0 }}
                       className="mt-6"
                     >
-                      <Card className="bg-muted/50">
-                        <CardContent className="p-6">
+                      <VerseFrame showBrackets parchment>
+                        <CardContent className="p-0">
                           <div className="flex items-start justify-between mb-4">
-                            <Badge variant="outline">
+                            <Badge variant="outline" className="border-accent/30 text-accent">
                               {t('hadithNumberLabel')} {currentHadith.hadithnumber}
                             </Badge>
                             <Button
@@ -194,6 +187,7 @@ export default function HadithPage() {
                                   <Badge 
                                     key={idx} 
                                     variant={grade.grade.toLowerCase().includes('sahih') ? 'default' : 'secondary'}
+                                    className={grade.grade.toLowerCase().includes('sahih') ? 'bg-primary/15 text-primary border-primary/30' : grade.grade.toLowerCase().includes('hasan') ? 'bg-accent/15 text-accent border-accent/30' : ''}
                                   >
                                     {grade.name}: {grade.grade}
                                   </Badge>
@@ -202,7 +196,7 @@ export default function HadithPage() {
                             </div>
                           )}
                         </CardContent>
-                      </Card>
+                      </VerseFrame>
                     </motion.div>
                   )}
                 </CardContent>

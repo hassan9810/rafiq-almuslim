@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import DOMPurify from 'dompurify';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAppStore } from '@/store/useAppStore';
+import { PageHeader } from '@/components/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -60,21 +61,11 @@ export default function E3rabPage() {
       <main>
         <div className="container max-w-5xl">
           {/* Page Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-8"
-          >
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-4">
-              <BookText className="w-8 h-8 text-primary" />
-            </div>
-            <h1 className="font-arabic text-3xl md:text-4xl font-bold mb-2">
-              {t('e3rabTitle')}
-            </h1>
-            <p className="font-arabic text-muted-foreground max-w-2xl mx-auto">
-              {t('e3rabSubtitle')}
-            </p>
-          </motion.div>
+          <PageHeader
+            icon={BookText}
+            title={t('e3rabTitle')}
+            subtitle={t('e3rabSubtitle')}
+          />
 
           {/* Back to Quran */}
           <div className="mb-6">

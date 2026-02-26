@@ -362,9 +362,11 @@ export default function SurahReader() {
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="text-center py-8 mb-8 bg-card rounded-2xl border border-border/50"
+              className="text-center py-8 mb-8 rounded-2xl border border-accent/20 bg-gradient-to-b from-[hsl(45_40%_98%)] to-[hsl(45_30%_96%)] dark:from-[hsl(30_15%_12%)] dark:to-[hsl(30_12%_10%)] dark:border-accent/15 relative overflow-hidden"
             >
-              <p className="font-arabic text-3xl">{t('bismillah')}</p>
+              {/* Subtle pattern overlay */}
+              <div className="absolute inset-0 islamic-pattern-light pointer-events-none" />
+              <p className="bismillah-golden font-arabic text-3xl relative z-10">{t('bismillah')}</p>
             </motion.div>
           )}
 
@@ -375,7 +377,7 @@ export default function SurahReader() {
               key="flowing"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className={`rounded-2xl border border-border/50 p-6 lg:p-8 ${showArabic ? 'bg-card' : 'bg-muted/30'}`}
+              className={`rounded-2xl border p-6 lg:p-8 ${showArabic ? 'bg-gradient-to-b from-[hsl(45_40%_98%)] to-[hsl(45_30%_96%)] dark:from-[hsl(30_15%_12%)] dark:to-[hsl(30_12%_10%)] border-accent/15' : 'bg-muted/30 border-border/50'}`}
               dir={showArabic ? 'rtl' : direction}
             >
               {showArabic ? (
@@ -445,7 +447,7 @@ export default function SurahReader() {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: Math.min(index * 0.02, 0.3) }}
-                      className={`ayah-highlight p-6 rounded-2xl border transition-all border-border/50 bg-card hover:border-primary/30 hover:bg-primary/5 ${isActive ? 'playing' : ''} ${blinkAyah === ayah.numberInSurah ? 'ayah-blink' : ''}`}
+                      className={`ayah-highlight p-6 rounded-2xl border transition-all border-border/50 bg-card hover:border-primary/30 hover:bg-primary/5 ${isActive ? 'playing active-gold' : ''} ${blinkAyah === ayah.numberInSurah ? 'ayah-blink' : ''}`}
                       onAnimationEnd={blinkAyah === ayah.numberInSurah ? () => setBlinkAyah(null) : undefined}
                     >
                       <div className="flex items-start justify-between mb-4">
@@ -635,7 +637,7 @@ export default function SurahReader() {
           </div>
 
       {/* Audio Player */}
-      <div className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-md border-t border-border z-50">
+      <div className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-md border-t border-border z-50 islamic-pattern-light">
         <div className="container max-w-4xl py-3 md:py-4">
           <div className="flex items-center gap-2 md:gap-4">
             {/* Reciter Select */}

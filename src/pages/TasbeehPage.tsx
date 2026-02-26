@@ -14,6 +14,7 @@ import {
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAppStore } from '@/store/useAppStore';
 import { useTasbeehStore } from '@/store/useTasbeehStore';
+import { PageHeader } from '@/components/PageHeader';
 
 const DEFAULT_ADHKAR = [
   { id: 'subhanallah', ar: 'سبحان الله', en: 'SubhanAllah', target: 33 },
@@ -119,17 +120,12 @@ export default function TasbeehPage() {
           </div>
 
           {/* Header */}
-          <div className="text-center mb-6">
-            <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-primary/10 mb-3">
-              <span className="text-2xl">📿</span>
-            </div>
-            <h1 className="font-arabic text-2xl md:text-3xl font-bold text-foreground mb-1">
-              {t('digitalTasbeeh')}
-            </h1>
-            <p className="text-muted-foreground text-sm">
-              {t('tasbeehSubtitle')}
-            </p>
-          </div>
+          <PageHeader
+            icon={Target}
+            emoji="📿"
+            title={t('digitalTasbeeh')}
+            subtitle={t('tasbeehSubtitle')}
+          />
 
           {/* Dhikr Selector */}
           <Select dir={direction} value={stats.selectedDhikr} onValueChange={changeDhikr}>
@@ -150,7 +146,7 @@ export default function TasbeehPage() {
             <motion.button
               whileTap={{ scale: 0.92 }}
               onClick={handleTap}
-              className="relative w-52 h-52 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 border-4 border-primary/30 flex flex-col items-center justify-center select-none cursor-pointer active:border-primary transition-colors focus:outline-none focus:ring-4 focus:ring-ring"
+              className={`relative w-52 h-52 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 border-4 border-primary/30 flex flex-col items-center justify-center select-none cursor-pointer active:border-primary transition-all focus:outline-none focus:ring-4 focus:ring-ring touch-counter ripple ${dhikrProgress >= 100 ? 'pulse-glow' : ''}`}
               aria-label={isAr ? 'اضغط للتسبيح' : 'Tap to count'}
             >
               {/* Progress ring */}
@@ -158,7 +154,7 @@ export default function TasbeehPage() {
                 <circle cx="104" cy="104" r="96" fill="none" stroke="hsl(var(--muted))" strokeWidth="6" />
                 <circle
                   cx="104" cy="104" r="96" fill="none"
-                  stroke="hsl(var(--primary))" strokeWidth="6"
+                  stroke={dhikrProgress >= 100 ? "hsl(43 80% 55%)" : "hsl(var(--primary))"} strokeWidth="6"
                   strokeLinecap="round"
                   strokeDasharray={2 * Math.PI * 96}
                   strokeDashoffset={2 * Math.PI * 96 * (1 - dhikrProgress / 100)}
@@ -181,7 +177,7 @@ export default function TasbeehPage() {
               </span>
             </motion.button>
 
-            <p className="font-arabic text-xl mt-4 text-foreground font-semibold" dir="rtl">
+            <p className={`font-arabic text-xl mt-4 font-semibold ${dhikrProgress >= 100 ? 'text-gradient-gold' : 'text-foreground'}`} dir="rtl">
               {isAr ? currentDhikr.ar : currentDhikr.en}
             </p>
 
@@ -204,7 +200,7 @@ export default function TasbeehPage() {
           </div>
 
           {/* Daily Goal */}
-          <div className="bg-card rounded-2xl border border-border/50 p-4 mb-4">
+          <div className={`bg-card rounded-2xl border p-4 mb-4 ${goalProgress >= 100 ? 'border-accent/40 active-gold' : 'border-border/50'}`}>
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
                 <Target className="w-4 h-4 text-primary" />

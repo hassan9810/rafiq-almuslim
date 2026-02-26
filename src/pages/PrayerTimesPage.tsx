@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAppStore } from '@/store/useAppStore';
+import { PageHeader } from '@/components/PageHeader';
 import { useToast } from '@/hooks/use-toast';
 import { 
   calculatePrayerTimes, 
@@ -140,19 +141,12 @@ export default function PrayerTimesPage() {
       <main>
         <div className="container max-w-2xl">
           {/* Page Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-8"
-          >
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-4">
-              <Clock className="w-8 h-8 text-primary" />
-            </div>
-            <h1 className="font-arabic text-3xl md:text-4xl font-bold text-foreground mb-2">
-              {t('prayerTimes')}
-            </h1>
-            {location && (
-              <div className="flex flex-col items-center gap-2">
+          <PageHeader
+            icon={Clock}
+            title={t('prayerTimes')}
+          />
+          {location && (
+            <div className="flex flex-col items-center gap-2 text-center -mt-4 mb-8">
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <MapPin className="w-4 h-4" />
                   <span>{location.city}</span>
@@ -226,7 +220,8 @@ export default function PrayerTimesPage() {
                 )}
               </div>
             )}
-          </motion.div>
+          </div>
+          )}
 
           {!location ? (
             <motion.div
@@ -340,8 +335,8 @@ export default function PrayerTimesPage() {
                     transition={{ delay: index * 0.1 }}
                     className={`prayer-card flex items-center justify-between p-5 rounded-2xl border transition-all ${
                       prayer.isNext 
-                        ? 'bg-primary/5 border-primary/30 active' 
-                        : 'bg-card border-border/50 hover:border-primary/20'
+                        ? 'bg-primary/5 border-primary/30 active active-gold' 
+                        : 'bg-card border-border/50 hover:border-primary/20 gold-hover'
                     }`}
                   >
                     <div className="flex items-center gap-4">

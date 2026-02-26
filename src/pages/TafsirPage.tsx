@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { BookMarked, Search, ChevronDown, Book, Languages, Loader2 } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAppStore } from '@/store/useAppStore';
+import { PageHeader } from '@/components/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -66,21 +67,11 @@ export default function TafsirPage() {
       <main>
         <div className="container">
           {/* Page Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-8"
-          >
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-4">
-              <BookMarked className="w-8 h-8 text-primary" />
-            </div>
-            <h1 className="font-arabic text-3xl md:text-4xl font-bold mb-2">
-              {t('tafsir')}
-            </h1>
-            <p className="font-arabic text-muted-foreground max-w-2xl mx-auto">
-              {t('tafsirSubtitle')}
-            </p>
-          </motion.div>
+          <PageHeader
+            icon={BookMarked}
+            title={t('tafsir')}
+            subtitle={t('tafsirSubtitle')}
+          />
 
           <div className="grid lg:grid-cols-4 gap-6">
             {/* Sidebar - Tafsir Selection */}
@@ -217,7 +208,7 @@ export default function TafsirPage() {
                             <div key={ayah.number} className="border-b border-border/50 pb-6 last:border-0">
                               {/* Ayah */}
                               <div className="flex items-start gap-4 mb-4">
-                                <div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold">
+                                <div className="flex-shrink-0 w-10 h-10 rounded-full bg-accent/15 flex items-center justify-center text-accent font-semibold ring-1 ring-accent/20">
                                   {ayah.numberInSurah}
                                 </div>
                                 <p className="font-arabic text-2xl leading-loose text-right flex-1" dir={direction}>
@@ -227,7 +218,7 @@ export default function TafsirPage() {
                               
                               {/* Tafsir */}
                               {tafsirAyah && (
-                                <div className="bg-muted/50 rounded-lg p-4 ms-14">
+                                <div className="bg-gradient-to-r from-muted/60 to-muted/30 dark:from-muted/40 dark:to-muted/20 rounded-lg p-4 ms-14 border-s-2 border-accent/30">
                                   <p className={`leading-relaxed ${currentTafsirEdition?.language === 'arabic' ? 'font-arabic text-right text-lg' : ''}`}
                                      dir={direction}>
                                     {tafsirAyah.text}
