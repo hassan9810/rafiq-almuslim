@@ -42,7 +42,7 @@ export default function ShareAyahPage() {
   const [loading, setLoading] = useState(false);
   const [themeId, setThemeId] = useState('emerald');
   const [fontId, setFontId] = useState('amiri');
-  const [fontSize, setFontSize] = useState(28);
+  const [fontSize, setFontSize] = useState(32);
   const [generating, setGenerating] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -90,8 +90,10 @@ export default function ShareAyahPage() {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const W = 1080;
-    const H = 1080;
+    // High resolution canvas (2x for crisp output)
+    const scale = 2;
+    const W = 1080 * scale;
+    const H = 1080 * scale;
     canvas.width = W;
     canvas.height = H;
 
@@ -104,15 +106,15 @@ export default function ShareAyahPage() {
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, W, H);
 
-    // Decorative border
+    // Decorative border (scaled)
     ctx.strokeStyle = currentTheme.accent;
-    ctx.lineWidth = 3;
-    ctx.strokeRect(40, 40, W - 80, H - 80);
-    ctx.strokeRect(55, 55, W - 110, H - 110);
+    ctx.lineWidth = 3 * scale;
+    ctx.strokeRect(40 * scale, 40 * scale, W - 80 * scale, H - 80 * scale);
+    ctx.strokeRect(55 * scale, 55 * scale, W - 110 * scale, H - 110 * scale);
 
     // Corner decorations
-    const cornerSize = 30;
-    [[60, 60], [W - 60, 60], [60, H - 60], [W - 60, H - 60]].forEach(([x, y]) => {
+    const cornerSize = 30 * scale;
+    [[60, 60], [1080 - 60, 60], [60, 1080 - 60], [1080 - 60, 1080 - 60]].map(([x, y]) => [x * scale, y * scale]).forEach(([x, y]) => {
       ctx.beginPath();
       ctx.arc(x, y, cornerSize / 2, 0, Math.PI * 2);
       ctx.fillStyle = currentTheme.accent;
@@ -121,42 +123,57 @@ export default function ShareAyahPage() {
 
     // Bismillah
     ctx.fillStyle = currentTheme.accent;
-    ctx.font = `24px ${currentFont.family}`;
+    ctx.font = `${24 * scale}px ${currentFont.family}`;
     ctx.textAlign = 'center';
     ctx.direction = 'rtl';
-    ctx.fillText('﷽', W / 2, 130);
+    ctx.fillText('﷽', W / 2, 130 * scale);
 
-    // Combined ayah text - word wrap
-    const text = combinedText;
-    // Auto-adjust font size for multiple ayahs - reduce proportionally
-    const adjustedSize = selectedAyahs.length > 5 ? Math.round(fontSize * 0.6) : selectedAyahs.length > 3 ? Math.round(fontSize * 0.75) : selectedAyahs.length > 1 ? Math.round(fontSize * 0.85) : fontSize;
-    
-    ctx.fillStyle = currentTheme.text;
-    ctx.font = `${adjustedSize}px ${currentFont.family}`;
-    ctx.textAlign = 'center';
-    ctx.direction = 'rtl';
+    // Auto-fit: try the user's fontSize (scaled), use it directly — no forced reduction
+    const scaledFontSize = fontSize * scale;
+    const maxWidth = W - 180 * scale;
+    const availableHeight = H - 320 * scale; // space between bismillah and footer
 
-    const maxWidth = W - 180;
-    const words = text.split(' ');
-    const lines: string[] = [];
-    let currentLine = '';
-
-    for (const word of words) {
-      const testLine = currentLine ? currentLine + ' ' + word : word;
-      const metrics = ctx.measureText(testLine);
-      if (metrics.width > maxWidth && currentLine) {
-        lines.push(currentLine);
-        currentLine = word;
-      } else {
-        currentLine = testLine;
+    // Helper to compute lines at a given font size
+    const computeLines = (size: number): string[] => {
+      ctx.font = `${size}px ${currentFont.family}`;
+      const text = combinedText;
+      const words = text.split(' ');
+      const result: string[] = [];
+      let currentLine = '';
+      for (const word of words) {
+        const testLine = currentLine ? currentLine + ' ' + word : word;
+        const metrics = ctx.measureText(testLine);
+        if (metrics.width > maxWidth && currentLine) {
+          result.push(currentLine);
+          currentLine = word;
+        } else {
+          currentLine = testLine;
+        }
       }
+      if (currentLine) result.push(currentLine);
+      return result;
+    };
+
+    // Find the best font size: start from user's choice, shrink only if text overflows
+    let finalSize = scaledFontSize;
+    let lines = computeLines(finalSize);
+    let lineHeight = finalSize * 1.7;
+    let totalTextHeight = lines.length * lineHeight;
+
+    while (totalTextHeight > availableHeight && finalSize > 16 * scale) {
+      finalSize -= 2;
+      lines = computeLines(finalSize);
+      lineHeight = finalSize * 1.7;
+      totalTextHeight = lines.length * lineHeight;
     }
-    if (currentLine) lines.push(currentLine);
 
-    const lineHeight = adjustedSize * 1.8;
-    const totalTextHeight = lines.length * lineHeight;
-    const startY = (H / 2) - (totalTextHeight / 2) + adjustedSize;
+    // Draw text
+    ctx.fillStyle = currentTheme.text;
+    ctx.font = `${finalSize}px ${currentFont.family}`;
+    ctx.textAlign = 'center';
+    ctx.direction = 'rtl';
 
+    const startY = (H / 2) - (totalTextHeight / 2) + finalSize;
     lines.forEach((line, i) => {
       ctx.fillText(line, W / 2, startY + i * lineHeight);
     });
@@ -164,19 +181,19 @@ export default function ShareAyahPage() {
     // Ayah range badge
     const rangeLabel = ayahFrom === ayahTo ? `﴿${ayahFrom}﴾` : `﴿${ayahFrom} - ${ayahTo}﴾`;
     ctx.fillStyle = currentTheme.accent;
-    ctx.font = `22px ${currentFont.family}`;
-    ctx.fillText(rangeLabel, W / 2, startY + lines.length * lineHeight + 20);
+    ctx.font = `${22 * scale}px ${currentFont.family}`;
+    ctx.fillText(rangeLabel, W / 2, startY + lines.length * lineHeight + 20 * scale);
 
     // Surah name
     const surahName = currentSurah ? (isAr ? currentSurah.name : currentSurah.englishName) : '';
     ctx.fillStyle = currentTheme.accent;
-    ctx.font = `20px ${currentFont.family}`;
-    ctx.fillText(`— ${surahName} —`, W / 2, H - 100);
+    ctx.font = `${20 * scale}px ${currentFont.family}`;
+    ctx.fillText(`— ${surahName} —`, W / 2, H - 100 * scale);
 
     // Watermark
     ctx.fillStyle = currentTheme.text + '80';
-    ctx.font = `14px 'Noto Sans', sans-serif`;
-    ctx.fillText('rafiqalmuslim.lovable.app', W / 2, H - 65);
+    ctx.font = `${14 * scale}px 'Noto Sans', sans-serif`;
+    ctx.fillText('rafiqalmuslim.lovable.app', W / 2, H - 65 * scale);
   }, [selectedAyahs, combinedText, currentTheme, currentFont, fontSize, ayahFrom, ayahTo, currentSurah, isAr]);
 
   useEffect(() => {
@@ -338,7 +355,7 @@ export default function ShareAyahPage() {
 
             <div className="flex items-center gap-3 mt-4">
               <span className="text-xs text-muted-foreground whitespace-nowrap">{isAr ? 'حجم الخط:' : 'Font size:'}</span>
-              <Slider value={[fontSize]} min={18} max={42} step={2} onValueChange={([v]) => setFontSize(v)} className="flex-1" />
+              <Slider value={[fontSize]} min={18} max={72} step={2} onValueChange={([v]) => setFontSize(v)} className="flex-1" />
               <span className="text-xs text-muted-foreground w-8">{fontSize}</span>
             </div>
           </div>
