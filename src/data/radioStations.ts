@@ -1,4 +1,4 @@
-export type RadioCategory = 'all' | 'official' | 'egyptian' | 'haramain' | 'other' | 'tafsir' | 'athkar' | 'books' | 'misc' | 'translations';
+export type RadioCategory = 'all' | 'favorites' | 'official' | 'egyptian' | 'haramain' | 'other' | 'tafsir' | 'athkar' | 'books' | 'misc' | 'translations';
 
 export interface RadioStation {
   id: string;
@@ -11,6 +11,7 @@ export interface RadioStation {
 
 export const RADIO_CATEGORIES: { key: RadioCategory; labelAr: string; labelEn: string }[] = [
   { key: 'all', labelAr: 'الكل', labelEn: 'All' },
+  { key: 'favorites', labelAr: '❤️ المفضلة', labelEn: '❤️ Favorites' },
   { key: 'official', labelAr: 'محطات رسمية', labelEn: 'Official' },
   { key: 'egyptian', labelAr: 'قراء مصريون', labelEn: 'Egyptian Reciters' },
   { key: 'haramain', labelAr: 'قراء الحرمين', labelEn: 'Haramain Reciters' },
