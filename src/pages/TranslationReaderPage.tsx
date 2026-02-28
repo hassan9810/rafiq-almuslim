@@ -248,7 +248,7 @@ export default function TranslationReaderPage() {
                       </div>
 
                       {/* Arabic Text */}
-                      <p className="font-arabic text-xl md:text-2xl leading-loose mb-4 text-foreground" dir={direction}>
+                      <p className="font-arabic text-xl md:text-2xl leading-loose mb-4 text-foreground" dir="rtl">
                         {ayah.arabic_text}
                         <span className="inline-block mx-2 text-primary">
                           ﴿{parseInt(ayah.aya).toLocaleString('ar-EG')}﴾
@@ -258,7 +258,7 @@ export default function TranslationReaderPage() {
                       {/* Translation */}
                       <p 
                         className="text-base leading-relaxed text-muted-foreground"
-                        dir={direction}
+                        dir="ltr"
                       >
                         {ayah.translation}
                       </p>
@@ -274,7 +274,7 @@ export default function TranslationReaderPage() {
                               </div>
                             </AccordionTrigger>
                             <AccordionContent>
-                              <div className="p-3 bg-muted/50 rounded-lg text-sm text-muted-foreground whitespace-pre-wrap">
+                              <div className="p-3 bg-muted/50 rounded-lg text-sm text-muted-foreground whitespace-pre-wrap" dir="ltr">
                                 {ayah.footnotes}
                               </div>
                             </AccordionContent>
