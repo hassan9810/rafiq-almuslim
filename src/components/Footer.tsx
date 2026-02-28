@@ -7,6 +7,8 @@ export function Footer() {
   const { t, language } = useTranslation();
   const currentYear = new Date().getFullYear();
 
+  const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+
   return (
     <footer className="bg-card border-t border-border relative overflow-hidden">
       {/* Islamic pattern overlay */}
@@ -36,11 +38,11 @@ export function Footer() {
               {t('quickLinks')}
             </h3>
             <ul className="space-y-2">
-              <li><Link to="/quran" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t('quran')}</Link></li>
-              <li><Link to="/tafsir" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t('tafsir')}</Link></li>
-              <li><Link to="/hadith" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t('hadith')}</Link></li>
-              <li><Link to="/translations" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t('translations')}</Link></li>
-              <li><Link to="/prayer-times" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t('prayerTimes')}</Link></li>
+              <li><Link to="/quran" onClick={scrollToTop} className="text-sm text-muted-foreground hover:text-primary transition-colors">{t('quran')}</Link></li>
+              <li><Link to="/tafsir" onClick={scrollToTop} className="text-sm text-muted-foreground hover:text-primary transition-colors">{t('tafsir')}</Link></li>
+              <li><Link to="/hadith" onClick={scrollToTop} className="text-sm text-muted-foreground hover:text-primary transition-colors">{t('hadith')}</Link></li>
+              <li><Link to="/translations" onClick={scrollToTop} className="text-sm text-muted-foreground hover:text-primary transition-colors">{t('translations')}</Link></li>
+              <li><Link to="/prayer-times" onClick={scrollToTop} className="text-sm text-muted-foreground hover:text-primary transition-colors">{t('prayerTimes')}</Link></li>
             </ul>
           </div>
 
@@ -50,10 +52,10 @@ export function Footer() {
               {t('features')}
             </h3>
             <ul className="space-y-2">
-              <li><Link to="/hisn-muslim" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t('hisnMuslim')}</Link></li>
-              <li><Link to="/radio" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t('radio')}</Link></li>
-              <li><Link to="/qibla" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t('qibla')}</Link></li>
-              <li><Link to="/azkar" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t('azkar')}</Link></li>
+              <li><Link to="/hisn-muslim" onClick={scrollToTop} className="text-sm text-muted-foreground hover:text-primary transition-colors">{t('hisnMuslim')}</Link></li>
+              <li><Link to="/radio" onClick={scrollToTop} className="text-sm text-muted-foreground hover:text-primary transition-colors">{t('radio')}</Link></li>
+              <li><Link to="/qibla" onClick={scrollToTop} className="text-sm text-muted-foreground hover:text-primary transition-colors">{t('qibla')}</Link></li>
+              <li><Link to="/azkar" onClick={scrollToTop} className="text-sm text-muted-foreground hover:text-primary transition-colors">{t('azkar')}</Link></li>
             </ul>
           </div>
 
