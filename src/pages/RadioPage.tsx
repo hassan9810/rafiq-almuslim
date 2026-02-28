@@ -64,7 +64,9 @@ export default function RadioPage() {
     let stations = allStations;
 
     // Filter by category
-    if (activeCategory !== 'all') {
+    if (activeCategory === 'favorites') {
+      stations = stations.filter(s => favorites.includes(s.id));
+    } else if (activeCategory !== 'all') {
       stations = stations.filter(s => s.categories.includes(activeCategory));
     }
 
@@ -78,7 +80,7 @@ export default function RadioPage() {
     }
 
     return stations;
-  }, [allStations, searchQuery, activeCategory]);
+  }, [allStations, searchQuery, activeCategory, favorites]);
 
   useEffect(() => {
     if (audioRef.current) {

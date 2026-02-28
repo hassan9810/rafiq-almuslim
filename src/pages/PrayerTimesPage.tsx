@@ -28,14 +28,14 @@ import {
 } from '@/lib/prayerNotifications';
 
 const prayerIcons = {
-  Fajr: 'ðŸŒ™',
-  Sunrise: 'ðŸŒ…',
-  Dhuhr: 'â˜€ï¸',
-  Asr: 'ðŸŒ¤ï¸',
-  Maghrib: 'ðŸŒ‡',
-  Isha: 'ðŸŒƒ',
-  Midnight: 'ðŸŒŒ',
-  LastThird: 'âœ¨',
+  Fajr: '🌙',
+  Sunrise: '🌅',
+  Dhuhr: '☀️',
+  Asr: '🌤️',
+  Maghrib: '🌇',
+  Isha: '🌃',
+  Midnight: '🌌',
+  LastThird: '✨',
 };
 
 
