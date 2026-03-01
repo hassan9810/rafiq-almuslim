@@ -601,6 +601,8 @@
     background-clip: text;
     -webkit-text-fill-color: transparent;
     filter: drop-shadow(0 2px 4px hsl(43 74% 49% / 0.3));
+    line-height: 2;
+    padding-block: 0.25em;
   }
   
   /* Ayah Number Circle */
