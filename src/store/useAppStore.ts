@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { CalcMethodKey } from '@/lib/prayerTimes';
+import { DEFAULT_ADHAN_ID } from '@/data/adhanSources';
 
 interface Surah {
   number: number;
@@ -62,7 +63,11 @@ interface AppState {
 
   // Layout (e.g. hide header in fullscreen mushaf)
   hideAppHeader: boolean;
-  
+
+  // Adhan
+  adhanEnabled: boolean;
+  adhanMuezzinId: string;
+
   // Actions
   setLanguage: (lang: 'ar' | 'en') => void;
   toggleTheme: () => void;
@@ -78,6 +83,8 @@ interface AppState {
   setLocation: (location: { latitude: number; longitude: number; city: string }) => void;
   setCalculationMethod: (method: CalcMethodKey) => void;
   setHideAppHeader: (hide: boolean) => void;
+  setAdhanEnabled: (enabled: boolean) => void;
+  setAdhanMuezzinId: (id: string) => void;
 }
 
 export const useAppStore = create<AppState>()(
@@ -107,6 +114,8 @@ export const useAppStore = create<AppState>()(
       location: null,
       calculationMethod: 'Egyptian',
       hideAppHeader: false,
+      adhanEnabled: false,
+      adhanMuezzinId: DEFAULT_ADHAN_ID,
 
       // Actions
       setLanguage: (lang) => set({ 
@@ -164,6 +173,8 @@ export const useAppStore = create<AppState>()(
       setLocation: (location) => set({ location }),
       setCalculationMethod: (method) => set({ calculationMethod: method }),
       setHideAppHeader: (hide) => set({ hideAppHeader: hide }),
+      setAdhanEnabled: (enabled) => set({ adhanEnabled: enabled }),
+      setAdhanMuezzinId: (id) => set({ adhanMuezzinId: id }),
     }),
     {
       name: 'rafiq-muslim-storage',
@@ -178,6 +189,8 @@ export const useAppStore = create<AppState>()(
         recentReads: state.recentReads,
         location: state.location,
         calculationMethod: state.calculationMethod,
+        adhanEnabled: state.adhanEnabled,
+        adhanMuezzinId: state.adhanMuezzinId,
       }),
     }
   )

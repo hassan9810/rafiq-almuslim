@@ -54,6 +54,9 @@ export default function TranslationReaderPage() {
   const isArabic = language === 'ar';
   const surahNum = surahNumber ? parseInt(surahNumber) : 1;
 
+  // Direction of the translation text itself (not the UI language)
+  const translationDir = translation?.language_iso_code === 'ar' ? 'rtl' : 'ltr';
+
   // Load translations list and surahs on mount
   useEffect(() => {
     const loadInitialData = async () => {
@@ -258,7 +261,7 @@ export default function TranslationReaderPage() {
                       {/* Translation */}
                       <p 
                         className="text-base leading-relaxed text-muted-foreground"
-                        dir="ltr"
+                        dir={translationDir}
                       >
                         {ayah.translation}
                       </p>
@@ -274,7 +277,7 @@ export default function TranslationReaderPage() {
                               </div>
                             </AccordionTrigger>
                             <AccordionContent>
-                              <div className="p-3 bg-muted/50 rounded-lg text-sm text-muted-foreground whitespace-pre-wrap" dir="ltr">
+                              <div className="p-3 bg-muted/50 rounded-lg text-sm text-muted-foreground whitespace-pre-wrap" dir={translationDir}>
                                 {ayah.footnotes}
                               </div>
                             </AccordionContent>

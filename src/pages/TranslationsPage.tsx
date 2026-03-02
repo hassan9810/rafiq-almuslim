@@ -214,7 +214,12 @@ export default function TranslationsPage() {
           ) : (
             // Grouped by language
             <div className="space-y-8">
-              {Object.entries(groupedTranslations).map(([langCode, langTranslations]) => (
+              {Object.entries(groupedTranslations)
+                .sort(([a], [b]) => {
+                  const order = (code: string) => code === 'en' ? 0 : code === 'ar' ? 1 : 2;
+                  return order(a) - order(b);
+                })
+                .map(([langCode, langTranslations]) => (
                 <motion.div
                   key={langCode}
                   initial={{ opacity: 0, y: 20 }}

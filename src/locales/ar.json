@@ -296,5 +296,14 @@
   "turkey": "تركيا (ديانت)",
   "confirmRemoveBookmark": "هل تريد حذف هذه العلامة المرجعية؟",
   "confirm": "تأكيد",
-  "cancel": "إلغاء"
+  "cancel": "إلغاء",
+  "adhanEnabled": "تم تفعيل الأذان",
+  "adhanDisabled": "تم إيقاف الأذان",
+  "enableAdhan": "تفعيل الأذان",
+  "disableAdhan": "إيقاف الأذان",
+  "muezzin": "المؤذن",
+  "previewAdhan": "معاينة الأذان",
+  "pauseAdhan": "إيقاف مؤقت",
+  "resumeAdhan": "استئناف",
+  "stopAdhan": "إيقاف"
 }

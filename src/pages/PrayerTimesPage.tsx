@@ -1,6 +1,6 @@
 ﻿import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { MapPin, Clock, Loader2, RefreshCw, Search, X, Bell, BellOff } from 'lucide-react';
+import { MapPin, Clock, Loader2, RefreshCw, Search, X, Bell, BellOff, Volume2, VolumeX, Play, Pause, Square } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -25,7 +25,14 @@ import {
   isNotificationsEnabled,
   setNotificationsEnabled,
   checkAndNotifyPrayers,
+  previewAdhan,
+  stopAdhan,
+  pauseAdhan,
+  resumeAdhan,
+  isAdhanPlaying,
+  isAdhanPaused,
 } from '@/lib/prayerNotifications';
+import { adhanSources } from '@/data/adhanSources';
 
 const prayerIcons = {
   Fajr: '🌙',
@@ -42,7 +49,10 @@ const prayerIcons = {
 export default function PrayerTimesPage() {
   const { t, language } = useTranslation();
   const { toast } = useToast();
-  const { direction, location, setLocation, calculationMethod, setCalculationMethod } = useAppStore();
+  const { 
+    direction, location, setLocation, calculationMethod, setCalculationMethod,
+    adhanEnabled, adhanMuezzinId, setAdhanEnabled, setAdhanMuezzinId,
+  } = useAppStore();
   const [prayerTimes, setPrayerTimes] = useState<PrayerTime[]>([]);
   const [loading, setLoading] = useState(false);
   const [timeUntilNext, setTimeUntilNext] = useState('');
@@ -51,17 +61,20 @@ export default function PrayerTimesPage() {
   const [searching, setSearching] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [notifEnabled, setNotifEnabled] = useState(isNotificationsEnabled());
+  const [adhanState, setAdhanState] = useState<'idle' | 'playing' | 'paused'>('idle');
 
-  // Prayer notification check interval
+  // Sync adhan playback state every 500ms
   useEffect(() => {
-    if (!notifEnabled || !location) return;
-    const interval = setInterval(() => {
-      checkAndNotifyPrayers(location.latitude, location.longitude, language);
-    }, 30_000);
-    // Check immediately too
-    checkAndNotifyPrayers(location.latitude, location.longitude, language);
-    return () => clearInterval(interval);
-  }, [notifEnabled, location, language]);
+    const id = setInterval(() => {
+      if (isAdhanPlaying()) setAdhanState('playing');
+      else if (isAdhanPaused()) setAdhanState('paused');
+      else setAdhanState('idle');
+    }, 500);
+    return () => clearInterval(id);
+  }, []);
+
+  // Prayer notification + adhan interval is handled globally in AppLayout
+  // (runs across all pages, not just this one)
 
   const handleToggleNotifications = async () => {
     if (!isNotificationSupported()) {
@@ -164,6 +177,20 @@ export default function PrayerTimesPage() {
                   >
                     {notifEnabled ? <Bell className="w-4 h-4" /> : <BellOff className="w-4 h-4" />}
                   </Button>
+                  {/* Adhan toggle */}
+                  <Button
+                    variant="ghost"
+                    size="icon-sm"
+                    onClick={() => {
+                      if (adhanEnabled) { stopAdhan(); }
+                      setAdhanEnabled(!adhanEnabled);
+                      toast({ title: adhanEnabled ? t('adhanDisabled') : t('adhanEnabled') });
+                    }}
+                    className={adhanEnabled ? 'text-primary' : ''}
+                    title={adhanEnabled ? t('disableAdhan') : t('enableAdhan')}
+                  >
+                    {adhanEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+                  </Button>
                 </div>
 
                 {/* Calculation Method Selector */}
@@ -188,6 +215,58 @@ export default function PrayerTimesPage() {
                     </SelectContent>
                   </Select>
                 </div>
+
+                {/* Adhan Muezzin Selector */}
+                {adhanEnabled && (
+                  <div className="flex items-center gap-2 mt-2">
+                    <span className="text-xs text-muted-foreground">{t('muezzin')}:</span>
+                    <Select dir={direction} value={adhanMuezzinId} onValueChange={setAdhanMuezzinId}>
+                      <SelectTrigger className="w-52 h-8 text-xs">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {adhanSources.map(src => (
+                          <SelectItem key={src.id} value={src.id}>
+                            {language === 'ar' ? src.nameAr : src.nameEn}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      title={t('previewAdhan')}
+                      onClick={() => { previewAdhan(adhanMuezzinId); setAdhanState('playing'); }}
+                    >
+                      <Play className="w-3.5 h-3.5" />
+                    </Button>
+                    {/* Pause / Resume */}
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      title={adhanState === 'paused' ? t('resumeAdhan') : t('pauseAdhan')}
+                      disabled={adhanState === 'idle'}
+                      onClick={() => {
+                        if (adhanState === 'paused') { resumeAdhan(); setAdhanState('playing'); }
+                        else { pauseAdhan(); setAdhanState('paused'); }
+                      }}
+                    >
+                      {adhanState === 'paused'
+                        ? <Play className="w-3.5 h-3.5 text-primary" />
+                        : <Pause className="w-3.5 h-3.5" />}
+                    </Button>
+                    {/* Stop */}
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      title={t('stopAdhan')}
+                      disabled={adhanState === 'idle'}
+                      onClick={() => { stopAdhan(); setAdhanState('idle'); }}
+                    >
+                      <Square className="w-3.5 h-3.5" />
+                    </Button>
+                  </div>
+                )}
                 
                 {showSearch && (
                   <div className="w-full max-w-sm mt-4 space-y-2">

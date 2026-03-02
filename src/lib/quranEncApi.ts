@@ -26,6 +26,56 @@ export interface TranslationAyah {
   footnotes: string;
 }
 
+// Arabic tafsir/translation editions — not returned by the quranenc list API
+// but their sura endpoints work correctly, so we inject them manually.
+export const arabicTranslations: TranslationEdition[] = [
+  {
+    key: 'arabic_moyassar',
+    direction: 'rtl',
+    language_iso_code: 'ar',
+    version: '1.0.4',
+    last_update: 1700000000,
+    title: 'التفسير الميسر',
+    description: 'مجمع الملك فهد لطباعة المصحف الشريف بالمدينة المنورة'
+  },
+  {
+    key: 'arabic_yaseer',
+    direction: 'rtl',
+    language_iso_code: 'ar',
+    version: '1.0.10',
+    last_update: 1735430400,
+    title: 'اليسير في التفسير',
+    description: 'اليسير في التفسير'
+  },
+  {
+    key: 'arabic_mokhtasar',
+    direction: 'rtl',
+    language_iso_code: 'ar',
+    version: '1.0.0',
+    last_update: 1487116800,
+    title: 'المختصر في تفسير القرآن الكريم',
+    description: 'مركز تفسير للدراسات القرآنية'
+  },
+  {
+    key: 'arabic_seraj',
+    direction: 'rtl',
+    language_iso_code: 'ar',
+    version: '1.0.0',
+    last_update: 1487116800,
+    title: 'السراج في بيان غريب القرآن',
+    description: 'كتاب السراج في بيان غريب القرآن'
+  },
+  {
+    key: 'arabic_nafahat',
+    direction: 'rtl',
+    language_iso_code: 'ar',
+    version: '1.0.0',
+    last_update: 1735084800,
+    title: 'النفحات المكية - محمد بن صالح الشاوي',
+    description: 'النفحات المكية في تفسير كتاب رب البرية للشيخ محمد بن صالح الشاوي'
+  },
+];
+
 // Fetch all available translations with optional language filter
 export async function fetchAvailableTranslations(language?: string, localization: string = 'en'): Promise<TranslationEdition[]> {
   try {
@@ -37,7 +87,19 @@ export async function fetchAvailableTranslations(language?: string, localization
     
     const response = await fetch(url);
     const data = await response.json();
-    return data.translations || [];
+    const apiResults: TranslationEdition[] = data.translations || [];
+
+    // The API does not list Arabic tafsirs in its /translations/list endpoint,
+    // so we always inject them manually (deduplicating by key).
+    const existingKeys = new Set(apiResults.map(t => t.key));
+    const missingArabic = arabicTranslations.filter(t => !existingKeys.has(t.key));
+
+    // If caller requested Arabic-only, return only Arabic entries
+    if (language === 'ar') {
+      return arabicTranslations;
+    }
+
+    return [...missingArabic, ...apiResults];
   } catch (error) {
     console.error('Error fetching translations list:', error);
     return popularTranslations;
@@ -81,6 +143,7 @@ export async function fetchAyahTranslation(
 
 // Popular translations with their keys
 export const popularTranslations: TranslationEdition[] = [
+  ...arabicTranslations,
   {
     key: 'english_rwwad',
     direction: 'ltr',
@@ -107,15 +170,6 @@ export const popularTranslations: TranslationEdition[] = [
     last_update: 1756933433,
     title: 'English - Hilali and Khan',
     description: 'Translated by Taquddin Al-Hilali & Mohsen Khan'
-  },
-  {
-    key: 'arabic_moyassar',
-    direction: 'rtl',
-    language_iso_code: 'ar',
-    version: '1.0.4',
-    last_update: 1700000000,
-    title: 'التفسير الميسر',
-    description: 'تفسير الميسر'
   },
   {
     key: 'urdu_junagarhi',

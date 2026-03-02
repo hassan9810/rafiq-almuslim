@@ -1,7 +1,77 @@
 import { calculatePrayerTimes, formatTime, type PrayerTime } from './prayerTimes';
+import { getAdhanSource } from '@/data/adhanSources';
 
 const NOTIF_STORAGE_KEY = 'rafiq-prayer-notifications';
 const NOTIFIED_KEY = 'rafiq-notified-prayers';
+const ADHAN_PLAYED_KEY = 'rafiq-adhan-played';
+
+// ── Adhan audio ────────────────────────────────────────────────────────────
+let currentAdhanAudio: HTMLAudioElement | null = null;
+
+export function stopAdhan() {
+  if (currentAdhanAudio) {
+    currentAdhanAudio.pause();
+    currentAdhanAudio.currentTime = 0;
+    currentAdhanAudio = null;
+  }
+}
+
+export function pauseAdhan() {
+  if (currentAdhanAudio && !currentAdhanAudio.paused) {
+    currentAdhanAudio.pause();
+  }
+}
+
+export function resumeAdhan() {
+  if (currentAdhanAudio && currentAdhanAudio.paused) {
+    currentAdhanAudio.play().catch(e => console.error('Adhan resume error:', e));
+  }
+}
+
+export function isAdhanPlaying(): boolean {
+  return !!currentAdhanAudio && !currentAdhanAudio.paused;
+}
+
+export function isAdhanPaused(): boolean {
+  return !!currentAdhanAudio && currentAdhanAudio.paused;
+}
+
+export function playAdhan(audioUrl: string) {
+  stopAdhan();
+  try {
+    currentAdhanAudio = new Audio(audioUrl);
+    currentAdhanAudio.play().catch(e => console.error('Adhan play error:', e));
+    currentAdhanAudio.onended = () => { currentAdhanAudio = null; };
+  } catch (e) {
+    console.error('Failed to create adhan audio:', e);
+  }
+}
+
+export function previewAdhan(muezzinId: string) {
+  const source = getAdhanSource(muezzinId);
+  playAdhan(source.audioUrl);
+}
+
+function wasAdhanPlayed(prayer: string): boolean {
+  try {
+    const today = new Date().toISOString().split('T')[0];
+    const played: string[] = JSON.parse(localStorage.getItem(ADHAN_PLAYED_KEY) || '[]');
+    return played.includes(`${prayer}-${today}`);
+  } catch { return false; }
+}
+
+function markAdhanPlayed(prayer: string) {
+  try {
+    const today = new Date().toISOString().split('T')[0];
+    const played: string[] = JSON.parse(localStorage.getItem(ADHAN_PLAYED_KEY) || '[]');
+    const key = `${prayer}-${today}`;
+    if (!played.includes(key)) {
+      const todayEntries = played.filter(k => k.endsWith(today));
+      todayEntries.push(key);
+      localStorage.setItem(ADHAN_PLAYED_KEY, JSON.stringify(todayEntries));
+    }
+  } catch { /* ignore */ }
+}
 
 export function isNotificationSupported(): boolean {
   return 'Notification' in window;
@@ -95,10 +165,13 @@ export function sendPrayerNotification(prayer: PrayerTime, lang: string) {
 export function checkAndNotifyPrayers(
   latitude: number,
   longitude: number,
-  lang: string
+  lang: string,
+  adhanEnabled?: boolean,
+  adhanMuezzinId?: string,
 ) {
-  if (!isNotificationsEnabled()) return;
-  if (!isNotificationSupported() || Notification.permission !== 'granted') return;
+  const canNotify = isNotificationsEnabled() && isNotificationSupported() && Notification.permission === 'granted';
+
+  if (!canNotify && !adhanEnabled) return;
 
   const prayers = calculatePrayerTimes(latitude, longitude);
   const now = Date.now();
@@ -111,7 +184,17 @@ export function checkAndNotifyPrayers(
     if (!notifiable.includes(prayer.name)) continue;
     const diff = now - prayer.time.getTime();
     if (diff >= 0 && diff < THRESHOLD) {
-      sendPrayerNotification(prayer, lang);
+      if (canNotify) {
+        sendPrayerNotification(prayer, lang);
+      }
+      if (adhanEnabled && adhanMuezzinId && !wasAdhanPlayed(prayer.name)) {
+        const source = getAdhanSource(adhanMuezzinId);
+        const url = prayer.name === 'Fajr' && source.fajrAudioUrl
+          ? source.fajrAudioUrl
+          : source.audioUrl;
+        playAdhan(url);
+        markAdhanPlayed(prayer.name);
+      }
     }
   }
 }

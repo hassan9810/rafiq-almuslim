@@ -296,5 +296,14 @@
   "turkey": "Turkey (Diyanet)",
   "confirmRemoveBookmark": "Remove this bookmark?",
   "confirm": "Confirm",
-  "cancel": "Cancel"
+  "cancel": "Cancel",
+  "adhanEnabled": "Adhan enabled",
+  "adhanDisabled": "Adhan disabled",
+  "enableAdhan": "Enable Adhan",
+  "disableAdhan": "Disable Adhan",
+  "muezzin": "Muezzin",
+  "previewAdhan": "Preview Adhan",
+  "pauseAdhan": "Pause",
+  "resumeAdhan": "Resume",
+  "stopAdhan": "Stop"
 }
