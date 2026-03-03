@@ -131,12 +131,19 @@ export function calculatePrayerTimes(latitude: number, longitude: number, date: 
   ];
 
 
-  // Find next prayer
-  const nextPrayer = prayerTimes.nextPrayer();
+  // Find next prayer (including custom ones like Midnight, LastThird)
+  const now = new Date();
+  let nextIndex = -1;
+  for (let i = 0; i < prayers.length; i++) {
+    if (prayers[i].time.getTime() > now.getTime()) {
+      nextIndex = i;
+      break;
+    }
+  }
 
-  return prayers.map((prayer) => ({
+  return prayers.map((prayer, i) => ({
     ...prayer,
-    isNext: Prayer[nextPrayer] === prayer.name,
+    isNext: i === nextIndex,
   }));
 }
 
