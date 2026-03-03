@@ -425,7 +425,9 @@ export default function PrayerTimesPage() {
                           {language === 'ar' ? prayer.nameArabic : prayer.name}
                         </h3>
                         {prayer.isNext && (
-                          <p className="text-xs text-primary">{t('nextPrayer')}</p>
+                          <p className="text-xs text-primary font-medium">
+                            {t('nextPrayer')} · {timeUntilNext}
+                          </p>
                         )}
                       </div>
                     </div>
