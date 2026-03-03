@@ -336,11 +336,9 @@ export default function TextMushafPage() {
             <span className="bg-primary/10 text-primary rounded-full px-3 py-1 font-medium">
               {language === 'ar' ? toArabicNumerals(pageNum) : pageNum}
             </span>
-            {isJuzStart && (
-              <span className="bg-primary/20 text-primary-foreground rounded-full px-2 py-0.5 text-xs juz-marker">
-                ۞ {language === 'ar' ? `الجزء ${toArabicNumerals(pageJuz)}` : `Juz ${pageJuz}`}
-              </span>
-            )}
+            <span className={`${isJuzStart ? 'bg-primary/20 text-primary-foreground juz-marker' : 'bg-muted text-muted-foreground'} rounded-full px-2 py-0.5 text-xs`}>
+              {isJuzStart ? '۞ ' : ''}{language === 'ar' ? `الجزء ${toArabicNumerals(pageJuz)}` : `Juz ${pageJuz}`}
+            </span>
             {/* Hizb marker */}
             {(() => {
               const hizbStart = isHizbStart(pageNum);
