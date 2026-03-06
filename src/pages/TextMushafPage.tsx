@@ -396,41 +396,33 @@ export default function TextMushafPage() {
                 {isFirstAyah && (
                   <div className="text-center mb-6">
                     {/* Decorative surah header */}
-                    <div className="relative w-full max-w-sm mx-auto mb-4">
-                      <div className="relative bg-card border border-border/60 rounded-xl overflow-hidden shadow-soft">
-                        {/* Top accent bar */}
-                        <div className="h-1 bg-gradient-to-r from-transparent via-primary to-transparent" />
+                    <div className="relative inline-block w-full max-w-md mx-auto">
+                      {/* Ornamental frame */}
+                      <div className="relative bg-gradient-to-b from-primary/10 via-primary/5 to-transparent rounded-2xl border border-primary/20 px-6 py-4 mb-4">
+                        {/* Surah name */}
+                        <h2 className="text-xl md:text-2xl font-bold surah-header-text text-primary mb-2">
+                          {language === 'ar' ? `سُورَةُ ${surah?.nameAr}` : surah?.name}
+                        </h2>
 
-                        <div className="px-5 py-3 space-y-1.5">
-                          {/* Surah name */}
-                          <h2 className="text-xl md:text-2xl font-bold font-arabic text-primary leading-relaxed">
-                            {language === 'ar' ? `سُورَةُ ${surah?.nameAr}` : surah?.name}
-                          </h2>
-
-                          {/* Metadata row */}
-                          <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
-                            <span className={`px-2 py-0.5 rounded-md font-medium ${
-                              surah?.type === 'Meccan'
-                                ? 'bg-accent/10 text-accent'
-                                : 'bg-primary/10 text-primary'
-                            }`}>
-                              {surah?.type === 'Meccan'
-                                ? (language === 'ar' ? 'مكية' : 'Meccan')
-                                : (language === 'ar' ? 'مدنية' : 'Medinan')
-                              }
-                            </span>
-                            <span className="text-border">|</span>
-                            <span>
-                              {language === 'ar'
-                                ? `${toArabicNumerals(surah?.ayahs || 0)} آية`
-                                : `${surah?.ayahs} Ayahs`
-                              }
-                            </span>
-                          </div>
+                        {/* Metadata badges */}
+                        <div className="flex items-center justify-center gap-3 text-xs">
+                          <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full font-medium ${
+                            surah?.type === 'Meccan'
+                              ? 'bg-accent/15 text-accent'
+                              : 'bg-primary/15 text-primary'
+                          }`}>
+                            {surah?.type === 'Meccan'
+                              ? (language === 'ar' ? 'مكية' : 'Meccan')
+                              : (language === 'ar' ? 'مدنية' : 'Medinan')
+                            }
+                          </span>
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-muted text-muted-foreground font-medium">
+                            {language === 'ar'
+                              ? `${toArabicNumerals(surah?.ayahs || 0)} آية`
+                              : `${surah?.ayahs} Ayahs`
+                            }
+                          </span>
                         </div>
-
-                        {/* Bottom accent bar */}
-                        <div className="h-1 bg-gradient-to-r from-transparent via-primary to-transparent" />
                       </div>
                     </div>
 
