@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -101,6 +101,8 @@ export default function SurahReader() {
   );
   const [popupTafsirText, setPopupTafsirText] = useState<string | null>(null);
   const [popupTafsirLoading, setPopupTafsirLoading] = useState(false);
+  const [readingProgress, setReadingProgress] = useState(0);
+  const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setPopupTafsirSource(language === 'ar' ? tafsirEditions[2].slug : tafsirEditions[7].slug);
@@ -234,6 +236,21 @@ export default function SurahReader() {
     return bookmarks.some(b => b.surah === surahNum && b.ayah === ayahNum);
   };
 
+  // Reading progress scroll tracking
+  useEffect(() => {
+    const handleScroll = () => {
+      const el = contentRef.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      const totalHeight = el.scrollHeight - window.innerHeight;
+      const scrolled = -rect.top;
+      const pct = Math.min(100, Math.max(0, (scrolled / totalHeight) * 100));
+      setReadingProgress(pct);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   if (loading) {
     return (
       <div>
@@ -263,7 +280,25 @@ export default function SurahReader() {
   const { arabic, translation } = surahData;
 
   return (
-    <div>
+    <div ref={contentRef}>
+      {/* Reading Progress Bar - fixed top */}
+      <div className="fixed top-0 left-0 right-0 z-[60] h-1 bg-muted/30">
+        <motion.div
+          className="h-full bg-gradient-to-r from-primary to-accent"
+          style={{ width: `${readingProgress}%` }}
+          transition={{ duration: 0.1 }}
+        />
+      </div>
+
+      {/* Reading Progress Bar - fixed top */}
+      <div className="fixed top-0 left-0 right-0 z-[60] h-1 bg-muted/30">
+        <motion.div
+          className="h-full bg-gradient-to-r from-primary to-accent"
+          style={{ width: `${readingProgress}%` }}
+          transition={{ duration: 0.1 }}
+        />
+      </div>
+
       <main>
         <div className="container max-w-4xl py-8">
           {/* Surah Header */}
