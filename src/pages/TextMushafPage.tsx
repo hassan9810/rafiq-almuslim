@@ -395,11 +395,47 @@ export default function TextMushafPage() {
                 {/* Surah Header */}
                 {isFirstAyah && (
                   <div className="text-center mb-6">
-                    <div className="inline-block bg-primary/10 rounded-xl px-6 py-3 mb-4">
-                      <h2 className="text-xl md:text-2xl font-bold surah-header-text text-primary">
-                        {language === 'ar' ? surah?.nameAr : surah?.name}
-                      </h2>
+                    {/* Decorative surah header */}
+                    <div className="relative inline-block w-full max-w-md mx-auto">
+                      {/* Ornamental frame */}
+                      <div className="relative bg-gradient-to-b from-primary/10 via-primary/5 to-transparent rounded-2xl border border-primary/20 px-6 py-4 mb-4">
+                        {/* Top decorative line */}
+                        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-card px-3">
+                          <span className="text-primary/60 text-lg">❁</span>
+                        </div>
+
+                        {/* Surah name */}
+                        <h2 className="text-xl md:text-2xl font-bold surah-header-text text-primary mb-2">
+                          {language === 'ar' ? `سُورَةُ ${surah?.nameAr}` : surah?.name}
+                        </h2>
+
+                        {/* Metadata badges */}
+                        <div className="flex items-center justify-center gap-3 text-xs">
+                          <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full font-medium ${
+                            surah?.type === 'Meccan'
+                              ? 'bg-accent/15 text-accent'
+                              : 'bg-primary/15 text-primary'
+                          }`}>
+                            {surah?.type === 'Meccan'
+                              ? (language === 'ar' ? '🕋 مكية' : '🕋 Meccan')
+                              : (language === 'ar' ? '🕌 مدنية' : '🕌 Medinan')
+                            }
+                          </span>
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-muted text-muted-foreground font-medium">
+                            {language === 'ar'
+                              ? `${toArabicNumerals(surah?.ayahs || 0)} آية`
+                              : `${surah?.ayahs} Ayahs`
+                            }
+                          </span>
+                        </div>
+
+                        {/* Bottom decorative line */}
+                        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 bg-card px-3">
+                          <span className="text-primary/60 text-lg">❁</span>
+                        </div>
+                      </div>
                     </div>
+
                     {/* Bismillah - except for Surah 9 (At-Tawbah) */}
                     {parseInt(surahNum) !== 9 && parseInt(surahNum) !== 1 && (
                       <div className="bismillah-golden text-2xl md:text-3xl mb-4 font-arabic">
