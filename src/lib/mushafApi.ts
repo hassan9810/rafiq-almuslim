@@ -141,7 +141,7 @@ export function isQuarterStart(page: number): { quarter: number; position: 1 | 2
 export const pageToSurahMap: { [key: number]: { surah: number; name: string; nameAr: string }[] } = {};
 
 // Surah names
-export const surahNames: { number: number; name: string; nameAr: string }[] = [
+export const surahNames: { number: number; name: string; nameAr: string; ayahs: number; type: 'Meccan' | 'Medinan' }[] = [
   { number: 1, name: 'Al-Fatiha', nameAr: 'الفاتحة' },
   { number: 2, name: 'Al-Baqarah', nameAr: 'البقرة' },
   { number: 3, name: 'Aal-Imran', nameAr: 'آل عمران' },
