@@ -101,6 +101,8 @@ export default function SurahReader() {
   );
   const [popupTafsirText, setPopupTafsirText] = useState<string | null>(null);
   const [popupTafsirLoading, setPopupTafsirLoading] = useState(false);
+  const [readingProgress, setReadingProgress] = useState(0);
+  const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setPopupTafsirSource(language === 'ar' ? tafsirEditions[2].slug : tafsirEditions[7].slug);
