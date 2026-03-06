@@ -262,8 +262,35 @@ export default function SurahReader() {
 
   const { arabic, translation } = surahData;
 
+  // ── Reading progress bar (scroll-based) ──
+  const [readingProgress, setReadingProgress] = useState(0);
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const el = contentRef.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      const totalHeight = el.scrollHeight - window.innerHeight;
+      const scrolled = -rect.top;
+      const pct = Math.min(100, Math.max(0, (scrolled / totalHeight) * 100));
+      setReadingProgress(pct);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
-    <div>
+    <div ref={contentRef}>
+      {/* Reading Progress Bar - fixed top */}
+      <div className="fixed top-0 left-0 right-0 z-[60] h-1 bg-muted/30">
+        <motion.div
+          className="h-full bg-gradient-to-r from-primary to-accent"
+          style={{ width: `${readingProgress}%` }}
+          transition={{ duration: 0.1 }}
+        />
+      </div>
+
       <main>
         <div className="container max-w-4xl py-8">
           {/* Surah Header */}
