@@ -236,6 +236,21 @@ export default function SurahReader() {
     return bookmarks.some(b => b.surah === surahNum && b.ayah === ayahNum);
   };
 
+  // Reading progress scroll tracking
+  useEffect(() => {
+    const handleScroll = () => {
+      const el = contentRef.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      const totalHeight = el.scrollHeight - window.innerHeight;
+      const scrolled = -rect.top;
+      const pct = Math.min(100, Math.max(0, (scrolled / totalHeight) * 100));
+      setReadingProgress(pct);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   if (loading) {
     return (
       <div>
