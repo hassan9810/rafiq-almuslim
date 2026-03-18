@@ -157,22 +157,10 @@ export function SurahList() {
           </div>
         )}
 
-        {activeTab === 'favorites' && favorites.length === 0 && (
+        {!loading && displayedSurahs.length === 0 && (
           <div className="text-center py-12 text-muted-foreground">
-            <Star className="w-12 h-12 mx-auto mb-4 opacity-50" />
-            <p>{t('noFavoriteSurahs')}</p>
-          </div>
-        )}
-
-        {activeTab === 'bookmarks' && bookmarks.length === 0 && (
-          <div className="text-center py-12 text-muted-foreground">
-            <p>{t('noBookmarks')}</p>
-          </div>
-        )}
-
-        {activeTab === 'recent' && recentReads.length === 0 && (
-          <div className="text-center py-12 text-muted-foreground">
-            <p>{t('noRecentReads')}</p>
+            {activeTab === 'favorites' && <Star className="w-12 h-12 mx-auto mb-4 opacity-50" />}
+            <p>{t('noItemsToDisplay')}</p>
           </div>
         )}
       </div>
