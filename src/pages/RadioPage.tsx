@@ -88,24 +88,35 @@ export default function RadioPage() {
     }
   }, [volume, isMuted]);
 
-  const handlePlayStation = async (station: RadioStation) => {
+  const handlePlayStation = (station: RadioStation) => {
     if (!audioRef.current) return;
-    setLoading(true);
 
     if (currentStation?.id === station.id && isPlaying) {
       audioRef.current.pause();
       setIsPlaying(false);
-      setLoading(false);
-    } else {
-      audioRef.current.src = station.url;
-      setCurrentStation(station);
-      try {
-        await audioRef.current.play();
-        setIsPlaying(true);
-      } catch (error) {
-        console.error('Error playing audio:', error);
-      }
-      setLoading(false);
+      return;
+    }
+
+    // Unlock audio synchronously within user gesture context (critical for in-app browsers)
+    const audio = audioRef.current;
+    audio.src = station.url;
+    audio.load();
+    const playPromise = audio.play();
+
+    setLoading(true);
+    setCurrentStation(station);
+
+    if (playPromise !== undefined) {
+      playPromise
+        .then(() => {
+          setIsPlaying(true);
+          setLoading(false);
+        })
+        .catch((error) => {
+          console.error('Error playing audio:', error);
+          setIsPlaying(false);
+          setLoading(false);
+        });
     }
   };
 
