@@ -5,6 +5,7 @@ export interface RadioStation {
   name: string;
   nameAr?: string;
   url: string;
+  fallbackUrl?: string;
   img?: string;
   categories: RadioCategory[];
 }
