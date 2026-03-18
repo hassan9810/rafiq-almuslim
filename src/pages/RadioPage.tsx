@@ -88,18 +88,20 @@ export default function RadioPage() {
     }
   }, [volume, isMuted]);
 
-  const handlePlayStation = (station: RadioStation) => {
+  const handlePlayStation = (station: RadioStation, useFallback = false) => {
     if (!audioRef.current) return;
 
-    if (currentStation?.id === station.id && isPlaying) {
+    if (currentStation?.id === station.id && isPlaying && !useFallback) {
       audioRef.current.pause();
       setIsPlaying(false);
       return;
     }
 
+    const streamUrl = useFallback && station.fallbackUrl ? station.fallbackUrl : station.url;
+
     // Unlock audio synchronously within user gesture context (critical for in-app browsers)
     const audio = audioRef.current;
-    audio.src = station.url;
+    audio.src = streamUrl;
     audio.load();
     const playPromise = audio.play();
 
@@ -114,8 +116,14 @@ export default function RadioPage() {
         })
         .catch((error) => {
           console.error('Error playing audio:', error);
-          setIsPlaying(false);
-          setLoading(false);
+          // If primary URL fails and fallback exists, try fallback
+          if (!useFallback && station.fallbackUrl) {
+            console.log('Trying fallback URL for', station.name);
+            handlePlayStation(station, true);
+          } else {
+            setIsPlaying(false);
+            setLoading(false);
+          }
         });
     }
   };
