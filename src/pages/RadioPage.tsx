@@ -88,6 +88,27 @@ export default function RadioPage() {
     }
   }, [volume, isMuted]);
 
+  // Handle audio errors (e.g. stream 404) — try fallback URL
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    const onError = () => {
+      if (currentStation?.fallbackUrl && audio.src !== currentStation.fallbackUrl) {
+        console.log('Stream error, trying fallback for', currentStation.name);
+        audio.src = currentStation.fallbackUrl;
+        audio.load();
+        audio.play()
+          .then(() => { setIsPlaying(true); setLoading(false); })
+          .catch(() => { setIsPlaying(false); setLoading(false); });
+      } else {
+        setIsPlaying(false);
+        setLoading(false);
+      }
+    };
+    audio.addEventListener('error', onError);
+    return () => audio.removeEventListener('error', onError);
+  }, [currentStation]);
+
   const handlePlayStation = (station: RadioStation, useFallback = false) => {
     if (!audioRef.current) return;
 
