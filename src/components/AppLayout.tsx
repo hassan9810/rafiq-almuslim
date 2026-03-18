@@ -1,9 +1,9 @@
 import { useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import { useAppStore } from '@/store/useAppStore';
-import { Header } from '@/components/Header';
-import { Footer } from '@/components/Footer';
-import { ScrollToTop } from '@/components/ScrollToTop';
+// import { Header } from '@/components/Header';
+// import { Footer } from '@/components/Footer';
+// import { ScrollToTop } from '@/components/ScrollToTop';
 import { checkAndNotifyPrayers } from '@/lib/prayerNotifications';
 import { useTranslation } from '@/hooks/useTranslation';
 
@@ -33,12 +33,15 @@ export function AppLayout() {
 
   return (
     <div className="min-h-screen bg-background" dir={direction}>
-      {!hideAppHeader && <Header />}
+      {/* Temporarily hidden: top header buttons */}
+      {/* {!hideAppHeader && <Header />} */}
       <main className='py-24'>
         <Outlet />
       </main>
-      {!hideAppHeader && <Footer />}
-      <ScrollToTop />
+      {/* Temporarily hidden: bottom footer buttons/links */}
+      {/* {!hideAppHeader && <Footer />} */}
+      {/* Temporarily hidden: floating bottom button */}
+      {/* <ScrollToTop /> */}
     </div>
   );
 }
