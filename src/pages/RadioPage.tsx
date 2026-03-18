@@ -88,18 +88,41 @@ export default function RadioPage() {
     }
   }, [volume, isMuted]);
 
-  const handlePlayStation = (station: RadioStation) => {
+  // Handle audio errors (e.g. stream 404) — try fallback URL
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    const onError = () => {
+      if (currentStation?.fallbackUrl && audio.src !== currentStation.fallbackUrl) {
+        console.log('Stream error, trying fallback for', currentStation.name);
+        audio.src = currentStation.fallbackUrl;
+        audio.load();
+        audio.play()
+          .then(() => { setIsPlaying(true); setLoading(false); })
+          .catch(() => { setIsPlaying(false); setLoading(false); });
+      } else {
+        setIsPlaying(false);
+        setLoading(false);
+      }
+    };
+    audio.addEventListener('error', onError);
+    return () => audio.removeEventListener('error', onError);
+  }, [currentStation]);
+
+  const handlePlayStation = (station: RadioStation, useFallback = false) => {
     if (!audioRef.current) return;
 
-    if (currentStation?.id === station.id && isPlaying) {
+    if (currentStation?.id === station.id && isPlaying && !useFallback) {
       audioRef.current.pause();
       setIsPlaying(false);
       return;
     }
 
+    const streamUrl = useFallback && station.fallbackUrl ? station.fallbackUrl : station.url;
+
     // Unlock audio synchronously within user gesture context (critical for in-app browsers)
     const audio = audioRef.current;
-    audio.src = station.url;
+    audio.src = streamUrl;
     audio.load();
     const playPromise = audio.play();
 
@@ -114,8 +137,14 @@ export default function RadioPage() {
         })
         .catch((error) => {
           console.error('Error playing audio:', error);
-          setIsPlaying(false);
-          setLoading(false);
+          // If primary URL fails and fallback exists, try fallback
+          if (!useFallback && station.fallbackUrl) {
+            console.log('Trying fallback URL for', station.name);
+            handlePlayStation(station, true);
+          } else {
+            setIsPlaying(false);
+            setLoading(false);
+          }
         });
     }
   };
