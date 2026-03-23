@@ -1,5 +1,3 @@
-import { useEffect } from 'react';
-import { useAppStore } from '@/store/useAppStore';
 import { useTranslation } from '@/hooks/useTranslation';
 import { HeroSection } from '@/components/HeroSection';
 import { SurahList } from '@/components/SurahList';
@@ -9,12 +7,7 @@ import { DhikrOfTheDay } from '@/components/DhikrOfTheDay';
 import { NextPrayerWidget } from '@/components/NextPrayerWidget';
 
 const Index = () => {
-  const { theme } = useAppStore();
   const { language } = useTranslation();
-
-  useEffect(() => {
-    document.documentElement.classList.toggle('dark', theme === 'dark');
-  }, [theme]);
 
   return (
     <div className="-mt-24">
