@@ -19,7 +19,6 @@ import {
   type RadioStation,
   type RadioCategory,
 } from '@/data/radioStations';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 
 export default function RadioPage() {
   const { t, language } = useTranslation();
@@ -190,23 +189,20 @@ export default function RadioPage() {
             )}
           </div>
 
-          {/* Category Tabs */}
-          <ScrollArea className="w-full mb-4">
-            <div className="flex gap-2 pb-2">
-              {RADIO_CATEGORIES.map(cat => (
-                <Button
-                  key={cat.key}
-                  variant={activeCategory === cat.key ? 'default' : 'outline'}
-                  size="sm"
-                  className="shrink-0 rounded-full text-xs font-medium"
-                  onClick={() => setActiveCategory(cat.key)}
-                >
-                  {getCategoryLabel(cat)}
-                </Button>
-              ))}
-            </div>
-            <ScrollBar orientation="horizontal" />
-          </ScrollArea>
+          {/* Category Tabs - Wrapped layout for all screens */}
+          <div className="flex flex-wrap gap-2 mb-4">
+            {RADIO_CATEGORIES.map(cat => (
+              <Button
+                key={cat.key}
+                variant={activeCategory === cat.key ? 'default' : 'outline'}
+                size="sm"
+                className="rounded-full text-xs font-medium"
+                onClick={() => setActiveCategory(cat.key)}
+              >
+                {getCategoryLabel(cat)}
+              </Button>
+            ))}
+          </div>
 
           {/* Count */}
           <p className="text-xs text-muted-foreground mb-3">
