@@ -239,9 +239,9 @@ export function HeroSection() {
                 <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
               </Button>
 
-              {/* Gold button with sweeping shimmer */}
+              {/* Primary theme button with sweeping shimmer */}
               <Button
-                variant="gold"
+                variant="hero"
                 size="xl"
                 onClick={() => navigate('/quran')}
                 className="group relative overflow-hidden"

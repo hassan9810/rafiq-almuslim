@@ -4,6 +4,7 @@ import { BookOpen, RefreshCw, Share2, Copy } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { getSeasonalAyahList, TOTAL_QURAN_AYAHS } from '@/data/curatedAyahs';
 
 interface AyahData {
   text: string;
@@ -17,26 +18,57 @@ function getDaySeed(): number {
   return now.getFullYear() * 10000 + (now.getMonth() + 1) * 100 + now.getDate();
 }
 
+/**
+ * Get ayah reference for today using hybrid approach:
+ * - 80% from curated list (seasonal or general)
+ * - 20% random from entire Quran (for variety and discovery)
+ */
+function getTodayAyahReference(): { surah: number; ayah: number } {
+  const seed = getDaySeed();
+  const curatedList = getSeasonalAyahList();
+
+  // Use modulo to determine if we use curated (0-7) or random (8-9)
+  const useRandom = (seed % 10) >= 8; // 20% chance
+
+  if (useRandom) {
+    // Random ayah from entire Quran
+    // This is a simplified approach - we return a number from 1-6236
+    // which will need conversion to surah:ayah in the API call
+    const ayahNumber = (seed % TOTAL_QURAN_AYAHS) + 1;
+    // For the random approach, we'll use the global ayah number
+    return { surah: 0, ayah: ayahNumber }; // surah=0 means use global number
+  } else {
+    // Pick from curated list
+    const index = Math.floor(seed / 10) % curatedList.length;
+    return curatedList[index];
+  }
+}
+
 export function AyahOfTheDay() {
   const { t, language } = useTranslation();
   const { toast } = useToast();
   const [ayah, setAyah] = useState<AyahData | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const ayahNumber = useMemo(() => {
-    // Deterministic "random" ayah based on day (1-6236)
-    return (getDaySeed() % 6236) + 1;
-  }, []);
+  const ayahRef = useMemo(() => getTodayAyahReference(), []);
 
   useEffect(() => {
     let cancelled = false;
     async function fetchAyah() {
       setLoading(true);
       try {
-        const [arRes, enRes] = await Promise.all([
-          fetch(`https://api.alquran.cloud/v1/ayah/${ayahNumber}/quran-simple`),
-          fetch(`https://api.alquran.cloud/v1/ayah/${ayahNumber}/en.sahih`),
-        ]);
+        let arRes, enRes;
+
+        if (ayahRef.surah === 0) {
+          // Random mode: use global ayah number (1-6236)
+          arRes = await fetch(`https://api.alquran.cloud/v1/ayah/${ayahRef.ayah}/quran-simple`);
+          enRes = await fetch(`https://api.alquran.cloud/v1/ayah/${ayahRef.ayah}/en.sahih`);
+        } else {
+          // Curated mode: use surah:ayah reference
+          arRes = await fetch(`https://api.alquran.cloud/v1/ayah/${ayahRef.surah}:${ayahRef.ayah}/quran-simple`);
+          enRes = await fetch(`https://api.alquran.cloud/v1/ayah/${ayahRef.surah}:${ayahRef.ayah}/en.sahih`);
+        }
+
         const arData = await arRes.json();
         const enData = await enRes.json();
         if (!cancelled && arData.data) {
@@ -55,7 +87,7 @@ export function AyahOfTheDay() {
     }
     fetchAyah();
     return () => { cancelled = true; };
-  }, [ayahNumber]);
+  }, [ayahRef]);
 
   const handleCopy = () => {
     if (!ayah) return;
