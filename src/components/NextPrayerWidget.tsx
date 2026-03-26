@@ -16,21 +16,29 @@ export function NextPrayerWidget() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (location) {
-      setPrayerTimes(calculatePrayerTimes(location.latitude, location.longitude, new Date(), calculationMethod));
-    }
-  }, [location, calculationMethod]);
+    if (!location) return;
 
-  useEffect(() => {
-    if (!prayerTimes.length) return;
-    const update = () => {
-      const next = prayerTimes.find(p => p.isNext);
-      if (next) setTimeUntilNext(getTimeUntilNextPrayer(next.time));
+    const areTimesEqual = (a: PrayerTime[], b: PrayerTime[]) => {
+      if (a.length !== b.length) return false;
+      return a.every((p, i) => (
+        p.name === b[i].name
+        && p.time.getTime() === b[i].time.getTime()
+        && p.isNext === b[i].isNext
+      ));
     };
-    update();
-    const id = setInterval(update, 1000);
+
+    const refreshPrayerState = () => {
+      const times = calculatePrayerTimes(location.latitude, location.longitude, new Date(), calculationMethod);
+      setPrayerTimes((prev) => (areTimesEqual(prev, times) ? prev : times));
+
+      const next = times.find((p) => p.isNext);
+      setTimeUntilNext(next ? getTimeUntilNextPrayer(next.time) : '');
+    };
+
+    refreshPrayerState();
+    const id = setInterval(refreshPrayerState, 5000);
     return () => clearInterval(id);
-  }, [prayerTimes]);
+  }, [location, calculationMethod]);
 
   const handleDetect = async () => {
     setLoading(true);
