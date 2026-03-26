@@ -82,7 +82,7 @@ export function Footer() {
                 <Github className="w-4 h-4" />
               </a>
               <a 
-                href="mailto:ahmed.hassan.shehatah@gmail.com" 
+                href="mailto:rafeeq.almuslim@gmail.com" 
                 className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center text-muted-foreground hover:bg-primary hover:text-primary-foreground transition-colors"
               >
                 <Mail className="w-4 h-4" />
