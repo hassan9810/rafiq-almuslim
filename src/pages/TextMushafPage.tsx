@@ -502,17 +502,30 @@ export default function TextMushafPage() {
                 </div>
               </div>
 
-              {/* Link to Image Mushaf */}
-              <Link to="/mushaf">
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className={`gap-2 ${settings.nightMode ? '!border-neutral-600 !text-neutral-100 !bg-neutral-800 hover:!bg-neutral-700' : ''}`}
-                >
-                  <BookOpen className="w-4 h-4" />
-                  {language === 'ar' ? 'المصحف المصور' : 'Image Mushaf'}
-                </Button>
-              </Link>
+              <div className="flex items-center gap-2 flex-wrap">
+                <Link to="/quran">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className={`gap-2 ${settings.nightMode ? '!border-neutral-600 !text-neutral-100 !bg-neutral-800 hover:!bg-neutral-700' : ''}`}
+                  >
+                    <Home className="w-4 h-4" />
+                    {language === 'ar' ? 'العودة للقرآن' : 'Back to Quran'}
+                  </Button>
+                </Link>
+
+                {/* Link to Image Mushaf */}
+                <Link to="/mushaf">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className={`gap-2 ${settings.nightMode ? '!border-neutral-600 !text-neutral-100 !bg-neutral-800 hover:!bg-neutral-700' : ''}`}
+                  >
+                    <BookOpen className="w-4 h-4" />
+                    {language === 'ar' ? 'المصحف المصور' : 'Image Mushaf'}
+                  </Button>
+                </Link>
+              </div>
             </div>
           </motion.div>
         )}

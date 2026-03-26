@@ -284,6 +284,12 @@ export default function MushafPage() {
         <div className="container max-w-6xl">
           <PageHeader icon={BookImage} title={t('holyQuranMushaf')} subtitle={t('browseMushafPages')} />
           <div className="flex flex-wrap items-center justify-center gap-3 mb-6 -mt-4">
+            <Link to="/quran">
+              <Button variant="outline" className="gap-2 btn-islamic">
+                <Home className="w-4 h-4" />
+                {t('backToQuran')}
+              </Button>
+            </Link>
             <Link to="/mushaf-text">
               <Button variant="outline" className="gap-2 btn-islamic">
                 <BookOpen className="w-4 h-4" />

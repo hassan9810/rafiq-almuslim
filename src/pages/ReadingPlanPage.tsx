@@ -64,7 +64,7 @@ export default function ReadingPlanPage() {
       <main>
         <div className="container max-w-3xl py-6">
           <div className="mb-4">
-            <Link to="/">
+            <Link to="/quran">
               <Button variant="ghost" size="sm" className="gap-2">
                 <ArrowLeft className="w-4 h-4" />
                 {t('back')}
