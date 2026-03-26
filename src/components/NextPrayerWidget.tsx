@@ -41,6 +41,10 @@ export function NextPrayerWidget() {
   };
 
   const nextPrayer = prayerTimes.find(p => p.isNext);
+  const isNextMainPrayer = nextPrayer
+    ? ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'].includes(nextPrayer.name)
+    : true;
+  const nextLabelKey = isNextMainPrayer ? 'nextPrayer' : 'nextTime';
 
   // Find next 3 prayers after current next
   const nextIndex = prayerTimes.findIndex(p => p.isNext);
@@ -67,7 +71,7 @@ export function NextPrayerWidget() {
               <Clock className="w-4 h-4 text-primary" />
             </div>
             <h3 className="font-semibold text-foreground">
-              {language === 'ar' ? 'الصلاة القادمة' : 'Next Prayer'}
+              {t(nextLabelKey)}
             </h3>
           </div>
           {location && (
@@ -94,7 +98,7 @@ export function NextPrayerWidget() {
                 <p className="text-lg font-bold text-primary">
                   {language === 'ar' ? nextPrayer.nameArabic : nextPrayer.name}
                 </p>
-                <p className="text-xs text-muted-foreground">{t('nextPrayer')}</p>
+                <p className="text-xs text-muted-foreground">{t(nextLabelKey)}</p>
               </div>
               <div className="text-end">
                 <p className="text-2xl font-bold text-foreground">{formatTime(nextPrayer.time)}</p>

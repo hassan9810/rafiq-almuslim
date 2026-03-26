@@ -148,6 +148,10 @@ export default function PrayerTimesPage() {
   };
 
   const nextPrayer = prayerTimes.find(p => p.isNext);
+  const isNextMainPrayer = nextPrayer
+    ? ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'].includes(nextPrayer.name)
+    : true;
+  const nextLabelKey = isNextMainPrayer ? 'nextPrayer' : 'nextTime';
 
   return (
     <div>
@@ -385,7 +389,7 @@ export default function PrayerTimesPage() {
                   animate={{ opacity: 1, y: 0 }}
                   className="hero-gradient rounded-3xl p-8 mb-8 text-center islamic-pattern"
                 >
-                  <p className="text-primary-foreground/70 text-sm mb-2">{t('nextPrayer')}</p>
+                  <p className="text-primary-foreground/70 text-sm mb-2">{t(nextLabelKey)}</p>
                   <div className="text-5xl mb-2">
                     {prayerIcons[nextPrayer.name as keyof typeof prayerIcons]}
                   </div>
@@ -426,7 +430,7 @@ export default function PrayerTimesPage() {
                         </h3>
                         {prayer.isNext && (
                           <p className="text-xs text-primary font-medium">
-                            {t('nextPrayer')} · {timeUntilNext}
+                            {t(['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'].includes(prayer.name) ? 'nextPrayer' : 'nextTime')} · {timeUntilNext}
                           </p>
                         )}
                       </div>

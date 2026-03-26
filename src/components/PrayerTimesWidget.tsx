@@ -45,6 +45,10 @@ export function PrayerTimesWidget() {
   };
 
   const nextPrayer = prayerTimes.find(p => p.isNext);
+  const isNextMainPrayer = nextPrayer
+    ? ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'].includes(nextPrayer.name)
+    : true;
+  const nextLabelKey = isNextMainPrayer ? 'nextPrayer' : 'nextTime';
 
   return (
     <motion.div
@@ -96,7 +100,7 @@ export function PrayerTimesWidget() {
             <div className="bg-gradient-to-r from-primary/10 to-accent/10 rounded-xl p-3 mb-4 border border-accent/15">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs text-muted-foreground">{t('nextPrayer')}</p>
+                  <p className="text-xs text-muted-foreground">{t(nextLabelKey)}</p>
                   <p className="text-lg font-bold text-primary">
                     {language === 'ar' ? nextPrayer.nameArabic : nextPrayer.name}
                   </p>
