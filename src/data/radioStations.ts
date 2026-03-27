@@ -45,6 +45,7 @@ export const curatedStations: RadioStation[] = [
   { id: 'c7j', name: 'Mahmoud Ali Al-Banna (Murattal)', nameAr: 'إذاعة محمود علي البنا', url: 'https://backup.qurango.net/radio/mahmoud_ali__albanna', categories: ['egyptian'] },
   { id: 'c7k', name: 'Ahmad Amer', nameAr: 'إذاعة أحمد عامر', url: 'https://backup.qurango.net/radio/ahmed_amer', categories: ['egyptian'] },
   { id: 'c7l', name: 'Ahmad Khalil Shaheen', nameAr: 'إذاعة أحمد خليل شاهين', url: 'https://backup.qurango.net/radio/ahmad_shaheen', categories: ['egyptian'] },
+  { id: 'c-baqarah', name: 'Surah Al-Baqarah - Various Reciters', nameAr: 'سورة البقرة - مختلف القراء', url: 'https://backup.qurango.net/radio/albaqarah', categories: ['official', 'misc'] },
   { id: 'c8', name: 'Maher Al-Muaiqly', nameAr: 'إذاعة ماهر المعيقلي', url: 'https://backup.qurango.net/radio/maher', img: 'https://is1-ssl.mzstatic.com/image/thumb/Podcasts113/v4/4b/80/58/4b80582d-78ca-a466-0341-0869bc611745/mza_5280524847349008894.jpg/250x250bb.jpg', categories: ['haramain'] },
   { id: 'c9', name: 'Mishary Al-Afasy', nameAr: 'إذاعة مشاري العفاسي', url: 'https://backup.qurango.net/radio/mishary_alafasi', img: 'https://i1.sndcdn.com/artworks-000019055020-yr9cjc-t200x200.jpg', categories: ['other'] },
   { id: 'c10', name: 'Abu Bakr Al-Shatri', nameAr: 'إذاعة أبو بكر الشاطري', url: 'https://backup.qurango.net/radio/shaik_abu_bakr_al_shatri', img: 'https://i1.sndcdn.com/artworks-000663801097-wb0y31-t200x200.jpg', categories: ['other'] },
