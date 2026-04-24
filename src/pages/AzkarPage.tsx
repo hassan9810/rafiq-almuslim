@@ -293,14 +293,18 @@ export default function AzkarPage() {
                             disabled={isComplete}
                             className="w-full text-center cursor-pointer disabled:cursor-default"
                           >
-                            <p className="font-arabic text-2xl md:text-3xl leading-loose text-right" dir={direction}>
+                            <p
+                              className="font-arabic text-2xl md:text-3xl text-right"
+                              dir="rtl"
+                              style={{ lineHeight: '2.1em', paddingBlock: '0.25em' }}
+                            >
                               {currentDhikr.text}
                             </p>
                           </motion.button>
 
                           {/* Translation */}
                           {currentDhikr.translation && (
-                            <p className="text-muted-foreground text-center">
+                            <p className="text-muted-foreground text-left" dir="ltr">
                               {currentDhikr.translation}
                             </p>
                           )}
