@@ -110,7 +110,7 @@ export function PrayerTimesWidget() {
                 <div>
                   <p className="text-xs text-muted-foreground">{t(nextLabelKey)}</p>
                   <p className="text-lg font-bold text-primary">
-                    {language === 'ar' ? nextPrayer.nameArabic : nextPrayer.name}
+                    {language === 'ar' ? nextPrayer.displayNameArabic : nextPrayer.displayName}
                   </p>
                 </div>
                 <div className="text-right">
@@ -132,7 +132,7 @@ export function PrayerTimesWidget() {
                 whileHover={{ x: 4 }}
               >
                 <span className={`text-sm ${prayer.isNext ? 'font-semibold text-primary' : 'text-foreground'}`}>
-                  {language === 'ar' ? prayer.nameArabic : prayer.name}
+                  {language === 'ar' ? prayer.displayNameArabic : prayer.displayName}
                 </span>
                 <span className={`text-sm font-medium ${prayer.isNext ? 'text-primary' : 'text-muted-foreground'}`}>
                   {formatTime(prayer.time)}

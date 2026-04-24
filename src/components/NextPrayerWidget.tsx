@@ -104,7 +104,7 @@ export function NextPrayerWidget() {
             <div className="flex items-center justify-between bg-primary/5 rounded-xl p-3 border border-primary/10">
               <div>
                 <p className="text-lg font-bold text-primary">
-                  {language === 'ar' ? nextPrayer.nameArabic : nextPrayer.name}
+                  {language === 'ar' ? nextPrayer.displayNameArabic : nextPrayer.displayName}
                 </p>
                 <p className="text-xs text-muted-foreground">{t(nextLabelKey)}</p>
               </div>
@@ -120,7 +120,7 @@ export function NextPrayerWidget() {
                 {upcoming.slice(1).map(p => (
                   <div key={p.name} className="flex-1 text-center py-1.5 px-2 rounded-lg bg-muted/50">
                     <p className="text-xs text-muted-foreground">
-                      {language === 'ar' ? p.nameArabic : p.name}
+                      {language === 'ar' ? p.displayNameArabic : p.displayName}
                     </p>
                     <p className="text-sm font-medium text-foreground">{formatTime(p.time)}</p>
                   </div>

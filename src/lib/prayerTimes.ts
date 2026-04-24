@@ -3,6 +3,8 @@ import { Coordinates, CalculationMethod, PrayerTimes, Prayer, Qibla } from 'adha
 export interface PrayerTime {
   name: string;
   nameArabic: string;
+  displayName: string;
+  displayNameArabic: string;
   time: Date;
   isNext: boolean;
 }
@@ -118,16 +120,23 @@ export function calculatePrayerTimes(latitude: number, longitude: number, date: 
   const nightDuration = fajrTime - maghribTime;
   const midnight = new Date(maghribTime + nightDuration / 2);
   const lastThird = new Date(maghribTime + (nightDuration * 2) / 3);
+  const isFriday = date.getDay() === 5;
 
-  const prayers: { name: string; nameArabic: string; time: Date }[] = [
-    { name: 'Fajr', nameArabic: 'الفجر', time: prayerTimes.fajr },
-    { name: 'Sunrise', nameArabic: 'الشروق', time: prayerTimes.sunrise },
-    { name: 'Dhuhr', nameArabic: 'الظهر', time: prayerTimes.dhuhr },
-    { name: 'Asr', nameArabic: 'العصر', time: prayerTimes.asr },
-    { name: 'Maghrib', nameArabic: 'المغرب', time: prayerTimes.maghrib },
-    { name: 'Isha', nameArabic: 'العشاء', time: prayerTimes.isha },
-    { name: 'Midnight', nameArabic: 'منتصف الليل', time: midnight },
-    { name: 'LastThird', nameArabic: 'الثلث الأخير', time: lastThird },
+  const prayers: { name: string; nameArabic: string; displayName: string; displayNameArabic: string; time: Date }[] = [
+    { name: 'Fajr', nameArabic: 'الفجر', displayName: 'Fajr', displayNameArabic: 'الفجر', time: prayerTimes.fajr },
+    { name: 'Sunrise', nameArabic: 'الشروق', displayName: 'Sunrise', displayNameArabic: 'الشروق', time: prayerTimes.sunrise },
+    {
+      name: 'Dhuhr',
+      nameArabic: 'الظهر',
+      displayName: isFriday ? 'Jumuah' : 'Dhuhr',
+      displayNameArabic: isFriday ? 'الجمعة' : 'الظهر',
+      time: prayerTimes.dhuhr,
+    },
+    { name: 'Asr', nameArabic: 'العصر', displayName: 'Asr', displayNameArabic: 'العصر', time: prayerTimes.asr },
+    { name: 'Maghrib', nameArabic: 'المغرب', displayName: 'Maghrib', displayNameArabic: 'المغرب', time: prayerTimes.maghrib },
+    { name: 'Isha', nameArabic: 'العشاء', displayName: 'Isha', displayNameArabic: 'العشاء', time: prayerTimes.isha },
+    { name: 'Midnight', nameArabic: 'منتصف الليل', displayName: 'Midnight', displayNameArabic: 'منتصف الليل', time: midnight },
+    { name: 'LastThird', nameArabic: 'الثلث الأخير', displayName: 'LastThird', displayNameArabic: 'الثلث الأخير', time: lastThird },
   ];
 
 

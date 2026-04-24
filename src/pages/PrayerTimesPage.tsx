@@ -402,7 +402,7 @@ export default function PrayerTimesPage() {
                     {prayerIcons[nextPrayer.name as keyof typeof prayerIcons]}
                   </div>
                   <h2 className="text-3xl font-bold text-primary-foreground mb-1">
-                    {language === 'ar' ? nextPrayer.nameArabic : nextPrayer.name}
+                    {language === 'ar' ? nextPrayer.displayNameArabic : nextPrayer.displayName}
                   </h2>
                   <p className="text-4xl font-bold text-primary-foreground mb-2">
                     {formatTime(nextPrayer.time)}
@@ -434,7 +434,7 @@ export default function PrayerTimesPage() {
                       </div>
                       <div>
                         <h3 className={`font-semibold ${prayer.isNext ? 'text-primary' : 'text-foreground'}`}>
-                          {language === 'ar' ? prayer.nameArabic : prayer.name}
+                          {language === 'ar' ? prayer.displayNameArabic : prayer.displayName}
                         </h3>
                         {prayer.isNext && (
                           <p className="text-xs text-primary font-medium">
