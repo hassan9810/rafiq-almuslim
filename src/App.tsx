@@ -30,6 +30,7 @@ import ReadingPlanPage from "./pages/ReadingPlanPage";
 import TasbeehPage from "./pages/TasbeehPage";
 import ShareAyahPage from "./pages/ShareAyahPage";
 import NotFound from "./pages/NotFound";
+import CalendarPage from "./pages/CalendarPage";
 
 const queryClient = new QueryClient();
 
@@ -73,6 +74,7 @@ const App = () => {
             <Route path="/tasbeeh" element={<TasbeehPage />} />
             <Route path="/share-ayah" element={<ShareAyahPage />} />
             <Route path="/bookmarks" element={<BookmarksPage />} />
+            <Route path="/calendar" element={<CalendarPage />} />
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>

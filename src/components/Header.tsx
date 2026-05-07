@@ -18,7 +18,8 @@ import {
   MessageSquareQuote,
   Shield,
   Languages,
-  BookImage
+  BookImage,
+  CalendarDays
 } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAppStore, type ThemeColorId } from '@/store/useAppStore';
@@ -142,6 +143,19 @@ export function Header() {
                 className={useLightText ? 'text-primary-foreground hover:bg-primary-foreground/10' : ''}
               >
                 <Globe className="w-4 h-4" />
+              </Button>
+
+              {/* Calendar */}
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                asChild
+                className={useLightText ? 'text-primary-foreground hover:bg-primary-foreground/10' : ''}
+                aria-label={t('calendar')}
+              >
+                <Link to="/calendar">
+                  <CalendarDays className="w-4 h-4" />
+                </Link>
               </Button>
 
               {/* Theme Toggle */}
