@@ -4,12 +4,14 @@ import { persist } from 'zustand/middleware';
 interface PlanState {
   planDays: number;
   startDate: string;
+  startPage: number;
+  endPage: number;
   completedDays: number[];
 }
 
 interface ReadingPlanStore {
   plan: PlanState | null;
-  startPlan: (days: number) => void;
+  startPlan: (days: number, startPage?: number, endPage?: number) => void;
   resetPlan: () => void;
   toggleDay: (dayIndex: number) => void;
 }
@@ -19,11 +21,13 @@ export const useReadingPlanStore = create<ReadingPlanStore>()(
     (set, get) => ({
       plan: null,
 
-      startPlan: (days) =>
+      startPlan: (days, startPage = 1, endPage = 604) =>
         set({
           plan: {
             planDays: days,
             startDate: new Date().toISOString().split('T')[0],
+            startPage,
+            endPage,
             completedDays: [],
           },
         }),
