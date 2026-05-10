@@ -270,6 +270,8 @@
   "shareAyahTitle": "Share Ayah",
   "shareAyahSubtitle": "Share one or more verses easily",
   "surah": "Surah",
+  "surahName": "Surah",
+  "ayahName": "Ayah",
   "randomAyah": "Random",
   "ayahsSelected": "{{count}} ayahs selected",
   "themeLabel": "Theme",

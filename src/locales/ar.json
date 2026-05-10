@@ -270,6 +270,8 @@
   "shareAyahTitle": "مشاركة آية",
   "shareAyahSubtitle": "شارك آية أو أكثر بسهولة",
   "surah": "السورة",
+  "surahName": "سورة",
+  "ayahName": "آية",
   "randomAyah": "عشوائي",
   "ayahsSelected": "{{count}} آيات محددة",
   "themeLabel": "المظهر",

@@ -54,7 +54,7 @@ function DayAyahDetails({ startPage, endPage }: { startPage: number; endPage: nu
     if (!value) return '';
     const surah = surahNames.find((s) => s.number === value.surah);
     const surahLabel = surah ? (isAr ? surah.nameAr : surah.name) : String(value.surah);
-    return `${t('surah')} ${surahLabel} • ${t('ayah')} ${value.ayah}`;
+    return `${t('surahName')} ${surahLabel} • ${t('ayahName')} ${value.ayah}`;
   };
 
   if (loading) return <div className="p-3 text-center text-xs text-muted-foreground animate-pulse">{isAr ? 'جاري الحساب...' : 'Calculating...'}</div>;
@@ -172,7 +172,7 @@ export default function ReadingPlanPage() {
     if (!value) return '';
     const surah = surahNames.find((s) => s.number === value.surah);
     const surahLabel = surah ? (isAr ? surah.nameAr : surah.name) : String(value.surah);
-    return `${t('surah')} ${surahLabel} • ${t('ayah')} ${value.ayah}`;
+    return `${t('surahName')} ${surahLabel} • ${t('ayahName')} ${value.ayah}`;
   };
 
   const todayIndex = useMemo(() => {
@@ -439,7 +439,7 @@ export default function ReadingPlanPage() {
                       {t('planPreview')}
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="max-h-[85vh] overflow-y-auto w-[95vw] sm:max-w-md rounded-2xl p-5">
+                <DialogContent className="max-h-[85vh] overflow-y-auto w-[95vw] sm:max-w-md rounded-2xl p-5" dir={isAr ? 'rtl' : 'ltr'}>
                     <DialogHeader>
                       <DialogTitle className="text-start">{t('planPreview')}</DialogTitle>
                     </DialogHeader>
