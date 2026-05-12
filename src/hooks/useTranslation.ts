@@ -16,7 +16,10 @@ export function useTranslation() {
       let value = translations[locale][key] ?? (en as Record<string, string>)[key] ?? key;
       if (params) {
         Object.entries(params).forEach(([k, v]) => {
-          value = value.replace(new RegExp(`{{${k}}}`, 'g'), String(v));
+          const strValue = (typeof v === 'number' && locale === 'ar') 
+            ? new Intl.NumberFormat('ar-EG').format(v) 
+            : String(v);
+          value = value.replace(new RegExp(`{{${k}}}`, 'g'), strValue);
         });
       }
       return value;

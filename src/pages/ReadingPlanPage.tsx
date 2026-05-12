@@ -18,6 +18,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { PageHeader } from '@/components/PageHeader';
 import { useReadingPlanStore } from '@/store/useReadingPlanStore';
 import { fetchPageAyahs, surahNames } from '@/lib/mushafApi';
+import { formatNumber } from '@/lib/utils';
 
 // Quran has 604 pages, 30 juz
 const TOTAL_PAGES = 604;
@@ -53,8 +54,8 @@ function DayAyahDetails({ startPage, endPage }: { startPage: number; endPage: nu
   const formatAyahRange = (value?: { surah: number; ayah: number }) => {
     if (!value) return '';
     const surah = surahNames.find((s) => s.number === value.surah);
-    const surahLabel = surah ? (isAr ? surah.nameAr : surah.name) : String(value.surah);
-    return `${t('surahName')} ${surahLabel} • ${t('ayahName')} ${value.ayah}`;
+    const surahLabel = surah ? (isAr ? surah.nameAr : surah.name) : formatNumber(value.surah, isAr);
+    return `${t('surahName')} ${surahLabel} • ${t('ayahName')} ${formatNumber(value.ayah, isAr)}`;
   };
 
   if (loading) return <div className="p-3 text-center text-xs text-muted-foreground animate-pulse">{isAr ? 'جاري الحساب...' : 'Calculating...'}</div>;
@@ -79,7 +80,7 @@ interface ReadingPlan {
 
 const PLANS: ReadingPlan[] = [
   { days: 7, pagesPerDay: Math.ceil(TOTAL_PAGES / 7), label: { ar: 'ختمة في أسبوع', en: 'Khatmah in 7 Days' } },
-  { days: 15, pagesPerDay: Math.ceil(TOTAL_PAGES / 15), label: { ar: 'ختمة في 15 يوم', en: 'Khatmah in 15 Days' } },
+  { days: 15, pagesPerDay: Math.ceil(TOTAL_PAGES / 15), label: { ar: 'ختمة في ١٥ يوم', en: 'Khatmah in 15 Days' } },
   { days: 30, pagesPerDay: Math.ceil(TOTAL_PAGES / 30), label: { ar: 'ختمة في شهر', en: 'Khatmah in 30 Days' } },
   { days: 60, pagesPerDay: Math.ceil(TOTAL_PAGES / 60), label: { ar: 'ختمة في شهرين', en: 'Khatmah in 60 Days' } },
 ];
@@ -171,8 +172,8 @@ export default function ReadingPlanPage() {
   const formatAyahRange = (value?: { surah: number; ayah: number }) => {
     if (!value) return '';
     const surah = surahNames.find((s) => s.number === value.surah);
-    const surahLabel = surah ? (isAr ? surah.nameAr : surah.name) : String(value.surah);
-    return `${t('surahName')} ${surahLabel} • ${t('ayahName')} ${value.ayah}`;
+    const surahLabel = surah ? (isAr ? surah.nameAr : surah.name) : formatNumber(value.surah, isAr);
+    return `${t('surahName')} ${surahLabel} • ${t('ayahName')} ${formatNumber(value.ayah, isAr)}`;
   };
 
   const todayIndex = useMemo(() => {
@@ -259,7 +260,7 @@ export default function ReadingPlanPage() {
                           : 'border-border hover:border-primary/30'
                       }`}
                     >
-                      <p className="font-bold text-lg text-foreground">{plan.days}</p>
+                      <p className="font-bold text-lg text-foreground">{formatNumber(plan.days, isAr)}</p>
                       <p className="text-xs text-muted-foreground">{t('days')}</p>
                       <p className="text-sm font-medium text-primary mt-1">
                         {t('pagesPerDay', { count: plan.pagesPerDay })}
@@ -277,12 +278,13 @@ export default function ReadingPlanPage() {
                   <div className="mb-4">
                     <p className="text-xs text-muted-foreground mb-2">{t('customDays')}</p>
                     <Input
-                      type="number"
+                      type={isAr ? "text" : "number"}
                       min={1}
                       max={365}
-                      value={customDays}
+                      value={isAr ? formatNumber(customDays, true) : customDays}
                       onChange={(event) => {
-                        const nextValue = Math.max(1, Math.min(365, Number(event.target.value) || 1));
+                        const enValue = event.target.value.replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d).toString());
+                        const nextValue = Math.max(1, Math.min(365, Number(enValue) || 1));
                         setCustomDays(nextValue);
                         setStartPage(1);
                         setEndPage(TOTAL_PAGES);
@@ -293,19 +295,6 @@ export default function ReadingPlanPage() {
                     />
                   </div>
                   <div className="mt-6 space-y-3">
-                    <div className="rounded-xl border border-border/50 bg-card p-4">
-                      <p className="text-sm font-semibold text-foreground mb-2">{t('planPreview')}</p>
-                      <div className="text-sm text-muted-foreground space-y-1">
-                        <p>{t('pageRange', { from: startPage, to: endPage })} ({t('pagesCount', { count: selectedRangePages })})</p>
-                        {rangeInfo.start && (
-                          <p className="text-foreground">{t('fromAyahRange', { range: formatAyahRange(rangeInfo.start) })}</p>
-                        )}
-                        {rangeInfo.end && (
-                          <p className="text-foreground">{t('toAyahRange', { range: formatAyahRange(rangeInfo.end) })}</p>
-                        )}
-                      </div>
-                    </div>
-
                     <div className="rounded-xl border border-primary/20 bg-primary/5 p-4">
                       <p className="text-sm font-semibold text-primary mb-2 flex items-center gap-2">
                         <BookOpen className="w-4 h-4" />
@@ -346,9 +335,9 @@ export default function ReadingPlanPage() {
                     <p className="text-primary-foreground/70 text-sm mb-1">
                       {activePlanLabel}
                     </p>
-                    <p className="text-5xl font-bold text-primary-foreground mb-1">{progressPct}%</p>
+                    <p className="text-5xl font-bold text-primary-foreground mb-1">{formatNumber(progressPct, isAr)}%</p>
                     <p className="text-primary-foreground/80 text-sm">
-                      {planState.completedDays.length} / {planState.planDays} {t('days')}
+                      {formatNumber(planState.completedDays.length, isAr)} / {formatNumber(planState.planDays, isAr)} {t('days')}
                     </p>
                     <div className="mt-3 h-3 bg-primary-foreground/20 rounded-full overflow-hidden max-w-xs mx-auto">
                       <div className="h-full bg-primary-foreground rounded-full transition-all" style={{ width: `${progressPct}%` }} />
@@ -423,7 +412,7 @@ export default function ReadingPlanPage() {
                                 : 'bg-muted text-muted-foreground hover:bg-muted/80'
                         }`}
                       >
-                        {done ? <Check className="w-3.5 h-3.5" /> : i + 1}
+                        {done ? <Check className="w-3.5 h-3.5" /> : formatNumber(i + 1, isAr)}
                       </button>
                     );
                   })}
@@ -450,9 +439,9 @@ export default function ReadingPlanPage() {
                         return (
                           <div key={i} className="rounded-xl border border-border/50 bg-card overflow-hidden">
                             <div className="bg-muted/30 px-4 py-2 border-b border-border/50 flex justify-between items-center text-sm">
-                              <span className="font-semibold">{isAr ? 'اليوم' : 'Day'} {i + 1}</span>
+                              <span className="font-semibold">{isAr ? 'اليوم' : 'Day'} {formatNumber(i + 1, isAr)}</span>
                               <span className="text-muted-foreground text-xs ms-auto">
-                                ({isAr ? 'صفحة' : 'Page'} {sPage} - {ePage})
+                                ({isAr ? 'صفحة' : 'Page'} {formatNumber(sPage, isAr)} - {formatNumber(ePage, isAr)})
                               </span>
                             </div>
                             <div className="p-2">
