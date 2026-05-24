@@ -45,7 +45,7 @@ const mushafEditions: MushafEdition[] = [
     nameAr: 'مصحف المدينة المنورة',
     baseUrl: 'https://app.quranflash.com/book/Medina1/epub/EPUB/imgs/',
     startPage: 1,
-    endPage: 606,
+    endPage: 625,
     extension: 'gif',
     padLength: 4
   },
