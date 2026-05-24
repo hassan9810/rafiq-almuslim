@@ -118,7 +118,7 @@ const HIJRI_FORMAT: Intl.DateTimeFormatOptions = {
 };
 
 function getHijriMonthNumber(date: Date): number | null {
-  const parts = new Intl.DateTimeFormat('en-US-u-ca-islamic', { month: 'numeric' }).formatToParts(date);
+  const parts = new Intl.DateTimeFormat('en-US-u-ca-islamic-umalqura', { month: 'numeric' }).formatToParts(date);
   const monthPart = parts.find((part) => part.type === 'month');
   if (!monthPart) return null;
   const monthNumber = Number(monthPart.value);
@@ -136,7 +136,7 @@ export default function CalendarPage() {
   const [calendarMonth, setCalendarMonth] = useState<Date>(new Date());
 
   const locale = language === 'ar' ? 'ar-EG' : 'en-US';
-  const hijriLocale = language === 'ar' ? 'ar-SA-u-ca-islamic' : 'en-US-u-ca-islamic';
+  const hijriLocale = language === 'ar' ? 'ar-SA-u-ca-islamic-umalqura' : 'en-US-u-ca-islamic-umalqura';
   const isRtl = language === 'ar';
   const calendarLocale = isRtl ? arSA : enUS;
 
