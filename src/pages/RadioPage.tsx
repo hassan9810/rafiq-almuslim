@@ -24,6 +24,7 @@ export default function RadioPage() {
   const { t, language } = useTranslation();
   const { direction } = useAppStore();
   const [currentStation, setCurrentStation] = useState<RadioStation | null>(null);
+  const [failedImageIds, setFailedImageIds] = useState<Set<string>>(() => new Set());
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(0.8);
   const [isMuted, setIsMuted] = useState(false);
@@ -222,6 +223,7 @@ export default function RadioPage() {
             {filteredStations.map((station, index) => {
               const isActive = currentStation?.id === station.id;
               const isFavorite = favorites.includes(station.id);
+              const showImage = Boolean(station.img) && !failedImageIds.has(station.id);
 
               return (
                 <motion.div
@@ -241,12 +243,18 @@ export default function RadioPage() {
                   aria-label={getDisplayName(station)}
                 >
                   {/* Station Image */}
-                  {station.img ? (
+                  {showImage ? (
                     <img
                       src={station.img}
                       alt={station.name}
                       className="w-12 h-12 rounded-xl object-cover shrink-0"
-                      onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                      onError={() => {
+                        setFailedImageIds(prev => {
+                          const next = new Set(prev);
+                          next.add(station.id);
+                          return next;
+                        });
+                      }}
                     />
                   ) : (
                     <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
