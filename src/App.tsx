@@ -9,6 +9,7 @@ import { AppLayout } from "./components/AppLayout";
 import { useAppStore } from "./store/useAppStore";
 import Index from "./pages/Index";
 import QuranPage from "./pages/QuranPage";
+import RecitersPage from "./pages/RecitersPage";
 import SurahReader from "./pages/SurahReader";
 import MushafPage from "./pages/MushafPage";
 import TextMushafPage from "./pages/TextMushafPage";
@@ -53,6 +54,7 @@ const App = () => {
             <Route element={<AppLayout />}>
             <Route path="/" element={<Index />} />
             <Route path="/quran" element={<QuranPage />} />
+            <Route path="/reciters" element={<RecitersPage />} />
             <Route path="/quran/:surahNumber" element={<SurahReader />} />
             <Route path="/mushaf" element={<MushafPage />} />
             <Route path="/mushaf-text" element={<TextMushafPage />} />

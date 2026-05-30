@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { BookOpen, BookText, Play, Search, Brain, Calendar, Share2 } from 'lucide-react';
+import { BookOpen, BookText, Play, Search, Brain, Calendar, Share2, Users } from 'lucide-react';
 import { SurahList } from '@/components/SurahList';
 import { useTranslation } from '@/hooks/useTranslation';
 import { PageHeader } from '@/components/PageHeader';
@@ -39,6 +39,10 @@ export default function QuranPage() {
             <Link to="/mushaf" className={outlineLinkClasses}>
               <BookOpen className="w-5 h-5 text-primary" />
               {t('browseMushaf')}
+            </Link>
+            <Link to="/reciters" className={outlineLinkClasses}>
+              <Users className="w-5 h-5 text-primary" />
+              {t('recitersPageTitle')}
             </Link>
             <Link to="/ayah-player" className={outlineLinkClasses}>
               <Play className="w-5 h-5 text-primary" />
