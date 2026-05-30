@@ -1,4 +1,4 @@
-﻿import { useState, useMemo } from 'react';
+﻿import { useState, useMemo, useRef } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { Search, Book, Headphones, ChevronRight, Calendar } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -61,6 +61,9 @@ export function HeroSection() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const shouldReduceMotion = useReducedMotion();
+  const takbeerAudioRef = useRef<HTMLAudioElement | null>(null);
+  const talbiyaAudioRef = useRef<HTMLAudioElement | null>(null);
+  const [activeAudio, setActiveAudio] = useState<'takbeer' | 'talbiya' | null>(null);
 
   const { gregorianDate, hijriDate } = useMemo(() => {
     const now = new Date();
@@ -74,6 +77,44 @@ export function HeroSection() {
     });
     return { gregorianDate: gregorian, hijriDate: hijri };
   }, [language]);
+
+  const { hijriDay, hijriMonth } = useMemo(() => {
+    const formatter = new Intl.DateTimeFormat('en-US-u-ca-islamic-umalqura', {
+      day: 'numeric',
+      month: 'numeric',
+      year: 'numeric',
+    });
+    const parts = formatter.formatToParts(new Date());
+    const day = Number(parts.find((part) => part.type === 'day')?.value ?? '0');
+    const month = Number(parts.find((part) => part.type === 'month')?.value ?? '0');
+    return { hijriDay: day, hijriMonth: month };
+  }, []);
+
+  const showTakbeerButton =
+    (hijriMonth === 10 && hijriDay >= 1 && hijriDay <= 3) ||
+    (hijriMonth === 12 && hijriDay >= 1 && hijriDay <= 13);
+  const showTalbiyaButton = hijriMonth === 12 && hijriDay >= 1 && hijriDay <= 13;
+  const takbeerLabel = language === 'ar' ? 'تشغيل التكبير' : 'Play Takbeer';
+  const talbiyaLabel = language === 'ar' ? 'تشغيل التلبية' : 'Play Talbiya';
+
+  const handleAudioToggle = (type: 'takbeer' | 'talbiya') => {
+    const current = type === 'takbeer' ? takbeerAudioRef.current : talbiyaAudioRef.current;
+    const other = type === 'takbeer' ? talbiyaAudioRef.current : takbeerAudioRef.current;
+
+    if (!current) return;
+
+    if (other && !other.paused) {
+      other.pause();
+    }
+
+    if (!current.paused) {
+      current.pause();
+      setActiveAudio(null);
+      return;
+    }
+    
+    current.play().then(() => setActiveAudio(type)).catch(() => setActiveAudio(null));
+  };
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -147,14 +188,64 @@ export function HeroSection() {
           transition={{ delay: 0.1, type: 'spring', stiffness: 120 }}
           className="bg-primary-foreground/10 backdrop-blur-sm py-2 px-4"
         >
-          <div className="container flex items-center justify-center gap-2 text-white/90">
-            <Calendar className="w-4 h-4" />
-            <span className="font-arabic text-sm md:text-base">{hijriDate}</span>
-            <span className="text-white/50">|</span>
-            <span className="text-sm md:text-base">{gregorianDate}</span>
+          <div className="container grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] items-center gap-2 text-white/90">
+            <div className="hidden md:block" />
+            <div className="flex items-center justify-center gap-2">
+              <Calendar className="w-4 h-4" />
+              <span className="font-arabic text-sm md:text-base">{hijriDate}</span>
+              <span className="text-white/50">|</span>
+              <span className="text-sm md:text-base">{gregorianDate}</span>
+            </div>
+            {showTakbeerButton || showTalbiyaButton ? (
+              <div className="flex items-center justify-center md:justify-end gap-2">
+                {showTakbeerButton ? (
+                  <Button
+                    type="button"
+                    variant="hero-outline"
+                    size="sm"
+                    onClick={() => handleAudioToggle('takbeer')}
+                    aria-pressed={activeAudio === 'takbeer'}
+                    className="text-xs md:text-sm px-2 border-white/50 text-white bg-white/10 hover:bg-white/20"
+                  >
+                    <Headphones className="w-3.5 h-3.5" />
+                    {takbeerLabel}
+                  </Button>
+                ) : null}
+                {showTalbiyaButton ? (
+                  <Button
+                    type="button"
+                    variant="hero-outline"
+                    size="sm"
+                    onClick={() => handleAudioToggle('talbiya')}
+                    aria-pressed={activeAudio === 'talbiya'}
+                    className="text-xs md:text-sm px-2 border-white/50 text-white bg-white/10 hover:bg-white/20"
+                  >
+                    <Headphones className="w-3.5 h-3.5" />
+                    {talbiyaLabel}
+                  </Button>
+                ) : null}
+              </div>
+            ) : (
+              <div className="hidden md:block" />
+            )}
           </div>
         </motion.div>
       </div>
+
+      <audio
+        ref={takbeerAudioRef}
+        src="https://media.way2quran.com/specials/dhul-hijjah/takbeer.mp3"
+        onPause={() => setActiveAudio(null)}
+        loop
+        preload="none"
+      />
+      <audio
+        ref={talbiyaAudioRef}
+        src="https://media.way2quran.com/specials/dhul-hijjah/talbiya.mp3"
+        onPause={() => setActiveAudio(null)}
+        loop
+        preload="none"
+      />
 
       {/* â”€â”€ Main content grid â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <div className="container relative z-10 py-8 md:py-12">

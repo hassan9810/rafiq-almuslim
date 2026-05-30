@@ -1,4 +1,6 @@
 import { Coordinates, CalculationMethod, PrayerTimes, Prayer, Qibla } from 'adhan';
+import en from '@/locales/en.json';
+import ar from '@/locales/ar.json';
 
 export interface PrayerTime {
   name: string;
@@ -14,6 +16,36 @@ export interface Location {
   longitude: number;
   city: string;
   country: string;
+}
+
+function getHijriMonthDay(date: Date): { month: number; day: number } | null {
+  const parts = new Intl.DateTimeFormat('en-US-u-ca-islamic-umalqura', {
+    month: 'numeric',
+    day: 'numeric',
+  }).formatToParts(date);
+  const monthPart = parts.find((part) => part.type === 'month');
+  const dayPart = parts.find((part) => part.type === 'day');
+  if (!monthPart || !dayPart) return null;
+
+  const month = Number(monthPart.value);
+  const day = Number(dayPart.value);
+  if (Number.isNaN(month) || Number.isNaN(day)) return null;
+  return { month, day };
+}
+
+function getEidPrayerLabel(date: Date): { displayName: string; displayNameArabic: string } | null {
+  const hijri = getHijriMonthDay(date);
+  if (!hijri) return null;
+
+  if (hijri.month === 10 && hijri.day === 1) {
+    return { displayName: en.eidAlFitrPrayer, displayNameArabic: ar.eidAlFitrPrayer };
+  }
+
+  if (hijri.month === 12 && hijri.day === 10) {
+    return { displayName: en.eidAlAdhaPrayer, displayNameArabic: ar.eidAlAdhaPrayer };
+  }
+
+  return null;
 }
 
 // Get user's current location
@@ -121,10 +153,15 @@ export function calculatePrayerTimes(latitude: number, longitude: number, date: 
   const midnight = new Date(maghribTime + nightDuration / 2);
   const lastThird = new Date(maghribTime + (nightDuration * 2) / 3);
   const isFriday = date.getDay() === 5;
+  const eidPrayerLabel = getEidPrayerLabel(date);
+  const eidPrayerTime = new Date(prayerTimes.sunrise.getTime() + 20 * 60 * 1000);
 
   const prayers: { name: string; nameArabic: string; displayName: string; displayNameArabic: string; time: Date }[] = [
     { name: 'Fajr', nameArabic: 'الفجر', displayName: 'Fajr', displayNameArabic: 'الفجر', time: prayerTimes.fajr },
     { name: 'Sunrise', nameArabic: 'الشروق', displayName: 'Sunrise', displayNameArabic: 'الشروق', time: prayerTimes.sunrise },
+    ...(eidPrayerLabel
+      ? [{ name: 'Eid', nameArabic: eidPrayerLabel.displayNameArabic, displayName: eidPrayerLabel.displayName, displayNameArabic: eidPrayerLabel.displayNameArabic, time: eidPrayerTime }]
+      : []),
     {
       name: 'Dhuhr',
       nameArabic: 'الظهر',

@@ -362,5 +362,7 @@
   "hijriEventHajjBegins": "Start of Hajj",
   "hijriEventArafah": "Day of Arafah",
   "hijriEventEidAlAdha": "Eid al-Adha",
-  "hijriEventTashreeqDays": "Days of Tashreeq"
+  "hijriEventTashreeqDays": "Days of Tashreeq",
+  "eidAlFitrPrayer": "Eid al-Fitr Prayer",
+  "eidAlAdhaPrayer": "Eid al-Adha Prayer"
 }

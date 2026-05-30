@@ -51,7 +51,7 @@ function buildMoshafAudioUrl(server: string, surahNumber: number): string {
 }
 
 function orderMoshafList(moshafList: Reciter['moshaf'] = []): Reciter['moshaf'] {
-  const priority = ['المرتل', 'المجود', 'المعلم'];
+  const priority = ['مرتل', 'المجود', 'المعلم'];
   return [...moshafList].sort((a, b) => {
     const aIndex = priority.findIndex((label) => a.name.includes(label));
     const bIndex = priority.findIndex((label) => b.name.includes(label));
@@ -60,6 +60,13 @@ function orderMoshafList(moshafList: Reciter['moshaf'] = []): Reciter['moshaf'] 
     if (normalizedA !== normalizedB) return normalizedA - normalizedB;
     return a.name.localeCompare(b.name, 'ar', { sensitivity: 'base' });
   });
+}
+
+function getMoshafDisplayName(moshafName: string): string {
+  if (moshafName.includes('مرتل')) return 'المصحف المرتل';
+  if (moshafName.includes('المجود')) return 'المصحف المجود';
+  if (moshafName.includes('المعلم')) return 'المصحف المعلم';
+  return moshafName;
 }
 
 export default function RecitersPage() {
@@ -141,7 +148,7 @@ export default function RecitersPage() {
         key: `${reciter.id}-${moshaf.id}`,
         reciter,
         moshaf,
-        label: `${reciter.name} - ${moshaf.name}`,
+        label: `${reciter.name} - ${getMoshafDisplayName(moshaf.name)}`,
       }));
     });
   }, [reciters]);
@@ -313,7 +320,7 @@ export default function RecitersPage() {
                         }}
                       >
                         <div className="text-sm font-semibold">{option.label}</div>
-                        {option.moshaf?.name && (
+                        {option.moshaf?.name && !option.reciter.name.includes('المنشاوي') && (
                           <div className="text-xs text-muted-foreground">{option.moshaf.name}</div>
                         )}
                       </motion.button>

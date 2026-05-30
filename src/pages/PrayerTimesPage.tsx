@@ -37,6 +37,7 @@ import { adhanSources } from '@/data/adhanSources';
 const prayerIcons = {
   Fajr: '🌙',
   Sunrise: '🌅',
+  Eid: '🕌',
   Dhuhr: '☀️',
   Asr: '🌤️',
   Maghrib: '🌇',

@@ -362,5 +362,7 @@
   "hijriEventHajjBegins": "بدء مناسك الحج",
   "hijriEventArafah": "يوم عرفة",
   "hijriEventEidAlAdha": "عيد الأضحى",
-  "hijriEventTashreeqDays": "أيام التشريق"
+  "hijriEventTashreeqDays": "أيام التشريق",
+  "eidAlFitrPrayer": "صلاة عيد الفطر",
+  "eidAlAdhaPrayer": "صلاة عيد الأضحى"
 }
