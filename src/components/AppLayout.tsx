@@ -4,6 +4,7 @@ import { useAppStore } from '@/store/useAppStore';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { ScrollToTop } from '@/components/ScrollToTop';
+import { SunnahRemindersWidget } from '@/components/SunnahRemindersWidget';
 import { checkAndNotifyPrayers } from '@/lib/prayerNotifications';
 import { useTranslation } from '@/hooks/useTranslation';
 
@@ -39,6 +40,7 @@ export function AppLayout() {
       </main>
       {!hideAppHeader && <Footer />}
       <ScrollToTop />
+      <SunnahRemindersWidget />
     </div>
   );
 }
