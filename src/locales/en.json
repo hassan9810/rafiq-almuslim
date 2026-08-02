@@ -1,5 +1,6 @@
 {
   "appName": "Rafiq Al-Muslim",
+  "all": "All",
   "quran": "Quran",
   "mushaf": "Mushaf",
   "tafsir": "Tafsir",
@@ -364,5 +365,7 @@
   "hijriEventEidAlAdha": "Eid al-Adha",
   "hijriEventTashreeqDays": "Days of Tashreeq",
   "eidAlFitrPrayer": "Eid al-Fitr Prayer",
-  "eidAlAdhaPrayer": "Eid al-Adha Prayer"
+  "eidAlAdhaPrayer": "Eid al-Adha Prayer",
+  "totalReciters": "Total Reciters: {{count}}",
+  "availableSurahs": "Available Surahs: {{count}}"
 }

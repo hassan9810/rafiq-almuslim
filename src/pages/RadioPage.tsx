@@ -32,6 +32,7 @@ export default function RadioPage() {
   const { favorites, toggleFavorite } = useRadioStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState<RadioCategory>('all');
+  const [playlistIndex, setPlaylistIndex] = useState(0);
   const audioRef = useRef<HTMLAudioElement>(null);
 
   const { data: apiStations = [], isLoading } = useQuery({
@@ -88,6 +89,24 @@ export default function RadioPage() {
     }
   }, [volume, isMuted]);
 
+  // Save live radio state periodically for playlist stations
+  useEffect(() => {
+    if (!isPlaying || !currentStation?.playlistUrls || !audioRef.current) return;
+    
+    const interval = setInterval(() => {
+      const audio = audioRef.current;
+      if (audio) {
+        localStorage.setItem(`radio_live_${currentStation.id}`, JSON.stringify({
+          index: playlistIndex,
+          position: audio.currentTime,
+          timestamp: Date.now()
+        }));
+      }
+    }, 5000);
+    
+    return () => clearInterval(interval);
+  }, [isPlaying, currentStation, playlistIndex]);
+
   // Handle audio errors (e.g. stream 404) — try fallback URL
   useEffect(() => {
     const audio = audioRef.current;
@@ -106,8 +125,25 @@ export default function RadioPage() {
       }
     };
     audio.addEventListener('error', onError);
-    return () => audio.removeEventListener('error', onError);
-  }, [currentStation]);
+
+    const onEnded = () => {
+      if (currentStation?.playlistUrls && currentStation.playlistUrls.length > 0) {
+        const nextIndex = (playlistIndex + 1) % currentStation.playlistUrls.length;
+        setPlaylistIndex(nextIndex);
+        audio.src = currentStation.playlistUrls[nextIndex];
+        audio.load();
+        audio.play()
+          .then(() => { setIsPlaying(true); setLoading(false); })
+          .catch(() => { setIsPlaying(false); setLoading(false); });
+      }
+    };
+    audio.addEventListener('ended', onEnded);
+
+    return () => {
+      audio.removeEventListener('error', onError);
+      audio.removeEventListener('ended', onEnded);
+    };
+  }, [currentStation, playlistIndex]);
 
   const handlePlayStation = (station: RadioStation, useFallback = false) => {
     if (!audioRef.current) return;
@@ -118,12 +154,51 @@ export default function RadioPage() {
       return;
     }
 
-    const streamUrl = useFallback && station.fallbackUrl ? station.fallbackUrl : station.url;
+    let streamUrl = useFallback && station.fallbackUrl ? station.fallbackUrl : station.url;
+    let initialTime = 0;
+
+    if (station.playlistUrls && station.playlistUrls.length > 0) {
+      const storageKey = `radio_live_${station.id}`;
+      const saved = localStorage.getItem(storageKey);
+      let startIndex = Math.floor(Math.random() * station.playlistUrls.length);
+      let startPos = 0;
+
+      if (saved) {
+        try {
+          const { index, position, timestamp } = JSON.parse(saved);
+          const elapsed = (Date.now() - timestamp) / 1000;
+          let newPos = position + elapsed;
+          
+          const avgTrackLen = 1200; 
+          if (newPos > avgTrackLen) {
+              const skippedTracks = Math.floor(newPos / avgTrackLen);
+              startIndex = (index + skippedTracks) % station.playlistUrls.length;
+              startPos = newPos % avgTrackLen;
+          } else {
+              startIndex = index;
+              startPos = newPos;
+          }
+        } catch(e) {}
+      }
+      
+      streamUrl = station.playlistUrls[startIndex];
+      setPlaylistIndex(startIndex);
+      initialTime = startPos;
+    }
 
     // Unlock audio synchronously within user gesture context (critical for in-app browsers)
     const audio = audioRef.current;
     audio.src = streamUrl;
     audio.load();
+
+    if (initialTime > 0) {
+      const onLoadedMetadata = () => {
+        audio.currentTime = initialTime;
+        audio.removeEventListener('loadedmetadata', onLoadedMetadata);
+      };
+      audio.addEventListener('loadedmetadata', onLoadedMetadata);
+    }
+
     const playPromise = audio.play();
 
     setLoading(true);

@@ -126,8 +126,22 @@ export async function fetchReciters(language: string = 'ar'): Promise<Reciter[]>
 export function getAudioUrl(reciter: Reciter, surahNumber: number): string {
   if (!reciter.moshaf || reciter.moshaf.length === 0) return '';
   const moshaf = reciter.moshaf[0];
-  const paddedSurah = surahNumber.toString().padStart(3, '0');
-  return `${moshaf.server}${paddedSurah}.mp3`;
+  let filename = surahNumber.toString().padStart(3, '0');
+  
+  if (moshaf.server.includes('alsaid-saeed')) {
+     const customMap: Record<number, string> = {
+       2: '002-001', 3: '003-001', 4: '004-001', 5: '005-001', 6: '006-002', 
+       13: '013-001', 14: '014-001', 16: '016-001', 17: '017-001', 18: '018-001', 
+       19: '019-001', 20: '020-001', 21: '021-001', 23: '023-001', 25: '025-001', 
+       28: '028-001', 30: '030-001', 33: '033-001', 36: '036-001', 55: '055-001', 
+       78: '078-001'
+     };
+     if (customMap[surahNumber]) {
+        filename = customMap[surahNumber];
+     }
+  }
+  
+  return `${moshaf.server}${filename}.mp3`;
 }
 
 // Search in Quran

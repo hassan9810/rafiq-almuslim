@@ -46,8 +46,22 @@ function formatTime(seconds: number): string {
 
 function buildMoshafAudioUrl(server: string, surahNumber: number): string {
   if (!server) return '';
-  const paddedSurah = surahNumber.toString().padStart(3, '0');
-  return `${server}${paddedSurah}.mp3`;
+  let filename = surahNumber.toString().padStart(3, '0');
+
+  if (server.includes('alsaid-saeed')) {
+    const customMap: Record<number, string> = {
+      2: '002-001', 3: '003-001', 4: '004-001', 5: '005-001', 6: '006-002',
+      13: '013-001', 14: '014-001', 16: '016-001', 17: '017-001', 18: '018-001',
+      19: '019-001', 20: '020-001', 21: '021-001', 23: '023-001', 25: '025-001',
+      28: '028-001', 30: '030-001', 33: '033-001', 36: '036-001', 55: '055-001',
+      78: '078-001'
+    };
+    if (customMap[surahNumber]) {
+      filename = customMap[surahNumber];
+    }
+  }
+
+  return `${server}${filename}.mp3`;
 }
 
 function orderMoshafList(moshafList: Reciter['moshaf'] = []): Reciter['moshaf'] {
@@ -63,7 +77,11 @@ function orderMoshafList(moshafList: Reciter['moshaf'] = []): Reciter['moshaf'] 
 }
 
 function getMoshafDisplayName(moshafName: string): string {
-  if (moshafName.includes('مرتل')) return 'المصحف المرتل';
+  if (moshafName.includes('ورش')) return 'المصحف المرتل (ورش)';
+  if (moshafName.includes('قالون')) return 'المصحف المرتل (قالون)';
+  if (moshafName.includes('الدوري')) return 'المصحف المرتل (الدوري)';
+  if (moshafName.includes('المصحف المرتل الجديد')) return 'المصحف المرتل (النسخة الجديدة)';
+  if (moshafName.includes('مرتل') || moshafName === 'حفص عن عاصم') return 'المصحف المرتل (حفص)';
   if (moshafName.includes('المجود')) return 'المصحف المجود';
   if (moshafName.includes('المعلم')) return 'المصحف المعلم';
   return moshafName;
@@ -77,6 +95,7 @@ export default function RecitersPage() {
   const [selectedSurah, setSelectedSurah] = useState<number | null>(player.currentSurah ?? 1);
   const [selectedMoshafId, setSelectedMoshafId] = useState<number | null>(player.currentReciter?.moshaf?.[0]?.id ?? null);
   const [reciterQuery, setReciterQuery] = useState('');
+  const [activeRewayah, setActiveRewayah] = useState('all');
   const [surahQuery, setSurahQuery] = useState('');
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -133,13 +152,22 @@ export default function RecitersPage() {
 
   const reciterOptions = useMemo(() => {
     return reciters.flatMap((reciter) => {
-      const isMinshawi = reciter.name.includes('المنشاوي');
-      if (!isMinshawi) {
+      if (!reciter.moshaf || reciter.moshaf.length <= 1) {
+        let subtitle = reciter.moshaf?.[0]?.name || '';
+        if (reciter.name === 'مصحف مشاهير القراء') {
+          subtitle = 'محمود خليل الحصري، عبد الباسط عبد الصمد، محمود علي البنا، مصطفي إسماعيل (حفص)';
+        } else if (reciter.name === 'مصحف الختمة الثلاثية') {
+          subtitle = 'محمد محمود الطبلاوي، راغب مصطفى غلوش، شعبان عبد العزيز الصياد (حفص)';
+        } else if (subtitle) {
+          subtitle = getMoshafDisplayName(subtitle);
+        }
+
         return [{
           key: `${reciter.id}`,
           reciter,
           moshaf: reciter.moshaf?.[0] ?? null,
           label: reciter.name,
+          subtitle,
         }];
       }
 
@@ -148,16 +176,44 @@ export default function RecitersPage() {
         key: `${reciter.id}-${moshaf.id}`,
         reciter,
         moshaf,
-        label: `${reciter.name} - ${getMoshafDisplayName(moshaf.name)}`,
+        label: reciter.name,
+        subtitle: getMoshafDisplayName(moshaf.name),
       }));
     });
   }, [reciters]);
 
+  const availableRewayahs = useMemo(() => {
+    const keywords = [
+      'حفص', 'ورش', 'قالون', 'شعبة', 'الدوري', 'السوسي', 'خلاد', 'خلف',
+      'البزي', 'قنبل', 'هشام', 'ابن ذكوان', 'رويس', 'روح', 'ابن وردان', 
+      'ابن جماز', 'أبو الحارث', 'إدريس', 'إسحاق', 'مجود', 'معلم', 'حدر', 'قراءات'
+    ];
+    const found = new Set<string>();
+    reciterOptions.forEach((option) => {
+      const text = (option.label + ' ' + option.subtitle);
+      keywords.forEach((k) => {
+        if (text.includes(k)) found.add(k);
+      });
+    });
+    return ['all', ...Array.from(found)];
+  }, [reciterOptions]);
+
   const filteredReciters = useMemo(() => {
+    let result = reciterOptions;
+    if (activeRewayah !== 'all') {
+      result = result.filter((option) => (option.label + ' ' + option.subtitle).includes(activeRewayah));
+    }
+
     const query = reciterQuery.trim().toLowerCase();
-    if (!query) return reciterOptions;
-    return reciterOptions.filter((option) => option.label.toLowerCase().includes(query));
-  }, [reciterOptions, reciterQuery]);
+    if (!query) return result;
+
+    const normalizedQuery = normalizeArabic(query);
+    return result.filter((option) => {
+      const text = option.label + ' ' + option.subtitle;
+      return normalizeArabic(text).toLowerCase().includes(normalizedQuery) ||
+        text.toLowerCase().includes(query);
+    });
+  }, [reciterOptions, reciterQuery, activeRewayah]);
 
   const filteredSurahs = useMemo(() => {
     const query = surahQuery.trim().toLowerCase();
@@ -293,6 +349,21 @@ export default function RecitersPage() {
                   )}
                 </div>
 
+                <div className="flex flex-wrap gap-2 pt-1 pb-1">
+                  {availableRewayahs.map((rewayah) => (
+                    <button
+                      key={rewayah}
+                      onClick={() => setActiveRewayah(rewayah)}
+                      className={`px-3 py-1 text-xs rounded-full border transition-colors ${activeRewayah === rewayah
+                        ? 'bg-primary text-primary-foreground border-primary'
+                        : 'bg-card text-muted-foreground border-border hover:border-primary/50'
+                        }`}
+                    >
+                      {rewayah === 'all' ? t('all') : rewayah}
+                    </button>
+                  ))}
+                </div>
+
                 {filteredReciters.length === 0 && (
                   <p className="text-sm text-muted-foreground text-center py-8">{t('noRecitersFound')}</p>
                 )}
@@ -308,11 +379,10 @@ export default function RecitersPage() {
                         initial={{ opacity: 0, y: 8 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: Math.min(index * 0.01, 0.2) }}
-                        className={`w-full text-start p-3 rounded-2xl border transition-all ${
-                          isActive
-                            ? 'bg-primary/5 border-primary/30 active-gold'
-                            : 'bg-card border-border/50 hover:border-primary/20 gold-hover'
-                        }`}
+                        className={`w-full text-start p-3 rounded-2xl border transition-all ${isActive
+                          ? 'bg-primary/5 border-primary/30 active-gold'
+                          : 'bg-card border-border/50 hover:border-primary/20 gold-hover'
+                          }`}
                         onClick={() => {
                           setSelectedReciterId(option.reciter.id);
                           setSelectedMoshafId(option.moshaf?.id ?? option.reciter.moshaf?.[0]?.id ?? null);
@@ -320,38 +390,17 @@ export default function RecitersPage() {
                         }}
                       >
                         <div className="text-sm font-semibold">{option.label}</div>
-                        {option.moshaf?.name && !option.reciter.name.includes('المنشاوي') && (
-                          <div className="text-xs text-muted-foreground">{option.moshaf.name}</div>
+                        {option.subtitle && (
+                          <div className="text-xs text-muted-foreground mt-1 leading-relaxed">{option.subtitle}</div>
                         )}
                       </motion.button>
                     );
                   })}
                 </div>
 
-                {selectedReciter?.moshaf && selectedReciter.moshaf.length > 1 && !selectedReciter.name.includes('المنشاوي') && (
-                  <div className="pt-2">
-                    <div className="text-xs text-muted-foreground mb-2">{t('edition')}</div>
-                    <RadioGroup
-                      value={selectedMoshaf?.id?.toString()}
-                      onValueChange={(value) => setSelectedMoshafId(Number(value))}
-                      className="gap-3"
-                    >
-                      {orderMoshafList(selectedReciter.moshaf).map((moshaf) => (
-                        <label
-                          key={moshaf.id}
-                          className={`flex items-center gap-2 rounded-xl border px-3 py-2 text-sm transition-all cursor-pointer ${
-                            moshaf.id === selectedMoshaf?.id
-                              ? 'bg-primary/5 border-primary/30'
-                              : 'border-border/50 hover:border-primary/20'
-                          }`}
-                        >
-                          <RadioGroupItem value={moshaf.id.toString()} />
-                          <span>{moshaf.name}</span>
-                        </label>
-                      ))}
-                    </RadioGroup>
-                  </div>
-                )}
+                <div className="pt-3 text-center text-sm font-medium text-muted-foreground border-t border-border/50 mt-2">
+                  {t('totalReciters', { count: filteredReciters.length })}
+                </div>
               </CardContent>
             </Card>
 
@@ -394,11 +443,10 @@ export default function RecitersPage() {
                         initial={{ opacity: 0, y: 8 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: Math.min(index * 0.01, 0.2) }}
-                        className={`w-full text-start p-3 rounded-2xl border transition-all ${
-                          isActive
-                            ? 'bg-primary/5 border-primary/30 active-gold'
-                            : 'bg-card border-border/50 hover:border-primary/20 gold-hover'
-                        }`}
+                        className={`w-full text-start p-3 rounded-2xl border transition-all ${isActive
+                          ? 'bg-primary/5 border-primary/30 active-gold'
+                          : 'bg-card border-border/50 hover:border-primary/20 gold-hover'
+                          }`}
                         onClick={() => setSelectedSurah(surah.number)}
                       >
                         <div className="text-sm font-semibold">
@@ -408,6 +456,12 @@ export default function RecitersPage() {
                     );
                   })}
                 </div>
+
+                {selectedReciterId && (
+                  <div className="pt-3 text-center text-sm font-medium text-muted-foreground border-t border-border/50 mt-2">
+                    {t('availableSurahs', { count: filteredSurahs.length })}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>

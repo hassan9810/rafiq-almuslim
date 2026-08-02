@@ -1,5 +1,6 @@
 {
   "appName": "رفيق المسلم",
+  "all": "الكل",
   "quran": "القرآن",
   "mushaf": "المصحف",
   "tafsir": "التفسير",
@@ -364,5 +365,7 @@
   "hijriEventEidAlAdha": "عيد الأضحى",
   "hijriEventTashreeqDays": "أيام التشريق",
   "eidAlFitrPrayer": "صلاة عيد الفطر",
-  "eidAlAdhaPrayer": "صلاة عيد الأضحى"
+  "eidAlAdhaPrayer": "صلاة عيد الأضحى",
+  "totalReciters": "مجموع القراء: {{count}}",
+  "availableSurahs": "عدد السور المتاحة: {{count}}"
 }

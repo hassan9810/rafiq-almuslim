@@ -8,6 +8,7 @@ export interface RadioStation {
   fallbackUrl?: string;
   img?: string;
   categories: RadioCategory[];
+  playlistUrls?: string[];
 }
 
 export const RADIO_CATEGORIES: { key: RadioCategory; labelAr: string; labelEn: string }[] = [
@@ -65,6 +66,58 @@ export const curatedStations: RadioStation[] = [
   { id: 'c24', name: 'Ruqyah Radio', nameAr: 'إذاعة الرقية الشرعية', url: 'https://backup.qurango.net/radio/roqiah', img: 'https://i1.sndcdn.com/artworks-zygACgAd2NKwuohE-UF2Piw-t500x500.jpg', categories: ['athkar'] },
   { id: 'c25', name: 'Quran Tafsir Summary', nameAr: 'المختصر في تفسير القرآن الكريم', url: 'https://backup.qurango.net/radio/mukhtasartafsir', img: 'https://areejquran.net/wp-content/uploads/2015/12/unnamed.jpg', categories: ['tafsir'] },
   { id: 'c26', name: 'Eid Takbeer', nameAr: 'إذاعة تكبيرات العيد', url: 'https://backup.qurango.net/radio/eid', img: 'https://i.pinimg.com/736x/3c/b3/fc/3cb3fc494b9f8332a7b7b3256e3d9822.jpg', categories: ['misc'] },
+  { id: 'c-alsaid-saeed', name: 'Al-Sayyid Sa\'id', nameAr: 'الشيخ السيد السعيد', url: 'https://media.way2quran.com/alsaid-saeed/hafs-an-asim/001.mp3', img: 'https://i1.sndcdn.com/artworks-000455505294-x2v8z1-t500x500.jpg', categories: ['egyptian'], playlistUrls: [
+    'https://media.way2quran.com/alsaid-saeed/hafs-an-asim/001.mp3',
+    'https://media.way2quran.com/alsaid-saeed/hafs-an-asim/002-001.mp3',
+    'https://media.way2quran.com/alsaid-saeed/hafs-an-asim/002-002.mp3',
+    'https://media.way2quran.com/alsaid-saeed/hafs-an-asim/003-001.mp3',
+    'https://media.way2quran.com/alsaid-saeed/hafs-an-asim/003-002.mp3',
+    'https://media.way2quran.com/alsaid-saeed/hafs-an-asim/004-001.mp3',
+    'https://media.way2quran.com/alsaid-saeed/hafs-an-asim/005-001.mp3',
+    'https://media.way2quran.com/alsaid-saeed/hafs-an-asim/006-002.mp3',
+    'https://media.way2quran.com/alsaid-saeed/hafs-an-asim/012.mp3',
+    'https://media.way2quran.com/alsaid-saeed/hafs-an-asim/013-001.mp3',
+    'https://media.way2quran.com/alsaid-saeed/hafs-an-asim/014-001.mp3',
+    'https://media.way2quran.com/alsaid-saeed/hafs-an-asim/016-001.mp3',
+    'https://media.way2quran.com/alsaid-saeed/hafs-an-asim/017-001.mp3',
+    'https://media.way2quran.com/alsaid-saeed/hafs-an-asim/018-001.mp3',
+    'https://media.way2quran.com/alsaid-saeed/hafs-an-asim/019-001.mp3',
+    'https://media.way2quran.com/alsaid-saeed/hafs-an-asim/020-001.mp3',
+    'https://media.way2quran.com/alsaid-saeed/hafs-an-asim/021-001.mp3',
+    'https://media.way2quran.com/alsaid-saeed/hafs-an-asim/023-001.mp3',
+    'https://media.way2quran.com/alsaid-saeed/hafs-an-asim/025-001.mp3',
+    'https://media.way2quran.com/alsaid-saeed/hafs-an-asim/028-001.mp3',
+    'https://media.way2quran.com/alsaid-saeed/hafs-an-asim/030-001.mp3',
+    'https://media.way2quran.com/alsaid-saeed/hafs-an-asim/030-002.mp3',
+    'https://media.way2quran.com/alsaid-saeed/hafs-an-asim/031.mp3',
+    'https://media.way2quran.com/alsaid-saeed/hafs-an-asim/032.mp3',
+    'https://media.way2quran.com/alsaid-saeed/hafs-an-asim/033-001.mp3',
+    'https://media.way2quran.com/alsaid-saeed/hafs-an-asim/035.mp3',
+    'https://media.way2quran.com/alsaid-saeed/hafs-an-asim/036-001.mp3',
+    'https://media.way2quran.com/alsaid-saeed/hafs-an-asim/049.mp3',
+    'https://media.way2quran.com/alsaid-saeed/hafs-an-asim/050.mp3',
+    'https://media.way2quran.com/alsaid-saeed/hafs-an-asim/054.mp3',
+    'https://media.way2quran.com/alsaid-saeed/hafs-an-asim/055-001.mp3',
+    'https://media.way2quran.com/alsaid-saeed/hafs-an-asim/059.mp3',
+    'https://media.way2quran.com/alsaid-saeed/hafs-an-asim/066.mp3',
+    'https://media.way2quran.com/alsaid-saeed/hafs-an-asim/069.mp3',
+    'https://media.way2quran.com/alsaid-saeed/hafs-an-asim/073.mp3',
+    'https://media.way2quran.com/alsaid-saeed/hafs-an-asim/075.mp3',
+    'https://media.way2quran.com/alsaid-saeed/hafs-an-asim/078-001.mp3',
+    'https://media.way2quran.com/alsaid-saeed/hafs-an-asim/079.mp3',
+    'https://media.way2quran.com/alsaid-saeed/hafs-an-asim/082.mp3',
+    'https://media.way2quran.com/alsaid-saeed/hafs-an-asim/085.mp3',
+    'https://media.way2quran.com/alsaid-saeed/hafs-an-asim/086.mp3',
+    'https://media.way2quran.com/alsaid-saeed/hafs-an-asim/087.mp3',
+    'https://media.way2quran.com/alsaid-saeed/hafs-an-asim/088.mp3',
+    'https://media.way2quran.com/alsaid-saeed/hafs-an-asim/089.mp3',
+    'https://media.way2quran.com/alsaid-saeed/hafs-an-asim/090.mp3',
+    'https://media.way2quran.com/alsaid-saeed/hafs-an-asim/091.mp3',
+    'https://media.way2quran.com/alsaid-saeed/hafs-an-asim/093.mp3',
+    'https://media.way2quran.com/alsaid-saeed/hafs-an-asim/097.mp3',
+    'https://media.way2quran.com/alsaid-saeed/hafs-an-asim/106.mp3',
+    'https://media.way2quran.com/alsaid-saeed/hafs-an-asim/108.mp3'
+  ] },
 ];
 
 // Slug → categories for API stations
