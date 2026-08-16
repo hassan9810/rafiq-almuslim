@@ -1,4 +1,4 @@
-﻿import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { Search, Book, Headphones, ChevronRight, Calendar } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -112,7 +112,7 @@ export function HeroSection() {
       setActiveAudio(null);
       return;
     }
-    
+
     current.play().then(() => setActiveAudio(type)).catch(() => setActiveAudio(null));
   };
 
@@ -122,13 +122,13 @@ export function HeroSection() {
   };
 
   const particles = [
-    { x: '6%',  y: '18%', size: 8,  delay: 0,   duration: 5   },
-    { x: '12%', y: '62%', size: 5,  delay: 1.2, duration: 4.2 },
-    { x: '22%', y: '82%', size: 11, delay: 2.1, duration: 6   },
-    { x: '72%', y: '22%', size: 6,  delay: 0.6, duration: 4.8 },
-    { x: '84%', y: '60%', size: 9,  delay: 1.7, duration: 5.5 },
-    { x: '91%', y: '38%', size: 5,  delay: 2.8, duration: 3.8 },
-    { x: '48%', y: '88%', size: 7,  delay: 0.9, duration: 5.2 },
+    { x: '6%', y: '18%', size: 8, delay: 0, duration: 5 },
+    { x: '12%', y: '62%', size: 5, delay: 1.2, duration: 4.2 },
+    { x: '22%', y: '82%', size: 11, delay: 2.1, duration: 6 },
+    { x: '72%', y: '22%', size: 6, delay: 0.6, duration: 4.8 },
+    { x: '84%', y: '60%', size: 9, delay: 1.7, duration: 5.5 },
+    { x: '91%', y: '38%', size: 5, delay: 2.8, duration: 3.8 },
+    { x: '48%', y: '88%', size: 7, delay: 0.9, duration: 5.2 },
   ];
 
   return (
@@ -357,10 +357,10 @@ export function HeroSection() {
               className="flex flex-wrap gap-8 pt-2"
             >
               {[
-                { value: t('quran'),  label: t('kareem')  },
-                { value: '+50',       label: t('reciters') },
-                { value: t('hadith'), label: t('sharif')  },
-                { value: t('hisn'),   label: t('muslim')  },
+                { value: t('quran'), label: t('kareem') },
+                { value: '+1000', label: t('reciters') },
+                { value: t('hadith'), label: t('sharif') },
+                { value: t('hisn'), label: t('muslim') },
               ].map((stat, index) => (
                 <motion.div
                   key={index}
