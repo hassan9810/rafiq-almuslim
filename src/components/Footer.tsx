@@ -13,11 +13,11 @@ export function Footer() {
     <footer className="bg-card border-t border-border relative overflow-hidden">
       {/* Islamic pattern overlay */}
       <div className="absolute inset-0 islamic-pattern-light pointer-events-none" />
-      
+
       <div className="container py-12 relative z-10">
         {/* Ornamental divider at top */}
         <IslamicDivider className="mb-8" variant="gold" width={280} />
-        
+
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand */}
           <div className="space-y-4">
@@ -65,24 +65,24 @@ export function Footer() {
               {t('connect')}
             </h3>
             <div className="flex gap-3">
-              <a 
-                href="https://t.me/ah_9810" 
-                target="_blank" 
+              <a
+                href="https://t.me/ah_9810"
+                target="_blank"
                 rel="noopener noreferrer"
                 className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center text-muted-foreground hover:bg-primary hover:text-primary-foreground transition-colors"
               >
                 <Send className="w-4 h-4" />
               </a>
-              <a 
+              {/* <a 
                 href="https://github.com/hassan9810" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center text-muted-foreground hover:bg-primary hover:text-primary-foreground transition-colors"
               >
                 <Github className="w-4 h-4" />
-              </a>
-              <a 
-                href="mailto:rafeeq.almuslim@gmail.com" 
+              </a> */}
+              <a
+                href="mailto:rafeeq.almuslim@gmail.com"
                 className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center text-muted-foreground hover:bg-primary hover:text-primary-foreground transition-colors"
               >
                 <Mail className="w-4 h-4" />
@@ -95,12 +95,12 @@ export function Footer() {
         <div className="mt-12">
           <IslamicDivider className="mb-6" variant="muted" width={160} />
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-sm text-muted-foreground">
-            © {currentYear} {t('appName')}.
-          </p>
-          <p className="text-sm text-muted-foreground flex items-center gap-1">
-            {t('madeWith')} <Heart className="w-4 h-4 text-destructive fill-destructive" /> {t('forTheUmmah')}
-          </p>
+            <p className="text-sm text-muted-foreground">
+              © {currentYear} {t('appName')}.
+            </p>
+            <p className="text-sm text-muted-foreground flex items-center gap-1">
+              {t('madeWith')} <Heart className="w-4 h-4 text-destructive fill-destructive" /> {t('forTheUmmah')}
+            </p>
           </div>
         </div>
       </div>
