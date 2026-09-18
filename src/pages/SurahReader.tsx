@@ -87,7 +87,7 @@ export default function SurahReader() {
   const [surahData, setSurahData] = useState<{ arabic: SurahData; translation: SurahData } | null>(null);
   const [reciters, setReciters] = useState<Reciter[]>([]);
   const [selectedReciter, setSelectedReciter] = useState<Reciter | null>(null);
-  const [selectedTranslation, setSelectedTranslation] = useState('en.sahih');
+  const [selectedTranslation, setSelectedTranslation] = useState('en.hilali');
   const [loading, setLoading] = useState(true);
   const [currentAyah, setCurrentAyah] = useState<number>(1);
   const [volume, setVolume] = useState(1);

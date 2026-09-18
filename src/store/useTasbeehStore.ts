@@ -1,6 +1,13 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
+export interface CustomDhikr {
+  id: string;
+  ar: string;
+  en: string;
+  target: number;
+}
+
 interface TasbeehStats {
   totalToday: number;
   totalAllTime: number;
@@ -10,6 +17,7 @@ interface TasbeehStats {
   history: { date: string; count: number }[];
   selectedDhikr: string;
   currentCount: number;
+  customAdhkar: CustomDhikr[];
 }
 
 function getToday() {
@@ -20,6 +28,9 @@ interface TasbeehStore extends TasbeehStats {
   setStats: (stats: Partial<TasbeehStats>) => void;
   /** Call at the start of each session / render to roll over the day if needed */
   rolloverDay: () => void;
+  addCustomDhikr: (dhikr: Omit<CustomDhikr, 'id'>) => void;
+  removeCustomDhikr: (id: string) => void;
+  editCustomDhikr: (id: string, updates: Partial<Omit<CustomDhikr, 'id'>>) => void;
 }
 
 export const useTasbeehStore = create<TasbeehStore>()(
@@ -33,8 +44,34 @@ export const useTasbeehStore = create<TasbeehStore>()(
       history: [],
       selectedDhikr: 'subhanallah',
       currentCount: 0,
+      customAdhkar: [],
 
       setStats: (partial) => set(partial),
+
+      addCustomDhikr: (dhikr) => {
+        const id = `custom_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+        set({ customAdhkar: [...get().customAdhkar, { ...dhikr, id }] });
+      },
+
+      removeCustomDhikr: (id) => {
+        const state = get();
+        const updated = state.customAdhkar.filter(d => d.id !== id);
+        const patch: Partial<TasbeehStats> = { customAdhkar: updated };
+        // If the removed dhikr was selected, reset to default
+        if (state.selectedDhikr === id) {
+          patch.selectedDhikr = 'subhanallah';
+          patch.currentCount = 0;
+        }
+        set(patch);
+      },
+
+      editCustomDhikr: (id, updates) => {
+        set({
+          customAdhkar: get().customAdhkar.map(d =>
+            d.id === id ? { ...d, ...updates } : d
+          ),
+        });
+      },
 
       rolloverDay: () => {
         const state = get();

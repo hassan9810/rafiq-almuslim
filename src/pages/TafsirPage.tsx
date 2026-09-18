@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { BookMarked, Search, ChevronDown, Book, Languages, Loader2 } from 'lucide-react';
+import { BookMarked, Search, ChevronDown, Book, Languages, Loader2, Columns } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAppStore } from '@/store/useAppStore';
 import { PageHeader } from '@/components/PageHeader';
@@ -66,12 +67,23 @@ export default function TafsirPage() {
     <div>
       <main>
         <div className="container">
-          {/* Page Header */}
-          <PageHeader
-            icon={BookMarked}
-            title={t('tafsir')}
-            subtitle={t('tafsirSubtitle')}
-          />
+          {/* Page Header Area */}
+          <div className="relative">
+            <PageHeader
+              icon={BookMarked}
+              title={t('tafsir')}
+              subtitle={t('tafsirSubtitle')}
+            />
+            <div className="absolute top-4 sm:top-10 end-4 z-10">
+              <Link to="/tafsir-compare">
+                <Button variant="outline" className="gap-2 bg-background/80 backdrop-blur">
+                  <Columns className="w-4 h-4 text-primary" />
+                  <span className="hidden sm:inline">{language === 'ar' ? 'مقارنة التفاسير' : 'Compare Tafsirs'}</span>
+                  <span className="sm:hidden">{language === 'ar' ? 'مقارنة' : 'Compare'}</span>
+                </Button>
+              </Link>
+            </div>
+          </div>
 
           <div className="grid lg:grid-cols-4 gap-6">
             {/* Sidebar - Tafsir Selection */}

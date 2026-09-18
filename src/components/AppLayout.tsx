@@ -13,7 +13,7 @@ import { useTranslation } from '@/hooks/useTranslation';
  * Page content renders via <Outlet />. Modify Header/Footer here only.
  */
 export function AppLayout() {
-  const { direction, hideAppHeader, themeColor, quranFont, location, adhanEnabled, adhanMuezzinId } = useAppStore();
+  const { direction, hideAppHeader, themeColor, quranFont, location, adhanEnabled, adhanMuezzinId, adhanPerPrayer, tahajjudReminderEnabled, duhaReminderEnabled } = useAppStore();
   const { language } = useTranslation();
 
   useEffect(() => {
@@ -25,12 +25,12 @@ export function AppLayout() {
   useEffect(() => {
     if (!location) return;
     const run = () => checkAndNotifyPrayers(
-      location.latitude, location.longitude, language, adhanEnabled, adhanMuezzinId
+      location.latitude, location.longitude, language, adhanEnabled, adhanMuezzinId, adhanPerPrayer, tahajjudReminderEnabled, duhaReminderEnabled
     );
     run();
     const interval = setInterval(run, 30_000);
     return () => clearInterval(interval);
-  }, [location, language, adhanEnabled, adhanMuezzinId]);
+  }, [location, language, adhanEnabled, adhanMuezzinId, adhanPerPrayer, tahajjudReminderEnabled, duhaReminderEnabled]);
 
   return (
     <div className="min-h-screen bg-background" dir={direction}>

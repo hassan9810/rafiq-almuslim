@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { MapPin, Clock, Loader2, RefreshCw, Search, X, Bell, BellOff, Volume2, VolumeX, Play, Pause, Square } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -53,6 +53,9 @@ export default function PrayerTimesPage() {
   const { 
     direction, location, setLocation, calculationMethod, setCalculationMethod,
     adhanEnabled, adhanMuezzinId, setAdhanEnabled, setAdhanMuezzinId,
+    adhanPerPrayer, setAdhanForPrayer,
+    tahajjudReminderEnabled, setTahajjudReminderEnabled,
+    duhaReminderEnabled, setDuhaReminderEnabled,
   } = useAppStore();
   const [prayerTimes, setPrayerTimes] = useState<PrayerTime[]>([]);
   const [loading, setLoading] = useState(false);
@@ -231,55 +234,136 @@ export default function PrayerTimesPage() {
 
                 {/* Adhan Muezzin Selector */}
                 {adhanEnabled && (
-                  <div className="flex items-center gap-2 mt-2">
-                    <span className="text-xs text-muted-foreground">{t('muezzin')}:</span>
-                    <Select dir={direction} value={adhanMuezzinId} onValueChange={setAdhanMuezzinId}>
-                      <SelectTrigger className="w-52 h-8 text-xs">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {adhanSources.map(src => (
-                          <SelectItem key={src.id} value={src.id}>
-                            {language === 'ar' ? src.nameAr : src.nameEn}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <Button
-                      variant="ghost"
-                      size="icon-sm"
-                      title={t('previewAdhan')}
-                      onClick={() => { previewAdhan(adhanMuezzinId); setAdhanState('playing'); }}
-                    >
-                      <Play className="w-3.5 h-3.5" />
-                    </Button>
-                    {/* Pause / Resume */}
-                    <Button
-                      variant="ghost"
-                      size="icon-sm"
-                      title={adhanState === 'paused' ? t('resumeAdhan') : t('pauseAdhan')}
-                      disabled={adhanState === 'idle'}
-                      onClick={() => {
-                        if (adhanState === 'paused') { resumeAdhan(); setAdhanState('playing'); }
-                        else { pauseAdhan(); setAdhanState('paused'); }
-                      }}
-                    >
-                      {adhanState === 'paused'
-                        ? <Play className="w-3.5 h-3.5 text-primary" />
-                        : <Pause className="w-3.5 h-3.5" />}
-                    </Button>
-                    {/* Stop */}
-                    <Button
-                      variant="ghost"
-                      size="icon-sm"
-                      title={t('stopAdhan')}
-                      disabled={adhanState === 'idle'}
-                      onClick={() => { stopAdhan(); setAdhanState('idle'); }}
-                    >
-                      <Square className="w-3.5 h-3.5" />
-                    </Button>
+                  <div className="mt-2 space-y-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-muted-foreground">{t('muezzin')}:</span>
+                      <Select dir={direction} value={adhanMuezzinId} onValueChange={setAdhanMuezzinId}>
+                        <SelectTrigger className="w-52 h-8 text-xs">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {adhanSources.map(src => (
+                            <SelectItem key={src.id} value={src.id}>
+                              {language === 'ar' ? src.nameAr : src.nameEn}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        title={t('previewAdhan')}
+                        onClick={() => { previewAdhan(adhanMuezzinId); setAdhanState('playing'); }}
+                      >
+                        <Play className="w-3.5 h-3.5" />
+                      </Button>
+                      {/* Pause / Resume */}
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        title={adhanState === 'paused' ? t('resumeAdhan') : t('pauseAdhan')}
+                        disabled={adhanState === 'idle'}
+                        onClick={() => {
+                          if (adhanState === 'paused') { resumeAdhan(); setAdhanState('playing'); }
+                          else { pauseAdhan(); setAdhanState('paused'); }
+                        }}
+                      >
+                        {adhanState === 'paused'
+                          ? <Play className="w-3.5 h-3.5 text-primary" />
+                          : <Pause className="w-3.5 h-3.5" />}
+                      </Button>
+                      {/* Stop */}
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        title={t('stopAdhan')}
+                        disabled={adhanState === 'idle'}
+                        onClick={() => { stopAdhan(); setAdhanState('idle'); }}
+                      >
+                        <Square className="w-3.5 h-3.5" />
+                      </Button>
+                    </div>
+
+                    {/* Per-prayer Adhan Customization */}
+                    <div className="bg-muted/30 rounded-xl p-3 space-y-2">
+                      <p className="text-xs font-semibold text-muted-foreground mb-1">
+                        {language === 'ar' ? 'تخصيص المؤذن لكل صلاة' : 'Customize Muezzin Per Prayer'}
+                      </p>
+                      {['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'].map(prayer => {
+                        const prayerNameMap: Record<string, { ar: string; en: string }> = {
+                          Fajr: { ar: 'الفجر', en: 'Fajr' },
+                          Dhuhr: { ar: 'الظهر', en: 'Dhuhr' },
+                          Asr: { ar: 'العصر', en: 'Asr' },
+                          Maghrib: { ar: 'المغرب', en: 'Maghrib' },
+                          Isha: { ar: 'العشاء', en: 'Isha' },
+                        };
+                        const currentVal = adhanPerPrayer?.[prayer] || adhanMuezzinId;
+                        return (
+                          <div key={prayer} className="flex items-center justify-between gap-2">
+                            <span className="text-xs font-medium w-16">
+                              {language === 'ar' ? prayerNameMap[prayer].ar : prayerNameMap[prayer].en}
+                            </span>
+                            <Select
+                              dir={direction}
+                              value={currentVal}
+                              onValueChange={(v) => setAdhanForPrayer(prayer, v)}
+                            >
+                              <SelectTrigger className="flex-1 h-7 text-xs">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {adhanSources.map(src => (
+                                  <SelectItem key={src.id} value={src.id}>
+                                    {language === 'ar' ? src.nameAr : src.nameEn}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
                 )}
+
+                {/* Tahajjud & Duha Reminders */}
+                <div className="flex flex-wrap items-center gap-3 mt-3">
+                  <Button
+                    variant={tahajjudReminderEnabled ? 'default' : 'outline'}
+                    size="sm"
+                    className="gap-1.5 text-xs"
+                    onClick={() => {
+                      if (!tahajjudReminderEnabled && !isNotificationsEnabled()) {
+                        handleToggleNotifications();
+                      }
+                      setTahajjudReminderEnabled(!tahajjudReminderEnabled);
+                      toast({ title: tahajjudReminderEnabled
+                        ? (language === 'ar' ? 'تم تعطيل منبه قيام الليل' : 'Tahajjud reminder disabled')
+                        : (language === 'ar' ? 'تم تفعيل منبه قيام الليل' : 'Tahajjud reminder enabled')
+                      });
+                    }}
+                  >
+                    🌙 {language === 'ar' ? 'منبه قيام الليل' : 'Tahajjud'}
+                  </Button>
+                  <Button
+                    variant={duhaReminderEnabled ? 'default' : 'outline'}
+                    size="sm"
+                    className="gap-1.5 text-xs"
+                    onClick={() => {
+                      if (!duhaReminderEnabled && !isNotificationsEnabled()) {
+                        handleToggleNotifications();
+                      }
+                      setDuhaReminderEnabled(!duhaReminderEnabled);
+                      toast({ title: duhaReminderEnabled
+                        ? (language === 'ar' ? 'تم تعطيل منبه الضحى' : 'Duha reminder disabled')
+                        : (language === 'ar' ? 'تم تفعيل منبه الضحى' : 'Duha reminder enabled')
+                      });
+                    }}
+                  >
+                    ☀️ {language === 'ar' ? 'منبه صلاة الضحى' : 'Duha Prayer'}
+                  </Button>
+                </div>
+
                 
                 {showSearch && (
                   <div className="w-full max-w-sm mt-4 space-y-2">

@@ -67,6 +67,12 @@ interface AppState {
   // Adhan
   adhanEnabled: boolean;
   adhanMuezzinId: string;
+  /** Per-prayer muezzin override: { Fajr: 'makkah', Dhuhr: 'egypt', ... } */
+  adhanPerPrayer: Record<string, string>;
+
+  // Night prayer & Duha reminders
+  tahajjudReminderEnabled: boolean;
+  duhaReminderEnabled: boolean;
 
   // Actions
   setLanguage: (lang: 'ar' | 'en') => void;
@@ -85,6 +91,9 @@ interface AppState {
   setHideAppHeader: (hide: boolean) => void;
   setAdhanEnabled: (enabled: boolean) => void;
   setAdhanMuezzinId: (id: string) => void;
+  setAdhanForPrayer: (prayer: string, muezzinId: string) => void;
+  setTahajjudReminderEnabled: (enabled: boolean) => void;
+  setDuhaReminderEnabled: (enabled: boolean) => void;
 }
 
 export const useAppStore = create<AppState>()(
@@ -116,6 +125,9 @@ export const useAppStore = create<AppState>()(
       hideAppHeader: false,
       adhanEnabled: false,
       adhanMuezzinId: DEFAULT_ADHAN_ID,
+      adhanPerPrayer: {},
+      tahajjudReminderEnabled: false,
+      duhaReminderEnabled: false,
 
       // Actions
       setLanguage: (lang) => set({ 
@@ -175,6 +187,11 @@ export const useAppStore = create<AppState>()(
       setHideAppHeader: (hide) => set({ hideAppHeader: hide }),
       setAdhanEnabled: (enabled) => set({ adhanEnabled: enabled }),
       setAdhanMuezzinId: (id) => set({ adhanMuezzinId: id }),
+      setAdhanForPrayer: (prayer, muezzinId) => set({
+        adhanPerPrayer: { ...get().adhanPerPrayer, [prayer]: muezzinId },
+      }),
+      setTahajjudReminderEnabled: (enabled) => set({ tahajjudReminderEnabled: enabled }),
+      setDuhaReminderEnabled: (enabled) => set({ duhaReminderEnabled: enabled }),
     }),
     {
       name: 'rafiq-muslim-storage',
@@ -191,6 +208,9 @@ export const useAppStore = create<AppState>()(
         calculationMethod: state.calculationMethod,
         adhanEnabled: state.adhanEnabled,
         adhanMuezzinId: state.adhanMuezzinId,
+        adhanPerPrayer: state.adhanPerPrayer,
+        tahajjudReminderEnabled: state.tahajjudReminderEnabled,
+        duhaReminderEnabled: state.duhaReminderEnabled,
       }),
     }
   )

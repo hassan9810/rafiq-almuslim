@@ -158,14 +158,75 @@ export async function searchQuran(query: string): Promise<any> {
 
 // Available translations
 export const translations = [
+  { code: 'en.hilali', name: 'Hilali & Khan', language: 'English' },
   { code: 'en.sahih', name: 'Sahih International', language: 'English' },
   { code: 'en.pickthall', name: 'Pickthall', language: 'English' },
   { code: 'en.yusufali', name: 'Yusuf Ali', language: 'English' },
+  { code: 'en.shakir', name: 'Shakir', language: 'English' },
+  { code: 'en.arberry', name: 'Arberry', language: 'English' },
   { code: 'ar.muyassar', name: 'المیسر', language: 'Arabic' },
   { code: 'ur.jalandhry', name: 'جالندہری', language: 'Urdu' },
   { code: 'fr.hamidullah', name: 'Hamidullah', language: 'French' },
   { code: 'de.aburida', name: 'Abu Rida', language: 'German' },
   { code: 'tr.diyanet', name: 'Diyanet', language: 'Turkish' },
+  { code: 'es.cortes', name: 'Cortes', language: 'Spanish' },
   { code: 'id.indonesian', name: 'Indonesian', language: 'Indonesian' },
+  { code: 'ms.basmeih', name: 'Basmeih', language: 'Malay' },
   { code: 'bn.bengali', name: 'Bengali', language: 'Bengali' },
+  { code: 'so.abduh', name: 'Abduh', language: 'Somali' },
 ];
+
+// ---- Video generator: fetch Arabic text + translation + per-ayah audio in one request ----
+export interface VideoAyah {
+  numberInSurah: number;
+  arabic: string;
+  translation: string;
+  audio: string; // mp3 url (may be empty)
+}
+
+export interface VideoSurah {
+  number: number;
+  nameAr: string;
+  nameEn: string;
+  numberOfAyahs: number;
+  ayahs: VideoAyah[];
+}
+
+/**
+ * Fetches a surah with the Uthmani Arabic text, a translation, and a reciter's
+ * per-ayah audio in a single multi-edition call.
+ */
+export async function fetchSurahForVideo(
+  surahNumber: number,
+  audioEdition = 'ar.alafasy',
+  translationEdition = 'en.sahih'
+): Promise<VideoSurah | null> {
+  try {
+    const url = `${QURAN_API}/surah/${surahNumber}/editions/quran-uthmani,${audioEdition},${translationEdition}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    interface RawAyah { numberInSurah: number; text: string; audio?: string; audioSecondary?: string[] }
+    interface RawEdition { number: number; name: string; englishName: string; numberOfAyahs: number; ayahs: RawAyah[] }
+    const editions: RawEdition[] = data?.data || [];
+    if (editions.length < 3) throw new Error('Missing editions');
+
+    const [arabicEd, audioEd, translationEd] = editions;
+    const ayahs: VideoAyah[] = arabicEd.ayahs.map((a: RawAyah, i: number) => ({
+      numberInSurah: a.numberInSurah,
+      arabic: a.text,
+      translation: translationEd.ayahs[i]?.text || '',
+      audio: audioEd.ayahs[i]?.audio || audioEd.ayahs[i]?.audioSecondary?.[0] || '',
+    }));
+
+    return {
+      number: arabicEd.number,
+      nameAr: arabicEd.name,
+      nameEn: arabicEd.englishName,
+      numberOfAyahs: arabicEd.numberOfAyahs,
+      ayahs,
+    };
+  } catch (error) {
+    console.error('Error fetching surah for video:', error);
+    return null;
+  }
+}

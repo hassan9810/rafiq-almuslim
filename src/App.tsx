@@ -17,6 +17,9 @@ import PrayerTimesPage from "./pages/PrayerTimesPage";
 import QiblaPage from "./pages/QiblaPage";
 import RadioPage from "./pages/RadioPage";
 import TafsirPage from "./pages/TafsirPage";
+import TafsirComparePage from "./pages/TafsirComparePage";
+import ZakatPage from "./pages/ZakatPage";
+import VideoGeneratorPage from "./pages/VideoGeneratorPage";
 import HadithPage from "./pages/HadithPage";
 import AzkarPage from "./pages/AzkarPage";
 import HisnMuslimPage from "./pages/HisnMuslimPage";
@@ -60,6 +63,9 @@ const App = () => {
             <Route path="/mushaf-text" element={<TextMushafPage />} />
             <Route path="/search" element={<SearchPage />} />
             <Route path="/tafsir" element={<TafsirPage />} />
+            <Route path="/tafsir-compare" element={<TafsirComparePage />} />
+            <Route path="/zakat" element={<ZakatPage />} />
+            <Route path="/video-generator" element={<VideoGeneratorPage />} />
             <Route path="/hadith" element={<HadithPage />} />
             <Route path="/azkar" element={<AzkarPage />} />
             <Route path="/hisn-muslim" element={<HisnMuslimPage />} />

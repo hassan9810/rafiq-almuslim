@@ -168,10 +168,13 @@ export function checkAndNotifyPrayers(
   lang: string,
   adhanEnabled?: boolean,
   adhanMuezzinId?: string,
+  adhanPerPrayer?: Record<string, string>,
+  tahajjudReminderEnabled?: boolean,
+  duhaReminderEnabled?: boolean,
 ) {
   const canNotify = isNotificationsEnabled() && isNotificationSupported() && Notification.permission === 'granted';
 
-  if (!canNotify && !adhanEnabled) return;
+  if (!canNotify && !adhanEnabled && !tahajjudReminderEnabled && !duhaReminderEnabled) return;
 
   const prayers = calculatePrayerTimes(latitude, longitude);
   const now = Date.now();
@@ -181,19 +184,59 @@ export function checkAndNotifyPrayers(
   const notifiable = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
 
   for (const prayer of prayers) {
-    if (!notifiable.includes(prayer.name)) continue;
     const diff = now - prayer.time.getTime();
-    if (diff >= 0 && diff < THRESHOLD) {
+    const isInWindow = diff >= 0 && diff < THRESHOLD;
+
+    // Main prayer notifications + adhan
+    if (notifiable.includes(prayer.name) && isInWindow) {
       if (canNotify) {
         sendPrayerNotification(prayer, lang);
       }
-      if (adhanEnabled && adhanMuezzinId && !wasAdhanPlayed(prayer.name)) {
-        const source = getAdhanSource(adhanMuezzinId);
-        const url = prayer.name === 'Fajr' && source.fajrAudioUrl
-          ? source.fajrAudioUrl
-          : source.audioUrl;
-        playAdhan(url);
-        markAdhanPlayed(prayer.name);
+      if (adhanEnabled && !wasAdhanPlayed(prayer.name)) {
+        // Per-prayer adhan: check adhanPerPrayer first, then fallback to global
+        const muezzinId = adhanPerPrayer?.[prayer.name] || adhanMuezzinId;
+        if (muezzinId) {
+          const source = getAdhanSource(muezzinId);
+          const url = prayer.name === 'Fajr' && source.fajrAudioUrl
+            ? source.fajrAudioUrl
+            : source.audioUrl;
+          playAdhan(url);
+          markAdhanPlayed(prayer.name);
+        }
+      }
+    }
+
+    // Tahajjud reminder (Last Third of the night)
+    if (tahajjudReminderEnabled && canNotify && prayer.name === 'LastThird' && isInWindow) {
+      if (!wasNotified('Tahajjud')) {
+        const title = lang === 'ar'
+          ? 'حان وقت قيام الليل 🌙'
+          : 'Time for Tahajjud 🌙';
+        const body = lang === 'ar'
+          ? 'إن ناشئة الليل هي أشد وطئاً وأقوم قيلاً'
+          : 'The last third of the night - the best time for supplication';
+        try {
+          new Notification(title, { body, icon: '/favicon.ico', tag: 'tahajjud', silent: false });
+          markNotified('Tahajjud');
+        } catch (e) { console.error('Tahajjud notification error:', e); }
+      }
+    }
+
+    // Duha reminder (Sunrise + 20min)
+    if (duhaReminderEnabled && canNotify && prayer.name === 'Sunrise') {
+      const duhaTime = prayer.time.getTime() + 20 * 60_000; // 20 min after sunrise
+      const duhaDiff = now - duhaTime;
+      if (duhaDiff >= 0 && duhaDiff < THRESHOLD && !wasNotified('Duha')) {
+        const title = lang === 'ar'
+          ? 'حان وقت صلاة الضحى ☀️'
+          : 'Time for Duha Prayer ☀️';
+        const body = lang === 'ar'
+          ? 'صلاة الضحى - من حافظ عليها غُفرت ذنوبه وإن كانت مثل زبد البحر'
+          : 'Duha prayer - a voluntary prayer with great reward';
+        try {
+          new Notification(title, { body, icon: '/favicon.ico', tag: 'duha', silent: false });
+          markNotified('Duha');
+        } catch (e) { console.error('Duha notification error:', e); }
       }
     }
   }

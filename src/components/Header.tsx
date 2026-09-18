@@ -17,9 +17,11 @@ import {
   Bookmark,
   MessageSquareQuote,
   Shield,
-  Languages,
   BookImage,
-  CalendarDays
+  CalendarDays,
+  Calculator,
+  Languages,
+  Video
 } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAppStore, type ThemeColorId } from '@/store/useAppStore';
@@ -41,6 +43,8 @@ const navItems = [
   { path: '/hadith', icon: MessageSquareQuote, labelKey: 'hadith' as const },
   { path: '/translations', icon: Languages, labelKey: 'translations' as const },
   { path: '/azkar', icon: Mic2, labelKey: 'azkar' as const },
+  { path: '/zakat', icon: Calculator, labelKey: 'zakat' as const },
+  { path: '/video-generator', icon: Video, labelKey: 'videoGenerator' as const },
   { path: '/hisn-muslim', icon: Shield, labelKey: 'hisnMuslim' as const },
   { path: '/prayer-times', icon: Clock, labelKey: 'prayerTimes' as const },
   { path: '/qibla', icon: Compass, labelKey: 'qibla' as const },

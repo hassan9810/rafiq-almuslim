@@ -3,14 +3,18 @@ import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft, RotateCcw, Target, TrendingUp, Vibrate,
-  ChevronDown, ChevronUp, Plus, Minus, Trophy
+  ChevronDown, ChevronUp, Plus, Minus, Trophy, Pencil, Trash2, X
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { Input } from '@/components/ui/input';
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose,
+} from '@/components/ui/dialog';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAppStore } from '@/store/useAppStore';
 import { useTasbeehStore } from '@/store/useTasbeehStore';
@@ -44,12 +48,32 @@ export default function TasbeehPage() {
   const [vibrateEnabled, setVibrateEnabled] = useState(true);
   const [showStats, setShowStats] = useState(false);
 
+  // Custom dhikr dialog state
+  const [showAddDialog, setShowAddDialog] = useState(false);
+  const [editingDhikr, setEditingDhikr] = useState<string | null>(null);
+  const [dhikrFormAr, setDhikrFormAr] = useState('');
+  const [dhikrFormEn, setDhikrFormEn] = useState('');
+  const [dhikrFormTarget, setDhikrFormTarget] = useState(33);
+
   // Roll over day on mount
   useEffect(() => { stats.rolloverDay(); }, []);
 
+  // Merge default + custom adhkar
+  const allAdhkar = useMemo(() => {
+    const custom = (stats.customAdhkar || []).map(d => ({
+      ...d,
+      isCustom: true as const,
+    }));
+    const defaults = DEFAULT_ADHKAR.map(d => ({
+      ...d,
+      isCustom: false as const,
+    }));
+    return [...defaults, ...custom];
+  }, [stats.customAdhkar]);
+
   const currentDhikr = useMemo(
-    () => DEFAULT_ADHKAR.find(d => d.id === stats.selectedDhikr) || DEFAULT_ADHKAR[0],
-    [stats.selectedDhikr]
+    () => allAdhkar.find(d => d.id === stats.selectedDhikr) || allAdhkar[0],
+    [stats.selectedDhikr, allAdhkar]
   );
 
   const handleTap = useCallback(() => {
@@ -80,6 +104,47 @@ export default function TasbeehPage() {
 
   const changeDhikr = (id: string) => {
     setStats({ selectedDhikr: id, currentCount: 0 });
+  };
+
+  // Custom dhikr CRUD
+  const openAddDialog = () => {
+    setEditingDhikr(null);
+    setDhikrFormAr('');
+    setDhikrFormEn('');
+    setDhikrFormTarget(33);
+    setShowAddDialog(true);
+  };
+
+  const openEditDialog = (id: string) => {
+    const dhikr = stats.customAdhkar?.find(d => d.id === id);
+    if (!dhikr) return;
+    setEditingDhikr(id);
+    setDhikrFormAr(dhikr.ar);
+    setDhikrFormEn(dhikr.en);
+    setDhikrFormTarget(dhikr.target);
+    setShowAddDialog(true);
+  };
+
+  const handleSaveDhikr = () => {
+    if (!dhikrFormAr.trim() && !dhikrFormEn.trim()) return;
+    if (editingDhikr) {
+      stats.editCustomDhikr(editingDhikr, {
+        ar: dhikrFormAr.trim(),
+        en: dhikrFormEn.trim(),
+        target: dhikrFormTarget,
+      });
+    } else {
+      stats.addCustomDhikr({
+        ar: dhikrFormAr.trim(),
+        en: dhikrFormEn.trim() || dhikrFormAr.trim(),
+        target: dhikrFormTarget,
+      });
+    }
+    setShowAddDialog(false);
+  };
+
+  const handleDeleteDhikr = (id: string) => {
+    stats.removeCustomDhikr(id);
   };
 
   const goalProgress = Math.min((stats.totalToday / stats.dailyGoal) * 100, 100);
@@ -133,9 +198,16 @@ export default function TasbeehPage() {
               <SelectValue />
             </SelectTrigger>
             <SelectContent className="max-h-60 overflow-y-auto bg-popover">
-              {DEFAULT_ADHKAR.map(d => (
+              {allAdhkar.map(d => (
                 <SelectItem key={d.id} value={d.id}>
-                  {isAr ? d.ar : d.en} ({d.target})
+                  <span className="flex items-center gap-2">
+                    {isAr ? d.ar : d.en} ({d.target})
+                    {d.isCustom && (
+                      <span className="inline-block px-1.5 py-0.5 text-[10px] rounded bg-accent/20 text-accent font-semibold">
+                        {isAr ? 'مخصص' : 'Custom'}
+                      </span>
+                    )}
+                  </span>
                 </SelectItem>
               ))}
             </SelectContent>
@@ -315,11 +387,58 @@ export default function TasbeehPage() {
             )}
           </AnimatePresence>
 
-          {/* Suggested Adhkar */}
+          {/* Suggested Adhkar + Custom Adhkar */}
           <div className="bg-card rounded-2xl border border-border/50 p-4">
-            <h3 className="text-sm font-semibold text-foreground mb-3">
-              {t('suggestedAdhkar')}
-            </h3>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-semibold text-foreground">
+                {t('suggestedAdhkar')}
+              </h3>
+              <Button variant="outline" size="sm" onClick={openAddDialog} className="gap-1">
+                <Plus className="w-3.5 h-3.5" />
+                {isAr ? 'إضافة ذكر' : 'Add Dhikr'}
+              </Button>
+            </div>
+
+            {/* Custom adhkar section */}
+            {stats.customAdhkar && stats.customAdhkar.length > 0 && (
+              <div className="mb-3">
+                <h4 className="text-xs font-semibold text-muted-foreground mb-2 flex items-center gap-1.5">
+                  <span className="inline-block w-2 h-2 rounded-full bg-accent" />
+                  {isAr ? 'أذكاري المخصصة' : 'My Custom Adhkar'}
+                </h4>
+                <div className="grid grid-cols-1 gap-2">
+                  {stats.customAdhkar.map(d => (
+                    <div
+                      key={d.id}
+                      className={`flex items-center justify-between p-3 rounded-xl transition-colors ${
+                        stats.selectedDhikr === d.id
+                          ? 'bg-primary/10 ring-1 ring-primary/30'
+                          : 'bg-muted/30 hover:bg-muted/60'
+                      }`}
+                    >
+                      <button
+                        onClick={() => changeDhikr(d.id)}
+                        className="flex-1 text-start"
+                      >
+                        <p className="font-arabic text-foreground text-sm" dir="rtl">{d.ar}</p>
+                        {!isAr && <p className="text-xs text-muted-foreground">{d.en}</p>}
+                      </button>
+                      <div className="flex items-center gap-1 ms-2">
+                        <Badge variant="secondary" className="text-xs">{d.target}x</Badge>
+                        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => openEditDialog(d.id)}>
+                          <Pencil className="w-3 h-3" />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" onClick={() => handleDeleteDhikr(d.id)}>
+                          <Trash2 className="w-3 h-3" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Default adhkar */}
             <div className="grid grid-cols-1 gap-2">
               {DEFAULT_ADHKAR.filter(d => d.id !== stats.selectedDhikr).slice(0, 4).map(d => (
                 <button
@@ -338,6 +457,96 @@ export default function TasbeehPage() {
           </div>
         </div>
       </main>
+
+      {/* Add/Edit Custom Dhikr Dialog */}
+      <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+        <DialogContent className="sm:max-w-md" dir={direction}>
+          <DialogHeader>
+            <DialogTitle className="font-arabic">
+              {editingDhikr
+                ? (isAr ? 'تعديل الذكر' : 'Edit Dhikr')
+                : (isAr ? 'إضافة ذكر جديد' : 'Add New Dhikr')
+              }
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div>
+              <label className="text-sm font-medium mb-1.5 block">
+                {isAr ? 'النص العربي' : 'Arabic Text'} *
+              </label>
+              <Input
+                dir="rtl"
+                placeholder={isAr ? 'مثال: سبحان الله وبحمده' : 'e.g. سبحان الله وبحمده'}
+                value={dhikrFormAr}
+                onChange={e => setDhikrFormAr(e.target.value)}
+                className="font-arabic text-lg"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium mb-1.5 block">
+                {isAr ? 'النص الإنجليزي (اختياري)' : 'English Text (optional)'}
+              </label>
+              <Input
+                dir="ltr"
+                placeholder="e.g. SubhanAllahi wa bihamdihi"
+                value={dhikrFormEn}
+                onChange={e => setDhikrFormEn(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium mb-1.5 block">
+                {isAr ? 'العدد المستهدف' : 'Target Count'}
+              </label>
+              <div className="flex items-center gap-3">
+                <Button
+                  variant="outline" size="icon" className="h-9 w-9"
+                  onClick={() => setDhikrFormTarget(Math.max(1, dhikrFormTarget - 1))}
+                >
+                  <Minus className="w-4 h-4" />
+                </Button>
+                <Input
+                  type="number"
+                  min={1}
+                  value={dhikrFormTarget}
+                  onChange={e => setDhikrFormTarget(Math.max(1, parseInt(e.target.value) || 1))}
+                  className="w-24 text-center"
+                />
+                <Button
+                  variant="outline" size="icon" className="h-9 w-9"
+                  onClick={() => setDhikrFormTarget(dhikrFormTarget + 1)}
+                >
+                  <Plus className="w-4 h-4" />
+                </Button>
+              </div>
+              <div className="flex gap-2 mt-2 flex-wrap">
+                {[33, 50, 100, 200, 500, 1000].map(n => (
+                  <Button
+                    key={n}
+                    variant={dhikrFormTarget === n ? 'default' : 'outline'}
+                    size="sm"
+                    className="text-xs h-7"
+                    onClick={() => setDhikrFormTarget(n)}
+                  >
+                    {n}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          </div>
+          <DialogFooter className="gap-2">
+            <DialogClose asChild>
+              <Button variant="outline">{isAr ? 'إلغاء' : 'Cancel'}</Button>
+            </DialogClose>
+            <Button onClick={handleSaveDhikr} disabled={!dhikrFormAr.trim()}>
+              {editingDhikr
+                ? (isAr ? 'حفظ التعديل' : 'Save Changes')
+                : (isAr ? 'إضافة' : 'Add')
+              }
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
+

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Noto+Sans+Arabic:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Scheherazade+New:wght@400;700&family=Noto+Sans:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Noto+Sans+Arabic:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Scheherazade+New:wght@400;700&family=Noto+Sans:wght@400;500;600;700&family=Lateef:wght@400;700&family=Markazi+Text:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -7,8 +7,8 @@
 
 @font-face {
   font-family: 'QPC Hafs';
-  src: url('https://fonts.qurancdn.com/fonts/hafs/UthmanicHafs_v22.woff2') format('woff2'),
-       url('https://cdn.jsdelivr.net/gh/nicekiwi/Quran-Fonts@main/UthmanicHafs.ttf') format('truetype');
+  src: url('https://verses.quran.foundation/fonts/quran/hafs/uthmanic_hafs/UthmanicHafs1Ver18.woff2') format('woff2'),
+       url('https://cdn.jsdelivr.net/gh/quranacademy/quran-fonts@master/fonts/uthmanic/hafs/UthmanicHafs1Ver18.woff2') format('woff2');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -17,7 +17,7 @@
 /* Surah Header Decorative Font */
 @font-face {
   font-family: 'Surah Names';
-  src: url('https://fonts.qurancdn.com/fonts/surah_names/surah_names.woff2') format('woff2');
+  src: url('https://cdn.jsdelivr.net/gh/nicekiwi/Quran-Fonts@main/SurahNames.woff2') format('woff2');
   font-weight: normal;
   font-style: normal;
   font-display: swap;

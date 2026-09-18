@@ -251,12 +251,19 @@ export default function TranslationReaderPage() {
                       </div>
 
                       {/* Arabic Text */}
-                      <p className="font-arabic text-xl md:text-2xl leading-loose mb-4 text-foreground" dir="rtl">
+                      <p className="font-arabic text-xl md:text-2xl leading-loose mb-2 text-foreground" dir="rtl">
                         {ayah.arabic_text}
                         <span className="inline-block mx-2 text-primary">
                           ﴿{parseInt(ayah.aya).toLocaleString('ar-EG')}﴾
                         </span>
                       </p>
+
+                      {/* Divider */}
+                      <div className="flex items-center justify-center my-4">
+                        <div className="h-px w-16 bg-primary/20" />
+                        <div className="w-1.5 h-1.5 rounded-full bg-primary/30 mx-2" />
+                        <div className="h-px w-16 bg-primary/20" />
+                      </div>
 
                       {/* Translation */}
                       <p 
