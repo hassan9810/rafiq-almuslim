@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { useState, useEffect, useLayoutEffect, useRef, useCallback, useMemo, memo } from 'react';
 import {
   Video, Play, Square, Download, Loader2, ArrowLeft, Volume2, VolumeX,
   Type, Palette, Film, RefreshCw,
@@ -20,6 +20,9 @@ import {
   type EveryAyahReciter,
 } from '@/data/everyAyahReciters';
 import { Link } from 'react-router-dom';
+import {
+  createLayoutCache, pageForProgress, MIN_FONT_SCALE,
+} from '@/lib/quranTextLayout';
 
 // ---------------- Config ----------------
 type AspectId = '16:9' | '9:16' | '1:1';
@@ -78,6 +81,129 @@ function pickSupportedMime(): string {
   return '';
 }
 
+/**
+ * Everything the canvas needs to draw a frame. Read from refs on every frame
+ * (preview) or snapshotted once (video generation), so changing design settings
+ * never recreates the animation loop and the video matches the preview exactly.
+ */
+interface RenderSettings {
+  bgTop: string;
+  bgBottom: string;
+  textColor: string;
+  accentColor: string;
+  fontFamily: string;
+  fontScale: number;
+  showTranslation: boolean;
+  isAr: boolean;
+  surahName: string;
+  fontsVersion: number;
+}
+
+const roundRect = (ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) => {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+};
+
+const HEX_COLOR_RE = /^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
+const toSixDigitHex = (v: string) =>
+  v.length === 4 ? `#${v[1]}${v[1]}${v[2]}${v[2]}${v[3]}${v[3]}`.toLowerCase() : v.toLowerCase();
+
+interface ColorFieldProps {
+  label: string;
+  value: string;
+  /** High-frequency updates while the picker is open — must be cheap (writes a ref). */
+  onLive: (v: string) => void;
+  /** Persists the final colour in React state. */
+  onCommit: (v: string) => void;
+}
+
+/**
+ * Colour picker + hex field. Dragging inside the native picker only re-renders
+ * this small component and pushes the colour to the canvas through `onLive`;
+ * the page's React state is updated once, when the picker is closed (native
+ * `change` event), on blur, or when a valid hex is typed.
+ */
+const ColorField = memo(function ColorField({ label, value, onLive, onCommit }: ColorFieldProps) {
+  const [color, setColor] = useState(value);
+  const [text, setText] = useState(value);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const committedRef = useRef(value);
+  const latestRef = useRef(value);
+  const onCommitRef = useRef(onCommit);
+  onCommitRef.current = onCommit;
+
+  // External change of the committed value → resync local state.
+  useEffect(() => {
+    if (value !== committedRef.current) {
+      committedRef.current = value;
+      latestRef.current = value;
+      setColor(value);
+      setText(value);
+    }
+  }, [value]);
+
+  const commit = useCallback((v: string) => {
+    if (v === committedRef.current) return;
+    committedRef.current = v;
+    onCommitRef.current(v);
+  }, []);
+
+  const live = (v: string) => {
+    latestRef.current = v;
+    setColor(v);
+    setText(v);
+    onLive(v);
+  };
+
+  // React's onChange fires on every `input` event; the native `change` event fires once when the picker closes.
+  useEffect(() => {
+    const el = inputRef.current;
+    if (!el) return;
+    const onNativeChange = () => commit(el.value);
+    el.addEventListener('change', onNativeChange);
+    return () => el.removeEventListener('change', onNativeChange);
+  }, [commit]);
+
+  // Never lose an uncommitted colour (e.g. the custom-colours switch is turned off mid-drag).
+  useEffect(() => () => {
+    if (latestRef.current !== committedRef.current) onCommitRef.current(latestRef.current);
+  }, []);
+
+  return (
+    <div className="space-y-2">
+      <label className="text-xs text-muted-foreground">{label}</label>
+      <div className="flex gap-2">
+        <Input ref={inputRef} type="color" value={color} onChange={(e) => live(e.target.value)} onBlur={() => commit(latestRef.current)} className="w-12 h-10 p-1" />
+        <Input
+          type="text"
+          value={text}
+          onChange={(e) => {
+            const v = e.target.value.trim();
+            setText(e.target.value);
+            if (HEX_COLOR_RE.test(v)) {
+              const hex = toSixDigitHex(v);
+              latestRef.current = hex;
+              setColor(hex);
+              onLive(hex);
+              commit(hex);
+            }
+          }}
+          onBlur={() => setText(latestRef.current)}
+          className="flex-1"
+        />
+      </div>
+    </div>
+  );
+});
+
+/** Number of selected verses up to which the full text is listed under the dropdowns. */
+const FULL_RANGE_PREVIEW_MAX = 3;
+
 export default function VideoGeneratorPage() {
   const { t, language } = useTranslation();
   const { direction } = useAppStore();
@@ -88,7 +214,9 @@ export default function VideoGeneratorPage() {
   const [selectedSurah, setSelectedSurah] = useState(1);
   const [ayahFrom, setAyahFrom] = useState(1);
   const [ayahTo, setAyahTo] = useState(1);
-  const [surahData, setSurahData] = useState<VideoSurah | null>(null);
+  // Static Quran text + translation only. Reciter audio is layered on top in `surahData` below,
+  // so changing the reciter never refetches text or touches the selected range.
+  const [textData, setTextData] = useState<VideoSurah | null>(null);
   const [loadingSurah, setLoadingSurah] = useState(false);
 
   // Design
@@ -132,54 +260,85 @@ export default function VideoGeneratorPage() {
 
   const dims = ASPECTS[aspect];
   const theme = THEMES.find((th) => th.id === themeId) || THEMES[0];
-  const bgTop = useCustom ? customBg : theme.from;
-  const bgBottom = useCustom ? customBg : theme.to;
-  const textColor = useCustom ? customText : theme.text;
-  const accentColor = useCustom ? customText : theme.accent;
 
   // Load surah list
   useEffect(() => { fetchSurahs().then(setSurahs); }, []);
 
-  // Load selected surah (arabic + translation) then overlay EveryAyah audio URLs
+  // Load Quran text + translation. Depends ONLY on surah and translation edition (not the reciter),
+  // and never touches the selected range. Each run cancels the previous one, so a slow, older response
+  // can neither overwrite newer data nor clear the loading state of the newer request.
   useEffect(() => {
-    let active = true;
-    (async () => {
-      setLoadingSurah(true);
-      // Fetch text + translation from alquran.cloud (no audio from there)
-      const data = await fetchSurahForVideo(selectedSurah, 'ar.alafasy', translationEdition);
-      if (!active || !data) { setLoadingSurah(false); return; }
-      // Override audio URLs with EveryAyah.com (CORS-friendly)
-      const reciterObj = selectedEveryAyahReciter;
-      if (reciterObj) {
-        data.ayahs = data.ayahs.map((a) => ({
-          ...a,
-          audio: getAyahAudioUrl(reciterObj, selectedSurah, a.numberInSurah),
-        }));
-      }
-      setSurahData(data);
-      setAyahFrom(1);
-      setAyahTo(1);
-      setPreviewAyahIdx(0);
-      setLoadingSurah(false);
-    })();
-    return () => { active = false; };
-  }, [selectedSurah, selectedEveryAyahReciter, translationEdition]);
+    let cancelled = false;
+    setLoadingSurah(true);
+    // Text + translation come from alquran.cloud; its audio edition is ignored (EveryAyah is used instead).
+    fetchSurahForVideo(selectedSurah, 'ar.alafasy', translationEdition)
+      .then((data) => {
+        if (!cancelled && data && data.number === selectedSurah) setTextData(data);
+      })
+      .finally(() => { if (!cancelled) setLoadingSurah(false); });
+    return () => { cancelled = true; };
+  }, [selectedSurah, translationEdition]);
 
-  // Ensure the chosen Arabic font is loaded before drawing on canvas
+  // Text data for the selected surah with the selected reciter's EveryAyah audio URLs (CORS-friendly).
+  // Pure derivation: switching reciter only remaps audio URLs.
+  const surahData = useMemo<VideoSurah | null>(() => {
+    if (!textData || textData.number !== selectedSurah) return null; // previous surah still loaded → nothing selected yet
+    const reciterObj = selectedEveryAyahReciter;
+    if (!reciterObj) return textData;
+    return {
+      ...textData,
+      ayahs: textData.ayahs.map((a) => ({ ...a, audio: getAyahAudioUrl(reciterObj, textData.number, a.numberInSurah) })),
+    };
+  }, [textData, selectedSurah, selectedEveryAyahReciter]);
+
+  // Changing the surah is the only thing that resets the range (it's a different set of verses).
+  const handleSurahChange = (v: string) => {
+    const n = parseInt(v);
+    if (!Number.isFinite(n) || n === selectedSurah) return;
+    setSelectedSurah(n);
+    setAyahFrom(1);
+    setAyahTo(1);
+    setPreviewAyahIdx(0);
+  };
+
+  // Keep the range valid if the loaded data is shorter than the current selection (defensive; never resets a valid range).
+  useEffect(() => {
+    if (!surahData) return;
+    const count = surahData.ayahs.length;
+    if (count === 0) return;
+    setAyahFrom((f) => Math.min(Math.max(1, f), count));
+    setAyahTo((to) => Math.min(Math.max(1, to), count));
+  }, [surahData]);
+
+  // Ensure the chosen Arabic font is loaded before drawing on canvas.
+  // fontsVersionRef invalidates cached text layouts whenever font metrics may have changed.
+  const fontsVersionRef = useRef(0);
   useEffect(() => {
     setFontsReady(false);
+    let cancelled = false;
     const fontSet = (document as Document & { fonts?: FontFaceSet }).fonts;
+    const done = () => { if (!cancelled) { fontsVersionRef.current++; setFontsReady(true); } };
     if (fontSet?.load) {
       Promise.all([
         fontSet.load(`bold 48px "${fontFamily}"`),
         fontSet.load(`40px "${fontFamily}"`),
         fontSet.load('28px "Noto Sans"'),
-      ]).then(() => setFontsReady(true)).catch(() => setFontsReady(true));
+      ]).then(done).catch(done);
     } else {
-      setFontsReady(true);
+      done();
     }
+    return () => { cancelled = true; };
   }, [fontFamily]);
 
+  useEffect(() => {
+    const fontSet = (document as Document & { fonts?: FontFaceSet }).fonts;
+    if (!fontSet?.addEventListener) return;
+    const bump = () => { fontsVersionRef.current++; };
+    fontSet.addEventListener('loadingdone', bump);
+    return () => fontSet.removeEventListener('loadingdone', bump);
+  }, []);
+
+  // Single source of truth for the selected verses.
   const ayahsInRange = useCallback((): VideoAyah[] => {
     if (!surahData) return [];
     const lo = Math.min(ayahFrom, ayahTo);
@@ -187,175 +346,181 @@ export default function VideoGeneratorPage() {
     return surahData.ayahs.filter((a) => a.numberInSurah >= lo && a.numberInSurah <= hi);
   }, [surahData, ayahFrom, ayahTo]);
 
+  const rangeList = useMemo(() => ayahsInRange(), [ayahsInRange]);
+
+  // Keep the preview index valid when the range shrinks.
+  useEffect(() => {
+    setPreviewAyahIdx((i) => Math.min(i, Math.max(0, rangeList.length - 1)));
+  }, [rangeList.length]);
+
+  // ---------------- Render settings (refs, not render-time closures) ----------------
+  // The canvas reads these on every frame, so design changes show up on the next frame
+  // without re-creating drawFrame or restarting the animation loop.
+  const customColorsRef = useRef({ bg: customBg, text: customText });
+  const uiSettingsRef = useRef({ theme, useCustom, fontFamily, fontScale, showTranslation, isAr, surahName: '' });
+  useLayoutEffect(() => {
+    uiSettingsRef.current = {
+      theme, useCustom, fontFamily, fontScale, showTranslation, isAr,
+      surahName: (isAr ? surahData?.nameAr : surahData?.nameEn) || '',
+    };
+  });
+
+  const getRenderSettings = useCallback((): RenderSettings => {
+    const u = uiSettingsRef.current;
+    const c = customColorsRef.current;
+    return {
+      bgTop: u.useCustom ? c.bg : u.theme.from,
+      bgBottom: u.useCustom ? c.bg : u.theme.to,
+      textColor: u.useCustom ? c.text : u.theme.text,
+      accentColor: u.useCustom ? c.text : u.theme.accent,
+      fontFamily: u.fontFamily,
+      fontScale: u.fontScale,
+      showTranslation: u.showTranslation,
+      isAr: u.isAr,
+      surahName: u.surahName,
+      fontsVersion: fontsVersionRef.current,
+    };
+  }, []);
+
+  // Custom colour handlers: live updates write the ref only; commits also persist to state.
+  const handleBgLive = useCallback((v: string) => { customColorsRef.current.bg = v; }, []);
+  const handleBgCommit = useCallback((v: string) => { customColorsRef.current.bg = v; setCustomBg(v); }, []);
+  const handleTextLive = useCallback((v: string) => { customColorsRef.current.text = v; }, []);
+  const handleTextCommit = useCallback((v: string) => { customColorsRef.current.text = v; setCustomText(v); }, []);
+
   // ---------------- Drawing ----------------
-  const wrapText = (ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] => {
-    const words = text.split(/\s+/).filter(Boolean);
-    const lines: string[] = [];
-    let line = '';
-    for (const w of words) {
-      const test = line ? `${line} ${w}` : w;
-      if (ctx.measureText(test).width > maxWidth && line) {
-        lines.push(line);
-        line = w;
-      } else {
-        line = test;
-      }
-    }
-    if (line) lines.push(line);
-    return lines;
-  };
+  const layoutCacheRef = useRef(createLayoutCache());
 
-  const roundRect = (ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) => {
-    ctx.beginPath();
-    ctx.moveTo(x + r, y);
-    ctx.arcTo(x + w, y, x + w, y + h, r);
-    ctx.arcTo(x + w, y + h, x, y + h, r);
-    ctx.arcTo(x, y + h, x, y, r);
-    ctx.arcTo(x, y, x + w, y, r);
-    ctx.closePath();
-  };
-
-  const drawFrame = useCallback((ayah: VideoAyah | null, progress: number) => {
+  /** Shared by the live preview and MediaRecorder generation, so both render identically. */
+  const drawFrame = useCallback((ayah: VideoAyah | null, progress: number, s: RenderSettings) => {
     const canvas = canvasRef.current;
-    if (!canvas || !ayah) return;
+    if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     const W = canvas.width;
     const H = canvas.height;
 
+    if (!ayah) {
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = s.bgBottom;
+      ctx.fillRect(0, 0, W, H);
+      return;
+    }
+
+    const layout = layoutCacheRef.current(ctx, {
+      width: W,
+      height: H,
+      arabic: ayah.arabic,
+      translation: s.showTranslation && ayah.translation ? ayah.translation : null,
+      fontFamily: s.fontFamily,
+      fontScale: s.fontScale,
+    }, s.fontsVersion);
+    const g = layout.geometry;
+    const page = pageForProgress(layout, progress);
+
     // Background gradient
+    ctx.globalAlpha = 1;
     const grad = ctx.createLinearGradient(0, 0, 0, H);
-    grad.addColorStop(0, bgTop);
-    grad.addColorStop(1, bgBottom);
+    grad.addColorStop(0, s.bgTop);
+    grad.addColorStop(1, s.bgBottom);
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, W, H);
 
-    // Decorative rounded frame
-    const inset = Math.round(Math.min(W, H) * 0.04);
+    // Decorative rounded frame (only the border pulses; the text is static)
     ctx.save();
     ctx.globalAlpha = 0.35 + 0.25 * Math.sin(progress * Math.PI);
-    ctx.strokeStyle = accentColor;
+    ctx.strokeStyle = s.accentColor;
     ctx.lineWidth = Math.max(2, Math.round(Math.min(W, H) * 0.004));
-    roundRect(ctx, inset, inset, W - inset * 2, H - inset * 2, inset * 0.6);
+    roundRect(ctx, g.inset, g.inset, W - g.inset * 2, H - g.inset * 2, g.inset * 0.6);
     ctx.stroke();
     ctx.restore();
 
-    const fadeIn = Math.min(1, progress * 3);
-    const centerX = W / 2;
-    const maxWidth = W - inset * 3;
-
-    // Arabic text
-    const arSize = Math.round(H * 0.072 * fontScale);
-    const arLineHeight = arSize * 1.7;
-    ctx.font = `bold ${arSize}px "${fontFamily}", "Amiri", serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
+
+    // Arabic — fully opaque from the first frame (no fade-in)
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = s.textColor;
     ctx.direction = 'rtl';
-    const arLines = wrapText(ctx, ayah.arabic, maxWidth);
+    ctx.font = layout.arabicFont;
+    page.arabicLines.forEach((line, i) => ctx.fillText(line, g.centerX, page.startY + i * layout.lineHeight));
 
-    // Translation text
-    let trLines: string[] = [];
-    const trSize = Math.round(H * 0.03 * fontScale);
-    const trLineHeight = trSize * 1.5;
-    if (showTranslation && ayah.translation) {
-      ctx.font = `${trSize}px "Noto Sans", "Noto Sans Arabic", sans-serif`;
-      ctx.direction = 'ltr';
-      trLines = wrapText(ctx, ayah.translation, maxWidth);
-    }
-
-    const gap = showTranslation && trLines.length ? H * 0.08 : 0;
-    const blockHeight = arLines.length * arLineHeight + gap + trLines.length * trLineHeight;
-    let y = H / 2 - blockHeight / 2 + arLineHeight / 2;
-
-    // draw arabic
-    ctx.globalAlpha = fadeIn;
-    ctx.fillStyle = textColor;
-    ctx.direction = 'rtl';
-    ctx.font = `bold ${arSize}px "${fontFamily}", "Amiri", serif`;
-    for (const l of arLines) {
-      ctx.fillText(l, centerX, y);
-      y += arLineHeight;
-    }
-
-    // After drawing arabic, y is at bottom of last arabic line + arLineHeight
-    // The translation starts at: y + gap - arLineHeight + trLineHeight / 2
-    // Place divider exactly halfway in the gap
-    if (trLines.length) {
-      const arabicBottomY = y - arLineHeight / 2; // bottom edge of last arabic line
-      const translationTopY = y + gap - arLineHeight; // top edge of first translation line
-      const dividerY = (arabicBottomY + translationTopY) / 2;
-      ctx.globalAlpha = fadeIn * 0.3;
-      ctx.strokeStyle = accentColor;
-      ctx.lineWidth = Math.max(1, Math.round(H * 0.002));
-      const divW = Math.min(maxWidth * 0.3, 200);
-      ctx.beginPath();
-      ctx.moveTo(centerX - divW / 2, dividerY);
-      ctx.lineTo(centerX + divW / 2, dividerY);
-      ctx.stroke();
-    }
-
-    // draw translation
-    if (trLines.length) {
-      y += gap - arLineHeight + trLineHeight / 2;
-      ctx.globalAlpha = fadeIn * 0.9;
-      ctx.direction = 'ltr';
-      ctx.font = `${trSize}px "Noto Sans", "Noto Sans Arabic", sans-serif`;
-      for (const l of trLines) {
-        ctx.fillText(l, centerX, y);
-        y += trLineHeight;
+    if (page.translationLines.length) {
+      // Divider, centred in the gap between Arabic and translation
+      if (page.dividerY !== null) {
+        ctx.globalAlpha = 0.3;
+        ctx.strokeStyle = s.accentColor;
+        ctx.lineWidth = Math.max(1, Math.round(H * 0.002));
+        const divW = Math.min(g.safeWidth * 0.3, 200);
+        ctx.beginPath();
+        ctx.moveTo(g.centerX - divW / 2, page.dividerY);
+        ctx.lineTo(g.centerX + divW / 2, page.dividerY);
+        ctx.stroke();
       }
+      // Translation — constant opacity (no animation)
+      ctx.globalAlpha = 0.9;
+      ctx.fillStyle = s.textColor;
+      ctx.direction = layout.translationDirection;
+      ctx.font = layout.translationFont;
+      page.translationLines.forEach((line, i) =>
+        ctx.fillText(line, g.centerX, page.translationStartY + i * layout.translationLineHeight));
     }
 
     // Reference (surah name + ayah number)
     ctx.globalAlpha = 0.85;
-    ctx.direction = isAr ? 'rtl' : 'ltr';
-    const refSize = Math.round(H * 0.028);
-    ctx.font = `${refSize}px "Noto Sans", "Noto Sans Arabic", sans-serif`;
-    ctx.fillStyle = accentColor;
-    const name = isAr ? surahData?.nameAr : surahData?.nameEn;
-    ctx.fillText(`${name || ''} · ${ayah.numberInSurah}`, centerX, H - inset - refSize);
+    ctx.direction = s.isAr ? 'rtl' : 'ltr';
+    ctx.font = `${g.referenceSize}px "Noto Sans", "Noto Sans Arabic", sans-serif`;
+    ctx.fillStyle = s.accentColor;
+    ctx.fillText(`${s.surahName} · ${ayah.numberInSurah}`, g.centerX, g.referenceY);
 
     // Progress bar
     ctx.globalAlpha = 1;
-    const barY = H - inset * 0.55;
-    const barW = (W - inset * 2) * Math.max(0, Math.min(1, progress));
-    ctx.strokeStyle = accentColor;
+    const barW = (W - g.inset * 2) * Math.max(0, Math.min(1, progress));
+    ctx.strokeStyle = s.accentColor;
     ctx.lineWidth = Math.max(3, Math.round(H * 0.006));
     ctx.beginPath();
-    ctx.moveTo(inset, barY);
-    ctx.lineTo(inset + barW, barY);
+    ctx.moveTo(g.inset, g.progressBarY);
+    ctx.lineTo(g.inset + barW, g.progressBarY);
     ctx.stroke();
     ctx.globalAlpha = 1;
-  }, [bgTop, bgBottom, textColor, accentColor, fontFamily, fontScale, showTranslation, isAr, surahData]);
+  }, []);
 
   const audioCtxRef = useRef<AudioContext | null>(null);
   const destRef = useRef<MediaStreamAudioDestinationNode | null>(null);
 
+  // ---------------- Preview loop ----------------
+  const previewAyah = rangeList[Math.min(previewAyahIdx, Math.max(0, rangeList.length - 1))] ?? null;
+  const previewAyahRef = useRef<VideoAyah | null>(previewAyah);
+  const previewProgressRef = useRef(0);
+  useLayoutEffect(() => { previewAyahRef.current = previewAyah; });
+  // Identity of the previewed verse: the loop restarts its cycle only when this changes
+  // (not when the reciter's audio URLs, colours, font or theme change).
+  const previewKey = previewAyah ? `${surahData?.number}:${previewAyah.numberInSurah}` : 'none';
+
   // Preview animation loop (paused while recording)
   useEffect(() => {
     if (isRecording) return;
-    const list = ayahsInRange();
-    const ayah = list[Math.min(previewAyahIdx, Math.max(0, list.length - 1))] || null;
-    if (!ayah) {
-      const canvas = canvasRef.current;
-      const ctx = canvas?.getContext('2d');
-      if (canvas && ctx) { ctx.fillStyle = bgBottom; ctx.fillRect(0, 0, canvas.width, canvas.height); }
-      return;
-    }
     let raf = 0;
-    const start = Date.now();
+    const start = performance.now();
     const cycle = Math.max(3, durationPerAyah) * 1000;
-    const render = () => {
-      const p = ((Date.now() - start) % cycle) / cycle;
-      drawFrame(ayah, p);
+    const render = (now: number) => {
+      const p = (Math.max(0, now - start) % cycle) / cycle;
+      previewProgressRef.current = p;
+      drawFrame(previewAyahRef.current, p, getRenderSettings());
       raf = requestAnimationFrame(render);
     };
-    render();
+    render(start);
     return () => cancelAnimationFrame(raf);
-  }, [isRecording, drawFrame, ayahsInRange, previewAyahIdx, durationPerAyah, bgBottom, aspect, fontsReady]);
+  }, [isRecording, durationPerAyah, previewKey, drawFrame, getRenderSettings]);
+
+  // Resizing the canvas (aspect change) clears it; redraw synchronously so there's no blank flash.
+  useLayoutEffect(() => {
+    if (isRecording) return;
+    drawFrame(previewAyahRef.current, previewProgressRef.current, getRenderSettings());
+  }, [aspect, isRecording, drawFrame, getRenderSettings]);
 
   // ---------------- Generation ----------------
-  const playAyah = (ayah: VideoAyah, index: number, total: number) =>
+  const playAyah = (ayah: VideoAyah, index: number, total: number, settings: RenderSettings) =>
     new Promise<void>((resolve) => {
       let audio: HTMLAudioElement | null = null;
       let raf = 0;
@@ -379,7 +544,7 @@ export default function VideoGeneratorPage() {
           p = (now - start) / durMs;
         }
         p = Math.max(0, Math.min(1, p));
-        drawFrame(ayah, p);
+        drawFrame(ayah, p, settings);
         setRenderProgress(((index + p) / total) * 100);
         if (p >= 1 && !(audio && !audio.ended)) { finish(); return; }
         raf = requestAnimationFrame(step);
@@ -416,6 +581,9 @@ export default function VideoGeneratorPage() {
       return;
     }
 
+    // Freeze the design for the whole recording: exactly what the preview showed when Generate was pressed.
+    const settings = getRenderSettings();
+
     setVideoUrl(null);
     setRenderProgress(0);
     cancelRef.current = false;
@@ -449,11 +617,15 @@ export default function VideoGeneratorPage() {
         };
       });
 
+      // Pre-compute (and cache) every verse's layout before recording, so no frame stalls mid-video.
+      for (const ayah of list) drawFrame(ayah, 0, settings);
+      drawFrame(list[0], 0, settings);
+
       recorder.start();
 
       for (let i = 0; i < list.length; i++) {
         if (cancelRef.current) break;
-        await playAyah(list[i], i, list.length);
+        await playAyah(list[i], i, list.length, settings);
       }
 
       if (recorder.state !== 'inactive') recorder.stop();
@@ -489,7 +661,11 @@ export default function VideoGeneratorPage() {
 
   const ayahOptions = surahData?.ayahs ?? [];
 
-  const rangeList = ayahsInRange();
+  // Compact preview of the selected verses under the From/To dropdowns (derived from ayahsInRange()).
+  const rangeFirst = rangeList[0];
+  const rangeLast = rangeList[rangeList.length - 1];
+  const rangeLabel = rangeFirst && rangeList.length > 1 ? `${rangeFirst.numberInSurah} — ${rangeLast.numberInSurah}` : '';
+  const showFullRange = rangeList.length <= FULL_RANGE_PREVIEW_MAX;
 
   return (
     <div>
@@ -520,7 +696,7 @@ export default function VideoGeneratorPage() {
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
                     <label className="text-sm font-medium">{isAr ? 'السورة' : 'Surah'}</label>
-                    <Select value={selectedSurah.toString()} onValueChange={(v) => setSelectedSurah(parseInt(v))}>
+                    <Select value={selectedSurah.toString()} onValueChange={handleSurahChange}>
                       <SelectTrigger><SelectValue placeholder={t('selectSurah')} /></SelectTrigger>
                       <SelectContent className="max-h-80">
                         {surahs.map((s) => (
@@ -550,10 +726,37 @@ export default function VideoGeneratorPage() {
                     </div>
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    {loadingSurah
+                    {loadingSurah && !rangeList.length
                       ? (isAr ? 'جاري التحميل…' : 'Loading…')
-                      : (isAr ? `${rangeList.length} آية محددة` : `${rangeList.length} verse(s) selected`)}
+                      : (isAr
+                        ? `${rangeLabel ? `${rangeLabel} · ` : ''}${rangeList.length} آية محددة`
+                        : `${rangeLabel ? `${rangeLabel} · ` : ''}${rangeList.length} verse(s) selected`)}
                   </p>
+                  {rangeList.length > 0 && (
+                    <div className="rounded-lg border bg-muted/40 p-3 max-h-48 overflow-y-auto space-y-2" dir="rtl" aria-label={isAr ? 'الآيات المحددة' : 'Selected verses'}>
+                      {(showFullRange ? rangeList : [rangeFirst, rangeLast]).map((a, i) => (
+                        <div key={a.numberInSurah}>
+                          {!showFullRange && i === 1 && (
+                            <p className="text-center text-xs text-muted-foreground py-1" dir={direction}>
+                              {isAr ? `⋯ ${rangeList.length - 2} آية أخرى ⋯` : `⋯ ${rangeList.length - 2} more verse(s) ⋯`}
+                            </p>
+                          )}
+                          <div className="flex items-start gap-2">
+                            <span className="shrink-0 mt-1 inline-flex items-center justify-center min-w-[1.75rem] h-6 px-1 rounded-full bg-primary/10 text-primary text-[11px] font-semibold">
+                              {a.numberInSurah}
+                            </span>
+                            <p
+                              className={`text-base leading-loose text-foreground ${showFullRange ? '' : 'line-clamp-2'}`}
+                              style={{ fontFamily: `"${fontFamily}", "Amiri", serif` }}
+                              title={showFullRange ? undefined : a.arabic}
+                            >
+                              {a.arabic}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
 
@@ -595,20 +798,8 @@ export default function VideoGeneratorPage() {
                   </div>
                   {useCustom && (
                     <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <label className="text-xs text-muted-foreground">{isAr ? 'الخلفية' : 'Background'}</label>
-                        <div className="flex gap-2">
-                          <Input type="color" value={customBg} onChange={(e) => setCustomBg(e.target.value)} className="w-12 h-10 p-1" />
-                          <Input type="text" value={customBg} onChange={(e) => setCustomBg(e.target.value)} className="flex-1" />
-                        </div>
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-xs text-muted-foreground">{isAr ? 'النص' : 'Text'}</label>
-                        <div className="flex gap-2">
-                          <Input type="color" value={customText} onChange={(e) => setCustomText(e.target.value)} className="w-12 h-10 p-1" />
-                          <Input type="text" value={customText} onChange={(e) => setCustomText(e.target.value)} className="flex-1" />
-                        </div>
-                      </div>
+                      <ColorField label={isAr ? 'الخلفية' : 'Background'} value={customBg} onLive={handleBgLive} onCommit={handleBgCommit} />
+                      <ColorField label={isAr ? 'النص' : 'Text'} value={customText} onLive={handleTextLive} onCommit={handleTextCommit} />
                     </div>
                   )}
 
@@ -622,7 +813,7 @@ export default function VideoGeneratorPage() {
                     </div>
                     <div className="space-y-2">
                       <label className="text-sm font-medium">{isAr ? 'حجم الخط' : 'Text size'}: {Math.round(fontScale * 100)}%</label>
-                      <Slider value={[fontScale]} min={0.6} max={1.6} step={0.05} onValueChange={([v]) => setFontScale(v)} className="pt-3" />
+                      <Slider value={[fontScale]} min={MIN_FONT_SCALE} max={1.6} step={0.05} onValueChange={([v]) => setFontScale(v)} className="pt-3" />
                     </div>
                   </div>
 

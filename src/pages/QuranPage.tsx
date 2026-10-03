@@ -1,12 +1,12 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { BookOpen, BookText, Play, Search, Brain, Calendar, Share2, Users } from 'lucide-react';
+import { BookOpen, BookText, Play, Search, Brain, Calendar, Share2, Users, Mic2 } from 'lucide-react';
 import { SurahList } from '@/components/SurahList';
 import { useTranslation } from '@/hooks/useTranslation';
 import { PageHeader } from '@/components/PageHeader';
 
 export default function QuranPage() {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
 
   const linkClasses = "btn-islamic inline-flex items-center justify-center gap-3 rounded-xl text-base font-semibold transition-all h-auto px-6 py-3";
   const primaryLinkClasses = `${linkClasses} bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl`;
@@ -43,6 +43,10 @@ export default function QuranPage() {
             <Link to="/reciters" className={outlineLinkClasses}>
               <Users className="w-5 h-5 text-primary" />
               {t('recitersPageTitle')}
+            </Link>
+            <Link to="/tilawah" className={outlineLinkClasses}>
+              <Mic2 className="w-5 h-5 text-primary" />
+              {t('tilawahSelected')}
             </Link>
             <Link to="/ayah-player" className={outlineLinkClasses}>
               <Play className="w-5 h-5 text-primary" />
