@@ -28,13 +28,23 @@ export const ARABIC_SIZE_RATIO = 0.072;
 /** Translation font size as a fraction of canvas height at 100% scale. */
 export const TRANSLATION_SIZE_RATIO = 0.03;
 
+/**
+ * Vertical spacing. Lines are stacked from their REAL ink extents (measureText
+ * actualBoundingBoxAscent/Descent, which include tashkeel and pause marks):
+ * the distance between two baselines is at least
+ *   descent(line above) + lineGap + ascent(line below)
+ * so marks of one line can never touch the next line. `minLineHeight` only keeps
+ * a natural rhythm for lines that carry few marks.
+ */
 interface Spacing {
-  arabicLineHeight: number; // multiple of Arabic font size
-  translationLineHeight: number; // multiple of translation font size
+  arabicLineGap: number; // clear space between Arabic lines, multiple of Arabic font size
+  arabicMinLineHeight: number; // minimum baseline-to-baseline distance, multiple of Arabic font size
+  translationLineGap: number; // multiple of translation font size
+  translationMinLineHeight: number; // multiple of translation font size
   gap: number; // Arabic ink bottom → translation ink top, multiple of Arabic font size
 }
-const NORMAL_SPACING: Spacing = { arabicLineHeight: 1.7, translationLineHeight: 1.5, gap: 0.6 };
-const TIGHT_SPACING: Spacing = { arabicLineHeight: 1.45, translationLineHeight: 1.3, gap: 0.35 };
+const NORMAL_SPACING: Spacing = { arabicLineGap: 0.35, arabicMinLineHeight: 1.7, translationLineGap: 0.25, translationMinLineHeight: 1.5, gap: 0.6 };
+const TIGHT_SPACING: Spacing = { arabicLineGap: 0.18, arabicMinLineHeight: 1.3, translationLineGap: 0.15, translationMinLineHeight: 1.3, gap: 0.35 };
 
 /** Quranic pause (waqf) marks: ۖ ۗ ۘ ۙ ۚ ۛ ۜ */
 const PAUSE_MARK_RE = /[\u06D6-\u06DC]/;
@@ -159,16 +169,34 @@ export function isRtlText(text: string): boolean {
 /** Minimal subset of CanvasRenderingContext2D used by the layout (easy to fake in tests). */
 export type MeasureContext = Pick<CanvasRenderingContext2D, 'font' | 'direction' | 'textAlign' | 'textBaseline' | 'measureText'>;
 
-/** Ink width of a line: the larger of the advance width and the real glyph bounding box. */
-export function measureLineWidth(ctx: MeasureContext, text: string): number {
-  const m = ctx.measureText(text);
-  const box = (m.actualBoundingBoxLeft ?? 0) + (m.actualBoundingBoxRight ?? 0);
-  return Math.max(m.width, box);
+interface LineMetrics {
+  /** Ink width: the larger of the advance width and the real glyph bounding box. */
+  width: number;
+  /** Real ink above / below the 'middle' baseline, including all marks. */
+  ascent: number;
+  descent: number;
 }
 
-export interface WrappedLine {
+/** Measures a line's real ink box. The caller sets ctx.font/direction and textBaseline = 'middle'. */
+export function measureLine(ctx: MeasureContext, text: string): LineMetrics {
+  const m = ctx.measureText(text);
+  const box = (m.actualBoundingBoxLeft ?? 0) + (m.actualBoundingBoxRight ?? 0);
+  // Fallbacks only for environments without actualBoundingBox* (never the case in modern browsers).
+  const size = parseFloat(/(\d+(?:\.\d+)?)px/.exec(ctx.font)?.[1] ?? '16');
+  return {
+    width: Math.max(m.width, box),
+    ascent: m.actualBoundingBoxAscent ?? size,
+    descent: m.actualBoundingBoxDescent ?? size * 0.7,
+  };
+}
+
+/** Ink width of a line. */
+export function measureLineWidth(ctx: MeasureContext, text: string): number {
+  return measureLine(ctx, text).width;
+}
+
+export interface WrappedLine extends LineMetrics {
   text: string;
-  width: number;
   endsWithPause: boolean;
 }
 
@@ -179,22 +207,22 @@ export interface WrappedLine {
 export function wrapUnits(ctx: MeasureContext, units: TextUnit[], maxWidth: number): WrappedLine[] {
   const lines: WrappedLine[] = [];
   let cur = '';
-  let curWidth = 0;
+  let curMetrics: LineMetrics = { width: 0, ascent: 0, descent: 0 };
   let curPause = false;
   for (const u of units) {
     const candidate = cur ? cur + u.leading + u.display : u.display;
-    const w = measureLineWidth(ctx, candidate);
-    if (cur && w > maxWidth) {
-      lines.push({ text: cur, width: curWidth, endsWithPause: curPause });
+    const m = measureLine(ctx, candidate);
+    if (cur && m.width > maxWidth) {
+      lines.push({ text: cur, ...curMetrics, endsWithPause: curPause });
       cur = u.display;
-      curWidth = measureLineWidth(ctx, cur);
+      curMetrics = measureLine(ctx, cur);
     } else {
       cur = candidate;
-      curWidth = w;
+      curMetrics = m;
     }
     curPause = u.hasPause;
   }
-  if (cur) lines.push({ text: cur, width: curWidth, endsWithPause: curPause });
+  if (cur) lines.push({ text: cur, ...curMetrics, endsWithPause: curPause });
   return lines;
 }
 
@@ -203,16 +231,33 @@ export function wrapQuranText(ctx: MeasureContext, text: string, maxWidth: numbe
   return wrapUnits(ctx, tokenizeQuranText(text), maxWidth);
 }
 
-/** Max ink ascent/descent of a set of lines (relative to a 'middle' baseline). */
-function measureExtents(ctx: MeasureContext, lines: WrappedLine[], fontSize: number): { ascent: number; descent: number } {
-  let ascent = 0;
-  let descent = 0;
-  for (const l of lines) {
-    const m = ctx.measureText(l.text);
-    ascent = Math.max(ascent, m.actualBoundingBoxAscent ?? fontSize * 0.6);
-    descent = Math.max(descent, m.actualBoundingBoxDescent ?? fontSize * 0.6);
+export interface LineStack {
+  /** Baseline-to-baseline distance used for every line of this block. */
+  pitch: number;
+  /** From the ink top of the first line to the ink bottom of the last line. */
+  height: number;
+  /** Ink above the first baseline / below the last baseline. */
+  ascent: number;
+  descent: number;
+}
+
+/**
+ * Vertical stacking of a block of lines using their real ink extents.
+ * pitch = max(minLineHeight, max over neighbours of descent(i) + gap + ascent(i+1)),
+ * so every pair of consecutive lines keeps at least `gap` of clear space.
+ * A single uniform pitch keeps an even rhythm; because each pair is checked,
+ * the block's ink is exactly [first ascent … last descent].
+ */
+export function stackLines(lines: LineMetrics[], fontSize: number, gapEm: number, minLineHeightEm: number): LineStack {
+  if (lines.length === 0) return { pitch: 0, height: 0, ascent: 0, descent: 0 };
+  const gap = fontSize * gapEm;
+  let pitch = fontSize * minLineHeightEm;
+  for (let i = 0; i + 1 < lines.length; i++) {
+    pitch = Math.max(pitch, lines[i].descent + gap + lines[i + 1].ascent);
   }
-  return { ascent, descent };
+  const ascent = lines[0].ascent;
+  const descent = lines[lines.length - 1].descent;
+  return { pitch, ascent, descent, height: ascent + (lines.length - 1) * pitch + descent };
 }
 
 // ---------------------------------------------------------------------------
@@ -280,9 +325,16 @@ export interface QuranLayoutPage {
   translationLines: string[];
   /** 'middle' baseline Y of the first Arabic line. */
   startY: number;
-  /** 'middle' baseline Y of the first translation line. */
+  /** Baseline-to-baseline distance of this page's Arabic lines (from real ink metrics). */
+  lineHeight: number;
+  /** 'middle' baseline Y of the first translation line (below the Arabic block's real ink bottom). */
   translationStartY: number;
+  translationLineHeight: number;
   dividerY: number | null;
+  /** Ink top of the whole block (Arabic + translation). */
+  blockTop: number;
+  /** Ink bottom of the Arabic block. */
+  arabicBottom: number;
   blockHeight: number;
   /** Portion of the ayah's progress (0..1) during which this page is shown. */
   progressStart: number;
@@ -292,6 +344,7 @@ export interface QuranLayoutPage {
 export interface QuranLayout {
   geometry: FrameGeometry;
   fontSize: number;
+  /** Line heights of the first page (each page carries its own, measured from its lines). */
   lineHeight: number;
   translationFontSize: number;
   translationLineHeight: number;
@@ -312,17 +365,22 @@ interface Attempt {
   spacing: Spacing;
   arLines: WrappedLine[];
   trLines: WrappedLine[];
-  arExt: { ascent: number; descent: number };
-  trExt: { ascent: number; descent: number };
   widthOk: boolean;
 }
 
-function blockHeightOf(a: Attempt, arCount: number, trCount: number): number {
-  if (arCount === 0) return 0;
-  const arH = (arCount - 1) * a.arSize * a.spacing.arabicLineHeight + a.arExt.ascent + a.arExt.descent;
-  if (trCount === 0) return arH;
-  const trH = (trCount - 1) * a.trSize * a.spacing.translationLineHeight + a.trExt.ascent + a.trExt.descent;
-  return arH + a.arSize * a.spacing.gap + trH;
+interface BlockGeometry {
+  ar: LineStack;
+  tr: LineStack;
+  gap: number;
+  height: number;
+}
+
+/** Real height of a block made of the given Arabic and translation lines. */
+function blockOf(a: Attempt, arabic: WrappedLine[], translation: WrappedLine[]): BlockGeometry {
+  const ar = stackLines(arabic, a.arSize, a.spacing.arabicLineGap, a.spacing.arabicMinLineHeight);
+  const tr = stackLines(translation, a.trSize, a.spacing.translationLineGap, a.spacing.translationMinLineHeight);
+  const gap = arabic.length && translation.length ? a.arSize * a.spacing.gap : 0;
+  return { ar, tr, gap, height: ar.height + gap + tr.height };
 }
 
 function attempt(
@@ -339,24 +397,21 @@ function attempt(
   ctx.textBaseline = 'middle';
   ctx.direction = 'rtl';
   ctx.font = arabicFontString(arSize, input.fontFamily);
-  const arLines = wrapUnits(ctx, arUnits, maxWidth);
-  const arExt = measureExtents(ctx, arLines, arSize);
+  const arLines = wrapUnits(ctx, arUnits, maxWidth); // each line carries its real ink metrics
 
   const trSize = Math.max(1, Math.round(arSize * (TRANSLATION_SIZE_RATIO / ARABIC_SIZE_RATIO)));
   let trLines: WrappedLine[] = [];
-  let trExt = { ascent: 0, descent: 0 };
   if (trUnits.length) {
     ctx.direction = trRtl ? 'rtl' : 'ltr';
     ctx.font = translationFontString(trSize);
     trLines = wrapUnits(ctx, trUnits, maxWidth);
-    trExt = measureExtents(ctx, trLines, trSize);
   }
   const widthOk = [...arLines, ...trLines].every((l) => l.width <= maxWidth + 0.5);
-  return { arSize, trSize, spacing, arLines, trLines, arExt, trExt, widthOk };
+  return { arSize, trSize, spacing, arLines, trLines, widthOk };
 }
 
 function fitsWhole(a: Attempt, availableHeight: number): boolean {
-  return a.widthOk && blockHeightOf(a, a.arLines.length, a.trLines.length) <= availableHeight;
+  return a.widthOk && blockOf(a, a.arLines, a.trLines).height <= availableHeight;
 }
 
 /** Character weight used for page timing — base letters only, so diacritics don't skew it. */
@@ -411,19 +466,22 @@ function buildPage(
   progressEnd: number,
 ): QuranLayoutPage {
   const available = g.safeBottom - g.safeTop;
-  const blockHeight = blockHeightOf(a, arabic.length, translation.length);
-  const top = blockHeight <= available ? g.safeTop + (available - blockHeight) / 2 : g.safeTop;
-  const arLH = a.arSize * a.spacing.arabicLineHeight;
-  const startY = top + a.arExt.ascent;
-  const arabicBottom = startY + Math.max(0, arabic.length - 1) * arLH + a.arExt.descent;
-  const gap = translation.length ? a.arSize * a.spacing.gap : 0;
+  const b = blockOf(a, arabic, translation);
+  const top = b.height <= available ? g.safeTop + (available - b.height) / 2 : g.safeTop;
+  const startY = top + b.ar.ascent;
+  // Real ink bottom of the last Arabic line (not just its baseline).
+  const arabicBottom = top + b.ar.height;
   return {
     arabicLines: arabic.map((l) => l.text),
     translationLines: translation.map((l) => l.text),
     startY,
-    translationStartY: arabicBottom + gap + a.trExt.ascent,
-    dividerY: translation.length ? arabicBottom + gap / 2 : null,
-    blockHeight,
+    lineHeight: b.ar.pitch,
+    translationStartY: arabicBottom + b.gap + b.tr.ascent,
+    translationLineHeight: b.tr.pitch,
+    dividerY: translation.length ? arabicBottom + b.gap / 2 : null,
+    blockTop: top,
+    arabicBottom,
+    blockHeight: b.height,
     progressStart,
     progressEnd,
   };
@@ -441,9 +499,9 @@ function finalize(
   return {
     geometry: g,
     fontSize: a.arSize,
-    lineHeight: a.arSize * a.spacing.arabicLineHeight,
+    lineHeight: pages[0]?.lineHeight ?? 0,
     translationFontSize: a.trSize,
-    translationLineHeight: a.trSize * a.spacing.translationLineHeight,
+    translationLineHeight: pages[0]?.translationLineHeight ?? 0,
     arabicFont: arabicFontString(a.arSize, family),
     translationFont: translationFontString(a.trSize),
     translationDirection: trRtl ? 'rtl' : 'ltr',
@@ -456,10 +514,13 @@ function finalize(
 /**
  * Computes the full layout for one ayah on a canvas of the given size.
  *
+ * Every candidate is re-wrapped and re-measured with real canvas ink metrics, and
+ * lines are stacked so that no tashkeel / pause mark can touch a neighbouring line.
+ *
  * Strategy, in order:
  *  1. Normal spacing — binary-search the largest Arabic size between the
  *     60%-scale minimum and the user's requested size that fits.
- *  2. Minimum size + tighter line height / gap.
+ *  2. Minimum size + tighter (but still collision-free) spacing.
  *  3. Minimum size, normal spacing, split into the fewest timed pages that fit
  *     (breaks prefer pause marks). Text is never clipped or shrunk below the minimum.
  */
@@ -508,7 +569,7 @@ export function calculateQuranLayout(ctx: MeasureContext, input: QuranLayoutInpu
   const maxPages = Math.max(1, pageable.arLines.length);
   for (let n = 2; n <= maxPages; n++) {
     const parts = paginate(pageable, n);
-    const ok = pageable.widthOk && parts.every((p) => blockHeightOf(pageable, p.arabic.length, p.translation.length) <= available);
+    const ok = pageable.widthOk && parts.every((p) => blockOf(pageable, p.arabic, p.translation).height <= available);
     if (ok) {
       const pages = parts.map((p) => buildPage(pageable, p.arabic, p.translation, g, p.start, p.end));
       return finalize(pageable, g, family, trRtl, 'paged', pages, true);

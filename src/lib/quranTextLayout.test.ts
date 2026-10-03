@@ -1,12 +1,16 @@
 import { describe, it, expect } from 'vitest';
 import {
   tokenizeQuranText, joinUnits, joinDisplay, wrapUnits, calculateQuranLayout, calculateFrameGeometry,
-  pageForProgress, ARABIC_SIZE_RATIO, MIN_FONT_SCALE, type MeasureContext,
+  pageForProgress, stackLines, measureLine, arabicFontString, ARABIC_SIZE_RATIO, MIN_FONT_SCALE, type MeasureContext,
 } from '@/lib/quranTextLayout';
 
 const PAUSE_ONLY = /^[\u06D6-\u06DC]+$/;
 
-/** Deterministic fake canvas: combining marks have no width, everything else is 0.5em wide. */
+/**
+ * Deterministic fake canvas: combining marks have no width, everything else is 0.5em wide.
+ * Ink height varies per line like real Quranic text: pause marks / maddah raise the ascent,
+ * kasra-type marks lower the descent — so line spacing must come from per-line metrics.
+ */
 function fakeCtx(): MeasureContext {
   const ctx = {
     font: '10px x',
@@ -21,8 +25,8 @@ function fakeCtx(): MeasureContext {
         width,
         actualBoundingBoxLeft: width / 2,
         actualBoundingBoxRight: width / 2,
-        actualBoundingBoxAscent: size * 0.75,
-        actualBoundingBoxDescent: size * 0.55,
+        actualBoundingBoxAscent: size * (0.75 + (/[\u06D6-\u06DC\u0653]/.test(text) ? 0.7 : 0)),
+        actualBoundingBoxDescent: size * (0.55 + (/[\u0650\u064D]/.test(text) ? 0.45 : 0)),
       } as TextMetrics;
     },
   };
@@ -80,6 +84,24 @@ describe('wrapUnits', () => {
   });
 });
 
+describe('stackLines', () => {
+  it('uses real per-line ink so tall marks never collide with the next line', () => {
+    const lines = [
+      { width: 1, ascent: 40, descent: 30 },
+      { width: 1, ascent: 70, descent: 20 }, // stacked marks above
+      { width: 1, ascent: 30, descent: 45 },
+    ];
+    const s = stackLines(lines, 50, 0.2, 1.0);
+    expect(s.pitch).toBe(30 + 10 + 70); // descent(0) + gap + ascent(1) dominates the 50px minimum
+    expect(s.height).toBe(40 + 2 * s.pitch + 45);
+    for (let i = 1; i < lines.length; i++) {
+      const prevBottom = (i - 1) * s.pitch + lines[i - 1].descent;
+      const top = i * s.pitch - lines[i].ascent;
+      expect(top - prevBottom).toBeGreaterThanOrEqual(10);
+    }
+  });
+});
+
 describe('calculateQuranLayout', () => {
   const sizes = [[1280, 720], [720, 1280], [1080, 1080]] as const;
   const long = Array.from({ length: 18 }, () => AL_BAQARAH_2).join(' '); // ~ 2:282 length
@@ -99,12 +121,28 @@ describe('calculateQuranLayout', () => {
         expect(layout.fits).toBe(true);
         expect(layout.fontSize).toBeGreaterThanOrEqual(Math.round(h * ARABIC_SIZE_RATIO * MIN_FONT_SCALE));
         expect(layout.fontSize).toBeLessThanOrEqual(Math.round(h * ARABIC_SIZE_RATIO));
+        ctx.font = arabicFontString(layout.fontSize, 'Amiri');
         for (const page of layout.pages) {
-          const top = page.startY - layout.fontSize * 0.75;
-          expect(top).toBeGreaterThanOrEqual(g.safeTop - 0.01);
+          expect(page.blockTop).toBeGreaterThanOrEqual(g.safeTop - 0.01);
           expect(page.blockHeight).toBeLessThanOrEqual(g.safeBottom - g.safeTop + 0.01);
-          const bottom = top + page.blockHeight;
-          expect(bottom).toBeLessThanOrEqual(g.safeBottom + 0.01);
+          expect(page.blockTop + page.blockHeight).toBeLessThanOrEqual(g.safeBottom + 0.01);
+          // Real ink boxes of consecutive Arabic lines never touch.
+          const boxes = page.arabicLines.map((t, i) => {
+            const m = measureLine(ctx, t);
+            const y = page.startY + i * page.lineHeight;
+            return { top: y - m.ascent, bottom: y + m.descent };
+          });
+          expect(boxes[0].top).toBeGreaterThanOrEqual(page.blockTop - 0.01);
+          for (let i = 1; i < boxes.length; i++) expect(boxes[i].top - boxes[i - 1].bottom).toBeGreaterThan(layout.fontSize * 0.1);
+          const inkBottom = Math.max(...boxes.map((b) => b.bottom));
+          expect(page.arabicBottom).toBeGreaterThanOrEqual(inkBottom - 0.01);
+          // Translation starts below the Arabic block's real ink bottom.
+          if (page.translationLines.length) {
+            ctx.font = layout.translationFont;
+            const trTop = page.translationStartY - measureLine(ctx, page.translationLines[0]).ascent;
+            expect(trTop).toBeGreaterThan(inkBottom);
+            ctx.font = arabicFontString(layout.fontSize, 'Amiri');
+          }
         }
         // Every word appears exactly once across all pages, in order.
         expect(layout.pages.flatMap((p) => p.arabicLines).join(' ')).toBe(joinDisplay(tokenizeQuranText(arabic)));

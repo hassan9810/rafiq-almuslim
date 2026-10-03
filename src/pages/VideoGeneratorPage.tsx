@@ -201,6 +201,75 @@ const ColorField = memo(function ColorField({ label, value, onLive, onCommit }: 
   );
 });
 
+/** Arabic-Indic / Persian digits → ASCII, so "٢٨٢" can be typed too. */
+const toAsciiDigits = (v: string) =>
+  v.replace(/[\u0660-\u0669]/g, (d) => String(d.charCodeAt(0) - 0x0660)).replace(/[\u06F0-\u06F9]/g, (d) => String(d.charCodeAt(0) - 0x06F0));
+
+interface AyahNumberInputProps {
+  value: number;
+  min: number;
+  max: number;
+  disabled?: boolean;
+  ariaLabel: string;
+  /** Called only with a valid number in [min, max]. */
+  onCommit: (n: number) => void;
+}
+
+/**
+ * Typed ayah number that drives the same canonical state as the dropdown.
+ * The text is temporary while typing; only a valid number within [min, max]
+ * is committed. Invalid input is flagged and reverts on blur / Escape.
+ */
+const AyahNumberInput = memo(function AyahNumberInput({ value, min, max, disabled, ariaLabel, onCommit }: AyahNumberInputProps) {
+  const [text, setText] = useState(String(value));
+  const parse = (t: string) => {
+    const digits = toAsciiDigits(t.trim());
+    return /^\d+$/.test(digits) ? parseInt(digits, 10) : NaN;
+  };
+  const isValid = (n: number) => Number.isInteger(n) && n >= min && n <= max;
+
+  // Canonical value changed (dropdown, surah change, other field) → show it, unless the text already means it.
+  useEffect(() => {
+    setText((t) => (parse(t) === value ? t : String(value)));
+  }, [value]);
+
+  // Flag only what can't become valid by typing more digits (e.g. "2" on the way to "283" is fine).
+  const typed = parse(text);
+  const invalid = text.trim() !== '' && (Number.isNaN(typed) || typed > max || (typed < min && String(typed).length >= String(min).length));
+  const revert = () => setText(String(value));
+
+  return (
+    <Input
+      type="text"
+      inputMode="numeric"
+      autoComplete="off"
+      dir="ltr"
+      value={text}
+      disabled={disabled}
+      aria-label={ariaLabel}
+      aria-invalid={invalid || undefined}
+      title={`${min}–${max}`}
+      className={`w-[4.5rem] shrink-0 text-center tabular-nums ${invalid ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+      onChange={(e) => {
+        const t = e.target.value;
+        setText(t);
+        const n = parse(t);
+        if (isValid(n) && n !== value) onCommit(n);
+      }}
+      onBlur={() => { if (!isValid(parse(text))) revert(); else setText(String(parse(text))); }}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter') { if (isValid(parse(text))) setText(String(parse(text))); else revert(); }
+        else if (e.key === 'Escape') revert();
+        else if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+          e.preventDefault();
+          const n = Math.min(max, Math.max(min, value + (e.key === 'ArrowUp' ? 1 : -1)));
+          if (n !== value) onCommit(n);
+        }
+      }}
+    />
+  );
+});
+
 /** Number of selected verses up to which the full text is listed under the dropdowns. */
 const FULL_RANGE_PREVIEW_MAX = 3;
 
@@ -300,6 +369,18 @@ export default function VideoGeneratorPage() {
     setAyahTo(1);
     setPreviewAyahIdx(0);
   };
+
+  // From/To setters shared by the dropdowns and the typed inputs (single source of truth: ayahFrom / ayahTo).
+  const ayahCount = surahData?.ayahs.length ?? 0;
+  const selectAyahFrom = useCallback((n: number) => {
+    setAyahFrom(n);
+    setAyahTo((to) => (n > to ? n : to));
+    setPreviewAyahIdx(0);
+  }, []);
+  const selectAyahTo = useCallback((n: number) => {
+    setAyahTo(n);
+    setPreviewAyahIdx(0);
+  }, []);
 
   // Keep the range valid if the loaded data is shorter than the current selection (defensive; never resets a valid range).
   useEffect(() => {
@@ -443,7 +524,7 @@ export default function VideoGeneratorPage() {
     ctx.fillStyle = s.textColor;
     ctx.direction = 'rtl';
     ctx.font = layout.arabicFont;
-    page.arabicLines.forEach((line, i) => ctx.fillText(line, g.centerX, page.startY + i * layout.lineHeight));
+    page.arabicLines.forEach((line, i) => ctx.fillText(line, g.centerX, page.startY + i * page.lineHeight));
 
     if (page.translationLines.length) {
       // Divider, centred in the gap between Arabic and translation
@@ -463,7 +544,7 @@ export default function VideoGeneratorPage() {
       ctx.direction = layout.translationDirection;
       ctx.font = layout.translationFont;
       page.translationLines.forEach((line, i) =>
-        ctx.fillText(line, g.centerX, page.translationStartY + i * layout.translationLineHeight));
+        ctx.fillText(line, g.centerX, page.translationStartY + i * page.translationLineHeight));
     }
 
     // Reference (surah name + ayah number)
@@ -708,29 +789,40 @@ export default function VideoGeneratorPage() {
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <label className="text-sm font-medium">{isAr ? 'من آية' : 'From ayah'}</label>
-                      <Select value={ayahFrom.toString()} onValueChange={(v) => { const n = parseInt(v); setAyahFrom(n); if (n > ayahTo) setAyahTo(n); setPreviewAyahIdx(0); }} disabled={loadingSurah}>
-                        <SelectTrigger><SelectValue /></SelectTrigger>
-                        <SelectContent className="max-h-80">
-                          {ayahOptions.map((a) => <SelectItem key={a.numberInSurah} value={a.numberInSurah.toString()}>{a.numberInSurah}</SelectItem>)}
-                        </SelectContent>
-                      </Select>
+                      <div className="flex gap-2">
+                        <AyahNumberInput value={ayahFrom} min={1} max={Math.max(1, ayahCount)} disabled={loadingSurah || !ayahCount}
+                          ariaLabel={isAr ? 'رقم آية البداية' : 'From ayah number'} onCommit={selectAyahFrom} />
+                        <Select value={ayahFrom.toString()} onValueChange={(v) => selectAyahFrom(parseInt(v))} disabled={loadingSurah}>
+                          <SelectTrigger className="min-w-0 flex-1"><SelectValue /></SelectTrigger>
+                          <SelectContent className="max-h-80">
+                            {ayahOptions.map((a) => <SelectItem key={a.numberInSurah} value={a.numberInSurah.toString()}>{a.numberInSurah}</SelectItem>)}
+                          </SelectContent>
+                        </Select>
+                      </div>
                     </div>
                     <div className="space-y-2">
                       <label className="text-sm font-medium">{isAr ? 'إلى آية' : 'To ayah'}</label>
-                      <Select value={ayahTo.toString()} onValueChange={(v) => { setAyahTo(parseInt(v)); setPreviewAyahIdx(0); }} disabled={loadingSurah}>
-                        <SelectTrigger><SelectValue /></SelectTrigger>
-                        <SelectContent className="max-h-80">
-                          {ayahOptions.filter((a) => a.numberInSurah >= ayahFrom).map((a) => <SelectItem key={a.numberInSurah} value={a.numberInSurah.toString()}>{a.numberInSurah}</SelectItem>)}
-                        </SelectContent>
-                      </Select>
+                      <div className="flex gap-2">
+                        <AyahNumberInput value={ayahTo} min={ayahFrom} max={Math.max(ayahFrom, ayahCount)} disabled={loadingSurah || !ayahCount}
+                          ariaLabel={isAr ? 'رقم آية النهاية' : 'To ayah number'} onCommit={selectAyahTo} />
+                        <Select value={ayahTo.toString()} onValueChange={(v) => selectAyahTo(parseInt(v))} disabled={loadingSurah}>
+                          <SelectTrigger className="min-w-0 flex-1"><SelectValue /></SelectTrigger>
+                          <SelectContent className="max-h-80">
+                            {ayahOptions.filter((a) => a.numberInSurah >= ayahFrom).map((a) => <SelectItem key={a.numberInSurah} value={a.numberInSurah.toString()}>{a.numberInSurah}</SelectItem>)}
+                          </SelectContent>
+                        </Select>
+                      </div>
                     </div>
                   </div>
                   <p className="text-xs text-muted-foreground">
                     {loadingSurah && !rangeList.length
                       ? (isAr ? 'جاري التحميل…' : 'Loading…')
-                      : (isAr
-                        ? `${rangeLabel ? `${rangeLabel} · ` : ''}${rangeList.length} آية محددة`
-                        : `${rangeLabel ? `${rangeLabel} · ` : ''}${rangeList.length} verse(s) selected`)}
+                      : (
+                        <>
+                          {rangeLabel && <><bdi dir={isAr ? 'rtl' : 'ltr'}>{rangeLabel}</bdi>{' · '}</>}
+                          {isAr ? `${rangeList.length} آية محددة` : `${rangeList.length} verse(s) selected`}
+                        </>
+                      )}
                   </p>
                   {rangeList.length > 0 && (
                     <div className="rounded-lg border bg-muted/40 p-3 max-h-48 overflow-y-auto space-y-2" dir="rtl" aria-label={isAr ? 'الآيات المحددة' : 'Selected verses'}>
