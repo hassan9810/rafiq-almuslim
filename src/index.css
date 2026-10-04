@@ -827,6 +827,18 @@
     to   { clip-path: inset(0 0% 0 0%);   opacity: 1; }
   }
 
+  @keyframes marquee-ltr {
+    0%, 15% { transform: translateX(0); }
+    45%, 55% { transform: translateX(calc(-100% + 100cqw)); }
+    85%, 100% { transform: translateX(0); }
+  }
+
+  @keyframes marquee-rtl {
+    0%, 15% { transform: translateX(0); }
+    45%, 55% { transform: translateX(calc(100% - 100cqw)); }
+    85%, 100% { transform: translateX(0); }
+  }
+
   /* Utility animation classes */
   .animate-islamic-float          { animation: islamic-float 5s ease-in-out infinite; }
   .animate-islamic-float-delayed  { animation: islamic-float 6.5s ease-in-out infinite 1.8s; }
@@ -836,6 +848,24 @@
   .animate-gold-pulse             { animation: gold-pulse-ring 2s ease-out infinite; }
   .animate-draw-center-out        { animation: draw-center-out 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
   .animate-particle               { animation: particle-drift 4s ease-out infinite; }
+
+  .marquee-container {
+    container-type: inline-size;
+    overflow: hidden;
+    width: 100%;
+  }
+
+  .marquee-text-ltr {
+    display: inline-block;
+    white-space: nowrap;
+    animation: marquee-ltr 12s ease-in-out infinite;
+  }
+
+  .marquee-text-rtl {
+    display: inline-block;
+    white-space: nowrap;
+    animation: marquee-rtl 12s ease-in-out infinite;
+  }
 
   /* Shimmering gold text (bismillah, headings) */
   .shimmer-gold-text {

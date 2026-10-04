@@ -7,6 +7,8 @@ import {
   X,
   SkipBack,
   SkipForward,
+  RotateCcw,
+  RotateCw,
   Volume2,
   VolumeX,
   Mic2,
@@ -64,8 +66,13 @@ function normalizeArabic(value: string): string {
 
 function formatTime(seconds: number): string {
   if (!Number.isFinite(seconds)) return '0:00';
-  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
   const remaining = Math.floor(seconds % 60);
+  
+  if (hours > 0) {
+    return `${hours}:${minutes.toString().padStart(2, '0')}:${remaining.toString().padStart(2, '0')}`;
+  }
   return `${minutes}:${remaining.toString().padStart(2, '0')}`;
 }
 
@@ -77,7 +84,15 @@ function extractTracks(value: Record<string, TilawahTrack[]> | TilawahTrack[] | 
   if (!value) return [];
   if (Array.isArray(value)) return value;
   if (typeof value === 'object' && value !== null) {
-    return Object.values(value).flat();
+    // Deduplicate by URL when flattening nested objects (e.g. murattal/mujawwad
+    // can have identical tracks duplicated across multiple sub-keys like qira'at)
+    const all = Object.values(value).flat();
+    const seen = new Set<string>();
+    return all.filter((track) => {
+      if (seen.has(track.url)) return false;
+      seen.add(track.url);
+      return true;
+    });
   }
   return [];
 }
@@ -94,13 +109,21 @@ function getReciterTrackCount(reciter: TilawahReciter): number {
 
 function getReciterCategoryTracks(reciter: TilawahReciter, category: CategoryKey): TilawahTrack[] {
   if (category === 'all') {
-    return [
+    const combined = [
       ...extractTracks(reciter.murattal),
       ...extractTracks(reciter.mujawwad),
       ...extractTracks(reciter.nawader),
       ...extractTracks(reciter.purified),
       ...extractTracks(reciter.other)
     ];
+    // Deduplicate by URL across categories — the same track can exist
+    // in multiple categories (e.g. nawader + purified)
+    const seen = new Set<string>();
+    return combined.filter((track) => {
+      if (seen.has(track.url)) return false;
+      seen.add(track.url);
+      return true;
+    });
   }
   switch (category) {
     case 'nawader': return extractTracks(reciter.nawader);
@@ -127,6 +150,39 @@ function getAvailableCategories(reciter: TilawahReciter): CategoryKey[] {
 /* ── Lazy loading helper ──────────────────────────────────── */
 
 const TRACKS_PER_PAGE = 50;
+
+const MarqueeText = ({ children, isAr, className = '' }: { children: React.ReactNode, isAr: boolean, className?: string }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const textRef = useRef<HTMLDivElement>(null);
+  const [isOverflowing, setIsOverflowing] = useState(false);
+
+  useEffect(() => {
+    const checkOverflow = () => {
+      if (containerRef.current && textRef.current) {
+        setIsOverflowing(textRef.current.scrollWidth > containerRef.current.clientWidth);
+      }
+    };
+    checkOverflow();
+    // Re-check after a small delay to ensure fonts/layout are loaded
+    const timeout = setTimeout(checkOverflow, 100);
+    window.addEventListener('resize', checkOverflow);
+    return () => {
+      clearTimeout(timeout);
+      window.removeEventListener('resize', checkOverflow);
+    };
+  }, [children]);
+
+  return (
+    <div ref={containerRef} className={`marquee-container ${className}`}>
+      <div
+        ref={textRef}
+        className={isOverflowing ? (isAr ? 'marquee-text-rtl' : 'marquee-text-ltr') : 'truncate'}
+      >
+        {children}
+      </div>
+    </div>
+  );
+};
 
 /* ── Main Component ───────────────────────────────────────── */
 
@@ -298,6 +354,15 @@ export default function TilawahPage() {
   const handleSeek = (value: number[]) => {
     if (!audioRef.current || !duration) return;
     const nextTime = (value[0] / 100) * duration;
+    audioRef.current.currentTime = nextTime;
+    setCurrentTime(nextTime);
+  };
+
+  const handleSeekDelta = (delta: number) => {
+    if (!audioRef.current || !duration) return;
+    let nextTime = audioRef.current.currentTime + delta;
+    if (nextTime < 0) nextTime = 0;
+    if (nextTime > duration) nextTime = duration;
     audioRef.current.currentTime = nextTime;
     setCurrentTime(nextTime);
   };
@@ -536,7 +601,9 @@ export default function TilawahPage() {
                             )}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <div className="text-sm font-semibold truncate">{track.title.trim()}</div>
+                            <MarqueeText isAr={isAr} className="text-sm font-semibold">
+                              {track.title.trim()}
+                            </MarqueeText>
                             {track.surahs.length > 0 && (
                               <div className="text-xs text-muted-foreground mt-0.5 truncate">
                                 {track.surahs.join(' • ')}
@@ -589,9 +656,9 @@ export default function TilawahPage() {
                       <div className="text-sm text-muted-foreground">
                         {selectedReciter?.author_name || (isAr ? 'اختر قارئًا' : 'Select a reciter')}
                       </div>
-                      <div className="text-base font-semibold truncate">
+                      <MarqueeText isAr={isAr} className="text-base font-semibold">
                         {currentTrack?.title.trim() || (isAr ? 'اختر تلاوة للتشغيل' : 'Select a recitation')}
-                      </div>
+                      </MarqueeText>
                       {currentTrack?.surahs && currentTrack.surahs.length > 0 && (
                         <div className="text-xs text-muted-foreground truncate">
                           {currentTrack.surahs.join(' • ')}
@@ -599,17 +666,22 @@ export default function TilawahPage() {
                       )}
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2" dir="ltr">
                       <Button variant="outline" size="icon" onClick={handlePrevTrack} disabled={!currentTrackUrl}>
                         <SkipBack className="w-4 h-4" />
+                      </Button>
+                      <Button variant="outline" size="icon" onClick={() => handleSeekDelta(-10)} disabled={!currentTrackUrl}>
+                        <RotateCcw className="w-4 h-4" />
                       </Button>
                       <Button
                         onClick={handlePlayPause}
                         disabled={!currentTrackUrl}
-                        className="gap-2 rounded-xl"
+                        className="gap-2 rounded-xl px-4"
                       >
                         {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-                        {isPlaying ? t('pause') : t('play')}
+                      </Button>
+                      <Button variant="outline" size="icon" onClick={() => handleSeekDelta(10)} disabled={!currentTrackUrl}>
+                        <RotateCw className="w-4 h-4" />
                       </Button>
                       <Button variant="outline" size="icon" onClick={handleNextTrack} disabled={!currentTrackUrl}>
                         <SkipForward className="w-4 h-4" />
@@ -618,8 +690,8 @@ export default function TilawahPage() {
                   </div>
 
                   <div className="flex flex-col sm:flex-row gap-4 items-center">
-                    <div className="flex items-center gap-3 w-full">
-                      <span className="text-xs text-muted-foreground min-w-[42px] text-start">
+                    <div className="flex items-center gap-3 w-full" dir="ltr">
+                      <span className="text-xs text-muted-foreground min-w-[42px] text-end">
                         {formatTime(currentTime)}
                       </span>
                       <Slider
@@ -629,7 +701,7 @@ export default function TilawahPage() {
                         step={0.1}
                         className="w-full"
                       />
-                      <span className="text-xs text-muted-foreground min-w-[42px] text-end">
+                      <span className="text-xs text-muted-foreground min-w-[42px] text-start">
                         {formatTime(duration)}
                       </span>
                     </div>
